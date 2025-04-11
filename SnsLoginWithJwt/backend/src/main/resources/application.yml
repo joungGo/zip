@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb  # H2 인메모리 데이터베이스 URL
+    driver-class-name: org.h2.Driver  # H2 JDBC 드라이버
+    username: sa  # 데이터베이스 사용자 이름
+    password:  # 데이터베이스 비밀번호
+  h2:
+    console:
+      enabled: true  # H2 콘솔 활성화
+      path: /h2-console  # H2 콘솔 접근 경로
+  jpa:
+    hibernate:
+      ddl-auto: update  # 엔티티 변경 시 데이터베이스 스키마 자동 업데이트
+    show-sql: true  # SQL 쿼리 로깅 활성화
+  security:
+    oauth2:
+      client:
+        registration:
+          google:  # Google OAuth2 설정
+            client-id: ${GOOGLE_CLIENT_ID}  # Google 클라이언트 ID (환경 변수에서 가져옴)
+            client-secret: ${GOOGLE_CLIENT_SECRET}  # Google 클라이언트 시크릿 (환경 변수에서 가져옴)
+            scope:  # 요청할 권한 범위
+              - email  # 이메일 정보
+              - profile  # 프로필 정보
+          kakao:  # Kakao OAuth2 설정
+            client-id: ${KAKAO_CLIENT_ID}  # Kakao 클라이언트 ID (환경 변수에서 가져옴)
+            client-secret: ${KAKAO_CLIENT_SECRET}  # Kakao 클라이언트 시크릿 (환경 변수에서 가져옴)
+            authorization-grant-type: authorization_code  # 인증 코드 방식 사용
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao  # 리다이렉트 URI
+            scope:  # 요청할 권한 범위
+              - profile_nickname  # 닉네임 정보
+              - account_email  # 이메일 정보
+
+jwt:
+  secret: your-secret-key-here-must-be-at-least-32-characters-long  # JWT 서명에 사용할 비밀키
+  expiration: 86400000  # JWT 토큰 만료 시간 (24시간, 밀리초) 
