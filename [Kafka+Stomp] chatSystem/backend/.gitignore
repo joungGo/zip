@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### spring-boot-devtools ###
-/src/resources/*.yml
+C:\Users\jounghyeon\기술(개념) 코드 모음\[Kafka+Stomp] chatSystem\backend\src\main\resources\*.yml
