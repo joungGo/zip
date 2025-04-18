@@ -1,103 +1,130 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { ChatRoomList } from './components/ChatRoomList';
+import { ChatRoom } from './components/ChatRoom';
+import { ChatRoom as ChatRoomType } from '@/types';
+import { webSocketService } from '@/services/websocket';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [username, setUsername] = useState<string>('');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [selectedRoom, setSelectedRoom] = useState<ChatRoomType | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    // 로컬 스토리지에서 사용자 이름 가져오기
+    const savedUsername = localStorage.getItem('chat_username');
+    if (savedUsername) {
+      setUsername(savedUsername);
+      setIsLoggedIn(true);
+      // 웹소켓 연결
+      webSocketService.connect(savedUsername);
+    }
+  }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!username.trim()) return;
+    
+    // 로컬 스토리지에 사용자 이름 저장
+    localStorage.setItem('chat_username', username);
+    setIsLoggedIn(true);
+    
+    // 웹소켓 연결
+    webSocketService.connect(username);
+  };
+
+  const handleLogout = () => {
+    // 웹소켓 연결 해제
+    webSocketService.disconnect();
+    
+    // 로컬 스토리지에서 사용자 이름 제거
+    localStorage.removeItem('chat_username');
+    
+    setIsLoggedIn(false);
+    setSelectedRoom(null);
+  };
+
+  const handleRoomSelect = (room: ChatRoomType) => {
+    setSelectedRoom(room);
+  };
+
+  const handleLeaveRoom = () => {
+    setSelectedRoom(null);
+  };
+
+  // 로그인 폼
+  if (!isLoggedIn) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-100">
+        <div className="bg-white p-8 rounded-lg shadow-md w-96">
+          <h1 className="text-2xl font-bold mb-6 text-center">채팅 앱 로그인</h1>
+          <form onSubmit={handleLogin}>
+            <div className="mb-4">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium mb-2"
+              >
+                사용자 이름
+              </label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded"
+                placeholder="사용자 이름을 입력하세요"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+            >
+              입장하기
+            </button>
+          </form>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen">
+      <div className="flex flex-col h-full">
+        <div className="p-3 bg-blue-600 text-white flex justify-between items-center">
+          <div className="font-bold">안녕하세요, {username}님!</div>
+          <button
+            onClick={handleLogout}
+            className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+          >
+            로그아웃
+          </button>
+        </div>
+        <ChatRoomList
+          username={username}
+          onRoomSelect={handleRoomSelect}
+          selectedRoomId={selectedRoom?.id}
+        />
+      </div>
+
+      <div className="flex-1">
+        {selectedRoom ? (
+          <ChatRoom
+            room={selectedRoom}
+            username={username}
+            onLeaveRoom={handleLeaveRoom}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        ) : (
+          <div className="flex h-full items-center justify-center bg-gray-100">
+            <div className="text-center text-gray-500">
+              <p className="text-xl mb-2">채팅방을 선택하세요</p>
+              <p className="text-sm">왼쪽 목록에서 채팅방을 선택하거나 새로운 채팅방을 만드세요.</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

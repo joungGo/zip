@@ -1,0 +1,71 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Certainly! Here's the complete and detailed translation of the content in English:
+
+---
+
+### Key Principles
+
+1. **Writing Concise, Accurate TypeScript Examples**:
+   - Use functional, declarative programming. Avoid classes.
+   - Prefer iteration and modularization over duplication.
+   - Use descriptive variable names with auxiliary verbs (e.g., `isLoading`).
+   - Use lowercase with dashes for directories (e.g., `components/auth-wizard`).
+   - Favor named exports for components.
+   - Follow the **Receive an Object, Return an Object (RORO)** pattern.
+
+2. **JavaScript/TypeScript**:
+   - Use the `function` keyword for pure functions. Omit semicolons.
+   - Write all code in TypeScript. Prefer interfaces over types. Avoid enums, use maps.
+   - Maintain a clean file structure: Exported components, subcomponents, helpers, static content, types.
+   - Avoid unnecessary curly braces in conditional statements.
+   - For simple conditional statements, omit curly braces.
+   - Write simple conditional statements in a concise one-liner (e.g., `if (condition) doSomething()`).
+
+3. **Error Handling and Validation**:
+   - Prioritize error handling and edge cases:
+     - Handle errors and edge cases at the beginning of functions.
+     - Use early returns for error conditions to avoid deeply nested `if` statements.
+     - Place the "happy path" last in the function to improve readability.
+     - Avoid unnecessary `else` statements; use the **if-return** pattern instead.
+     - Use guard clauses to handle preconditions and invalid states early.
+     - Implement proper error logging and user-friendly error messages.
+     - Consider using custom error types or error factories for consistent error handling.
+
+4. **React/Next.js**:
+   - Use functional components and TypeScript interfaces.
+   - Write declarative JSX.
+   - Prefer function-based components over constant-based components.
+   - Use Shadcn UI, Radix, and Tailwind Aria for components and styling.
+   - Implement responsive design with Tailwind CSS, following a mobile-first approach.
+   - Place static content and interfaces at the end of the file.
+   - Use content variables for static content outside render functions.
+   - Minimize the use of `use client`, `useEffect`, and `setState`. Prioritize **React Server Components (RSC)**.
+   - Use Zod for form validation.
+   - Wrap client components in `Suspense` with a fallback.
+   - Use dynamic loading for non-critical components.
+   - Optimize images: Use WebP format, ensure appropriate size, and lazy load.
+   - Model expected errors as return values: Avoid using `try/catch` for expected errors in Server Actions. Use `useActionState` to manage these errors and return them to the client.
+   - Use error boundaries for unexpected errors: Implement error boundaries using `error.tsx` and `global-error.tsx` files to handle unexpected errors and provide fallback UI.
+   - Use `useActionState` with `react-hook-form` for form validation.
+   - Code in the services directory should always throw user-friendly errors that **tanStackQuery** can catch and display to the user.
+   - For all server actions, use **next-safe-action**:
+     - Implement type-safe server actions with proper validation.
+     - Utilize the `action` function from **next-safe-action** for creating actions.
+     - Define input schemas using **Zod** for robust type checking and validation.
+     - Handle errors gracefully and return appropriate responses.
+     - Ensure all server actions return the `ActionResponse` type.
+     - Implement consistent error handling and success responses using **ActionResponse**.
+
+5. **Key Conventions**:
+   1. Rely on **Next.js App Router** for state changes.
+   2. Prioritize **Web Vitals** (LCP, CLS, FID).
+   3. Minimize the use of `use client`:
+      - Prefer **server components** and Next.js SSR features.
+      - Use `use client` only for Web API access in small components.
+      - Avoid using `use client` for data fetching or state management.
+
+   Refer to the **Next.js documentation** for best practices on data fetching, rendering, and routing.
