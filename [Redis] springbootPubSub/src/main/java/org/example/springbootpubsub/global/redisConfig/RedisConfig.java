@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -38,9 +39,9 @@ public class RedisConfig {
      * application.yml에서 정의된 Redis 연결 속성들을 주입받는 객체
      * 
      * 포함 정보:
-     * - host: Redis 서버 주소
-     * - port: Redis 서버 포트
-     * - password: Redis 인증 비밀번호
+     * - host: Redis 서버 주소 (localhost)
+     * - port: Redis 서버 포트 (6379)
+     * - password: Redis 인증 비밀번호 (pk2258)
      * - timeout: 연결 타임아웃 등
      */
     private final RedisProperties redisProperties;
@@ -48,20 +49,53 @@ public class RedisConfig {
     /**
      * Redis 연결 팩토리를 생성하는 Bean
      * 
+     * application.yml의 모든 Redis 설정을 반영하여 연결을 생성합니다.
      * Lettuce 클라이언트를 사용하여 Redis 서버와의 연결을 관리합니다.
-     * Lettuce는 Redis의 공식 Java 클라이언트 중 하나로, 
-     * 비동기 및 동기 작업을 모두 지원하며 성능이 우수합니다.
      * 
      * Lettuce vs Jedis:
      * - Lettuce: 비동기 지원, 더 나은 성능, Spring Boot 기본값
      * - Jedis: 동기 전용, 단순한 API, 레거시 프로젝트에서 사용
      * 
+     * Redis 연결 설정:
+     * - Host: localhost (application.yml에서 설정)
+     * - Port: 6379 (application.yml에서 설정)
+     * - Password: pk2258 (application.yml에서 설정)
+     * - Database: 0 (기본값)
+     * 
      * @return RedisConnectionFactory Redis 연결을 생성하고 관리하는 팩토리
      */
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        // LettuceConnectionFactory를 사용하여 Redis 서버에 연결
-        return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
+        // Redis 독립 실행형 서버 설정 생성
+        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
+        
+        // application.yml에서 설정된 host 정보 적용
+        redisConfig.setHostName(redisProperties.getHost());
+        log.info("Redis Host 설정: {}", redisProperties.getHost());
+        
+        // application.yml에서 설정된 port 정보 적용
+        redisConfig.setPort(redisProperties.getPort());
+        log.info("Redis Port 설정: {}", redisProperties.getPort());
+        
+        // application.yml에서 설정된 password 정보 적용
+        if (redisProperties.getPassword() != null && !redisProperties.getPassword().isEmpty()) {
+            redisConfig.setPassword(redisProperties.getPassword());
+            log.info("Redis Password 설정 완료 (보안상 값은 로그에 표시하지 않음)");
+        } else {
+            log.info("Redis Password 설정 없음 (인증 없는 연결)");
+        }
+        
+        // 데이터베이스 번호 설정 (기본값: 0)
+        redisConfig.setDatabase(redisProperties.getDatabase());
+        log.info("Redis Database 설정: {}", redisProperties.getDatabase());
+        
+        // LettuceConnectionFactory 생성 및 설정 적용
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(redisConfig);
+        
+        log.info("Redis 연결 팩토리 생성 완료 - {}:{}", 
+                 redisProperties.getHost(), redisProperties.getPort());
+        
+        return factory;
     }
 
     /**
@@ -86,7 +120,7 @@ public class RedisConfig {
     public RedisTemplate<?, ?> redisTemplate() {
         RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
         
-        // Redis 연결 팩토리 설정
+        // Redis 연결 팩토리 설정 (위에서 생성한 connectionFactory 사용)
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         
         // Key 직렬화: 문자열 그대로 저장 (예: "user:123")
@@ -95,6 +129,8 @@ public class RedisConfig {
         // Value 직렬화: Java 객체를 JSON 문자열로 변환하여 저장
         // 예: MessageDto 객체 -> {"message":"안녕", "sender":"user1", "roomId":"room1"}
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
+        
+        log.info("RedisTemplate 설정 완료 - Key: String, Value: JSON");
         
         return redisTemplate;
     }
@@ -128,6 +164,8 @@ public class RedisConfig {
         
         // Redis 연결 팩토리 설정 (위에서 생성한 connectionFactory 사용)
         container.setConnectionFactory(redisConnectionFactory());
+        
+        log.info("Redis Message Listener Container 설정 완료");
         
         return container;
     }
