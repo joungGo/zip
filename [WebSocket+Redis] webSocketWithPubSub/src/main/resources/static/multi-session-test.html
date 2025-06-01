@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi WebSocket Session Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .sessions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .session-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            border: 2px solid #ddd;
+        }
+        
+        .session-card.connected {
+            border-color: #28a745;
+        }
+        
+        .session-card.disconnected {
+            border-color: #dc3545;
+        }
+        
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .session-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .session-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .session-controls {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .session-controls button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .btn-connect {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-disconnect {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-connect:disabled, .btn-disconnect:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .message-area {
+            height: 200px;
+            border: 1px solid #ddd;
+            padding: 8px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        
+        .message-input-group {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .btn-send {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .btn-send:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .global-controls {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .global-controls h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .global-button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .global-button-group button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .broadcast-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .broadcast-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .stats {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Multi WebSocket Session Test</h1>
+        <p>여러 WebSocket 세션을 동시에 관리하고 브로드캐스트 메시지를 테스트할 수 있습니다.</p>
+    </div>
+
+    <div class="global-controls">
+        <h3>전체 제어</h3>
+        
+        <div class="stats" id="globalStats">
+            활성 세션: 0개 | 총 생성된 세션: 0개
+        </div>
+        
+        <div class="global-button-group">
+            <button class="btn-primary" onclick="createNewSession()">새 세션 추가</button>
+            <button class="btn-success" onclick="connectAllSessions()">모든 세션 연결</button>
+            <button class="btn-warning" onclick="disconnectAllSessions()">모든 세션 해제</button>
+            <button class="btn-danger" onclick="removeAllSessions()">모든 세션 제거</button>
+        </div>
+        
+        <div class="global-button-group">
+            <button class="btn-primary" onclick="getSessionCount()">서버 세션 수 조회</button>
+            <button class="btn-primary" onclick="getServerStatus()">서버 상태 조회</button>
+        </div>
+        
+        <div class="broadcast-group">
+            <input type="text" class="broadcast-input" id="broadcastMessage" 
+                   placeholder="모든 세션에 브로드캐스트할 메시지를 입력하세요...">
+            <button class="btn-success" onclick="sendBroadcast()">브로드캐스트 전송</button>
+        </div>
+    </div>
+
+    <div class="sessions-container" id="sessionsContainer">
+        <!-- 세션 카드들이 동적으로 추가됩니다 -->
+    </div>
+
+    <script>
+        // ========== 전역 변수 ==========
+        
+        /**
+         * 모든 WebSocket 세션을 관리하는 배열
+         * 각 요소는 세션 정보 객체 { id, websocket, element, connected }
+         */
+        let sessions = [];
+        
+        /**
+         * 세션 ID 생성을 위한 카운터
+         */
+        let sessionCounter = 0;
+
+        // ========== 세션 관리 함수 ==========
+        
+        /**
+         * 새로운 WebSocket 세션을 생성하는 함수
+         */
+        function createNewSession() {
+            sessionCounter++;
+            const sessionId = `session-${sessionCounter}`;
+            
+            console.log(`🆕 새 세션 생성: ${sessionId}`);
+            
+            // 세션 객체 생성
+            const session = {
+                id: sessionId,
+                websocket: null,
+                element: null,
+                connected: false
+            };
+            
+            // 세션 UI 요소 생성
+            session.element = createSessionElement(session);
+            
+            // 세션 배열에 추가
+            sessions.push(session);
+            
+            // DOM에 세션 카드 추가
+            document.getElementById('sessionsContainer').appendChild(session.element);
+            
+            // 통계 업데이트
+            updateGlobalStats();
+            
+            console.log(`새 세션 생성: ${sessionId}`);
+        }
+        
+        /**
+         * 세션 UI 요소를 생성하는 함수
+         * @param {Object} session - 세션 객체
+         * @returns {HTMLElement} 생성된 세션 카드 요소
+         */
+        function createSessionElement(session) {
+            const sessionCard = document.createElement('div');
+            sessionCard.className = 'session-card disconnected';
+            sessionCard.id = session.id;
+            
+            sessionCard.innerHTML = `
+                <div class="session-header">
+                    <div class="session-title">${session.id}</div>
+                    <div class="session-status status-disconnected">연결 안됨</div>
+                </div>
+                
+                <div class="session-controls">
+                    <button class="btn-connect" onclick="connectSession('${session.id}')">연결</button>
+                    <button class="btn-disconnect" onclick="disconnectSession('${session.id}')" disabled>해제</button>
+                    <button class="btn-danger" onclick="removeSession('${session.id}')">제거</button>
+                </div>
+                
+                <div class="message-area" id="messages-${session.id}"></div>
+                
+                <div class="message-input-group">
+                    <input type="text" class="message-input" id="input-${session.id}" 
+                           placeholder="메시지 입력..." disabled>
+                    <button class="btn-send" onclick="sendMessage('${session.id}')" disabled>전송</button>
+                </div>
+            `;
+            
+            // Enter 키 이벤트 리스너 추가
+            const messageInput = sessionCard.querySelector(`#input-${session.id}`);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage(session.id);
+                }
+            });
+            
+            return sessionCard;
+        }
+        
+        /**
+         * 특정 세션을 WebSocket 서버에 연결하는 함수
+         * @param {string} sessionId - 연결할 세션 ID
+         */
+        function connectSession(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session || session.connected) return;
+            
+            const wsUrl = `ws://${window.location.host}/my-websocket`;
+            
+            console.log(`🔗 세션 연결 시도: ${sessionId} -> ${wsUrl}`);
+            
+            session.websocket = new WebSocket(wsUrl);
+            
+            // WebSocket 이벤트 핸들러 설정
+            session.websocket.onopen = function(event) {
+                console.log(`✅ 세션 연결 성공: ${sessionId}`, event);
+                
+                session.connected = true;
+                updateSessionUI(session, true);
+                addMessageToSession(session.id, `시스템: WebSocket 연결 성공`, 'system');
+                updateGlobalStats();
+            };
+            
+            session.websocket.onmessage = function(event) {
+                console.log(`📨 세션 메시지 수신: ${sessionId} ->`, event.data);
+                
+                addMessageToSession(session.id, `서버: ${event.data}`, 'received');
+            };
+            
+            session.websocket.onclose = function(event) {
+                console.log(`🔌 세션 연결 종료: ${sessionId}`, event.code, event.reason);
+                
+                session.connected = false;
+                updateSessionUI(session, false);
+                addMessageToSession(session.id, `시스템: WebSocket 연결 종료`, 'system');
+                updateGlobalStats();
+            };
+            
+            session.websocket.onerror = function(error) {
+                console.error(`❌ 세션 연결 에러: ${sessionId}`, error);
+                
+                addMessageToSession(session.id, `시스템: 연결 오류 발생`, 'error');
+            };
+        }
+        
+        /**
+         * 특정 세션의 WebSocket 연결을 해제하는 함수
+         * @param {string} sessionId - 해제할 세션 ID
+         */
+        function disconnectSession(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session || !session.connected) return;
+            
+            console.log(`🔌 세션 연결 해제 요청: ${sessionId}`);
+            
+            if (session.websocket) {
+                session.websocket.close();
+            }
+        }
+        
+        /**
+         * 특정 세션을 완전히 제거하는 함수
+         * @param {string} sessionId - 제거할 세션 ID
+         */
+        function removeSession(sessionId) {
+            const sessionIndex = sessions.findIndex(s => s.id === sessionId);
+            if (sessionIndex === -1) return;
+            
+            console.log(`🗑️ 세션 제거 시작: ${sessionId}`);
+            
+            const session = sessions[sessionIndex];
+            
+            // WebSocket 연결이 있다면 해제
+            if (session.websocket) {
+                session.websocket.close();
+            }
+            
+            // DOM에서 세션 카드 제거
+            session.element.remove();
+            
+            // 세션 배열에서 제거
+            sessions.splice(sessionIndex, 1);
+            
+            // 통계 업데이트
+            updateGlobalStats();
+            
+            console.log(`세션 제거: ${sessionId}`);
+        }
+        
+        /**
+         * 특정 세션에 메시지를 전송하는 함수
+         * @param {string} sessionId - 메시지를 전송할 세션 ID
+         */
+        function sendMessage(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session || !session.connected) return;
+            
+            const messageInput = document.getElementById(`input-${sessionId}`);
+            const message = messageInput.value.trim();
+            
+            if (message && session.websocket && session.websocket.readyState === WebSocket.OPEN) {
+                console.log(`📤 세션 메시지 전송: ${sessionId} ->`, message);
+                
+                session.websocket.send(message);
+                addMessageToSession(sessionId, `나: ${message}`, 'sent');
+                messageInput.value = '';
+            } else {
+                console.warn(`⚠️ 메시지 전송 실패: ${sessionId} - 연결되지 않았거나 메시지가 비어있음`);
+            }
+        }
+
+        // ========== 전체 제어 함수 ==========
+        
+        /**
+         * 모든 세션을 WebSocket 서버에 연결하는 함수
+         */
+        function connectAllSessions() {
+            console.log(`🔗 모든 세션 연결 시작 (총 ${sessions.length}개 세션)`);
+            
+            sessions.forEach(session => {
+                if (!session.connected) {
+                    connectSession(session.id);
+                }
+            });
+        }
+        
+        /**
+         * 모든 세션의 WebSocket 연결을 해제하는 함수
+         */
+        function disconnectAllSessions() {
+            console.log(`🔌 모든 세션 연결 해제 시작 (총 ${sessions.length}개 세션)`);
+            
+            sessions.forEach(session => {
+                if (session.connected) {
+                    disconnectSession(session.id);
+                }
+            });
+        }
+        
+        /**
+         * 모든 세션을 제거하는 함수
+         */
+        function removeAllSessions() {
+            console.log(`🗑️ 모든 세션 제거 시작 (총 ${sessions.length}개 세션)`);
+            
+            // 역순으로 제거 (배열 인덱스 문제 방지)
+            for (let i = sessions.length - 1; i >= 0; i--) {
+                removeSession(sessions[i].id);
+            }
+        }
+
+        // ========== UI 업데이트 함수 ==========
+        
+        /**
+         * 세션 UI 상태를 업데이트하는 함수
+         * @param {Object} session - 업데이트할 세션 객체
+         * @param {boolean} connected - 연결 상태
+         */
+        function updateSessionUI(session, connected) {
+            const sessionCard = session.element;
+            const statusElement = sessionCard.querySelector('.session-status');
+            const connectBtn = sessionCard.querySelector('.btn-connect');
+            const disconnectBtn = sessionCard.querySelector('.btn-disconnect');
+            const messageInput = sessionCard.querySelector('.message-input');
+            const sendBtn = sessionCard.querySelector('.btn-send');
+            
+            if (connected) {
+                sessionCard.className = 'session-card connected';
+                statusElement.className = 'session-status status-connected';
+                statusElement.textContent = '연결됨';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                messageInput.disabled = false;
+                sendBtn.disabled = false;
+            } else {
+                sessionCard.className = 'session-card disconnected';
+                statusElement.className = 'session-status status-disconnected';
+                statusElement.textContent = '연결 안됨';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                messageInput.disabled = true;
+                sendBtn.disabled = true;
+            }
+        }
+        
+        /**
+         * 특정 세션의 메시지 영역에 메시지를 추가하는 함수
+         * @param {string} sessionId - 세션 ID
+         * @param {string} message - 메시지 내용
+         * @param {string} type - 메시지 타입
+         */
+        function addMessageToSession(sessionId, message, type) {
+            const messagesDiv = document.getElementById(`messages-${sessionId}`);
+            const messageElement = document.createElement('div');
+            
+            messageElement.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            messageElement.style.marginBottom = '3px';
+            
+            switch(type) {
+                case 'sent':
+                    messageElement.style.color = '#007bff';
+                    break;
+                case 'received':
+                    messageElement.style.color = '#28a745';
+                    break;
+                case 'system':
+                    messageElement.style.color = '#6c757d';
+                    messageElement.style.fontStyle = 'italic';
+                    break;
+                case 'error':
+                    messageElement.style.color = '#dc3545';
+                    break;
+            }
+            
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        /**
+         * 전체 통계를 업데이트하는 함수
+         */
+        function updateGlobalStats() {
+            const totalSessions = sessions.length;
+            const activeSessions = sessions.filter(s => s.connected).length;
+            
+            console.log(`📊 세션 통계 업데이트: 활성 ${activeSessions}개 / 총 ${totalSessions}개`);
+            
+            document.getElementById('globalStats').textContent = 
+                `활성 세션: ${activeSessions}개 | 총 생성된 세션: ${totalSessions}개`;
+        }
+
+        // ========== REST API 함수 ==========
+        
+        /**
+         * 서버의 활성 세션 수를 조회하는 함수
+         */
+        async function getSessionCount() {
+            try {
+                console.log('🔍 API 호출: 서버 활성 세션 수 조회');
+                
+                const response = await fetch('/api/websocket/sessions/count');
+                const data = await response.json();
+                
+                console.log('📊 서버 활성 세션 수 조회 결과:', data);
+                
+                // 모든 세션에 결과 표시
+                sessions.forEach(session => {
+                    addMessageToSession(session.id, `API: 서버 활성 세션 수 - ${data.activeSessionCount}`, 'system');
+                });
+                
+                console.log('서버 활성 세션 수:', data.activeSessionCount);
+            } catch (error) {
+                console.error('❌ API 호출 실패 (서버 세션 수 조회):', error);
+                
+                sessions.forEach(session => {
+                    addMessageToSession(session.id, `API 오류: ${error.message}`, 'error');
+                });
+            }
+        }
+        
+        /**
+         * 서버 상태를 조회하는 함수
+         */
+        async function getServerStatus() {
+            try {
+                console.log('🔍 API 호출: 서버 상태 조회');
+                
+                const response = await fetch('/api/websocket/status');
+                const data = await response.json();
+                
+                console.log('📊 서버 상태 조회 결과:', data);
+                
+                // 모든 세션에 결과 표시
+                sessions.forEach(session => {
+                    addMessageToSession(session.id, 
+                        `API: 서버 상태 - ${data.status}, 연결 수: ${data.activeConnections}`, 'system');
+                });
+                
+                console.log('서버 상태:', data);
+            } catch (error) {
+                console.error('❌ API 호출 실패 (서버 상태 조회):', error);
+                
+                sessions.forEach(session => {
+                    addMessageToSession(session.id, `API 오류: ${error.message}`, 'error');
+                });
+            }
+        }
+        
+        /**
+         * 브로드캐스트 메시지를 전송하는 함수
+         */
+        async function sendBroadcast() {
+            const messageInput = document.getElementById('broadcastMessage');
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                console.warn('⚠️ 브로드캐스트 메시지가 비어있음');
+                alert('브로드캐스트 메시지를 입력하세요.');
+                return;
+            }
+            
+            try {
+                console.log('📡 API 호출: 브로드캐스트 메시지 전송:', message);
+                
+                const response = await fetch('/api/websocket/broadcast', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                console.log('📡 브로드캐스트 전송 결과:', data);
+                
+                // 모든 세션에 결과 표시
+                sessions.forEach(session => {
+                    addMessageToSession(session.id, 
+                        `API: 브로드캐스트 전송 완료 - ${data.sentTo}개 세션에 전송`, 'system');
+                });
+                
+                messageInput.value = '';
+                console.log('브로드캐스트 전송 완료:', data);
+            } catch (error) {
+                console.error('❌ API 호출 실패 (브로드캐스트 전송):', error);
+                
+                sessions.forEach(session => {
+                    addMessageToSession(session.id, `API 오류: ${error.message}`, 'error');
+                });
+            }
+        }
+
+        // ========== 초기화 ==========
+        
+        /**
+         * 페이지 로드 시 초기 세션들을 생성하는 함수
+         */
+        function initializeSessions() {
+            console.log('🚀 초기 세션 생성 시작 (3개 세션)');
+            
+            // 기본적으로 3개의 세션 생성
+            for (let i = 0; i < 3; i++) {
+                createNewSession();
+            }
+            
+            console.log('✅ 초기 세션 생성 완료');
+        }
+        
+        // 페이지 로드 완료 시 초기화 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Multi WebSocket Session Test 페이지 로드 시작');
+            
+            initializeSessions();
+            console.log('Multi WebSocket Session Test 페이지 초기화 완료');
+        });
+        
+        // 브로드캐스트 입력 필드에서 Enter 키 처리
+        document.getElementById('broadcastMessage').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                console.log('⌨️ Enter 키로 브로드캐스트 전송');
+                sendBroadcast();
+            }
+        });
+    </script>
+</body>
+</html> 
