@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redis Pub/Sub 사용자 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            padding-top: 30px;
+            padding-bottom: 50px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+        .btn-info {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 10px 15px;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+        .section-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .user-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+        }
+        .user-online {
+            border-left: 4px solid #00b894;
+        }
+        .user-offline {
+            border-left: 4px solid #636e72;
+        }
+        .channel-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin: 2px;
+            display: inline-block;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .stats-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .channel-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .subscriber-count {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 네비게이션 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h2><i class="fas fa-users me-2"></i>Redis Pub/Sub 사용자 관리 시스템</h2>
+                        <div class="mt-3">
+                            <a href="/" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-home me-1"></i>메인 페이지
+                            </a>
+                            <button type="button" class="btn btn-outline-info me-2" onclick="refreshAllData()">
+                                <i class="fas fa-sync-alt me-1"></i>전체 새로고침
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" onclick="cleanupInactiveUsers()">
+                                <i class="fas fa-broom me-1"></i>비활성 사용자 정리
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 알림 메시지 -->
+        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- 로그인/사용자 정보 섹션 -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="section-card">
+                    <h4 class="mb-3">
+                        <i class="fas fa-sign-in-alt me-2"></i>사용자 로그인
+                    </h4>
+                    
+                    <div th:if="${currentUser == null}">
+                        <form th:action="@{/users/login}" method="post">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control" name="userName" 
+                                       placeholder="사용자 이름을 입력하세요" required>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-sign-in-alt me-1"></i>로그인
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div th:if="${currentUser != null}">
+                        <div class="user-card user-online">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">
+                                        <i class="fas fa-user-circle me-2"></i>
+                                        <span th:text="${currentUser.userName}">사용자명</span>
+                                    </h5>
+                                    <small class="text-muted">
+                                        ID: <span th:text="${currentUser.userId}">사용자ID</span>
+                                    </small><br>
+                                    <small class="text-muted">
+                                        구독 채널: <span th:text="${currentUser.subscribedChannelCount}">0</span>개
+                                    </small>
+                                </div>
+                                <div>
+                                    <form th:action="@{/users/logout}" method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-sign-out-alt me-1"></i>로그아웃
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 시스템 통계 -->
+            <div class="col-md-6">
+                <div class="stats-card">
+                    <h5><i class="fas fa-chart-line me-2"></i>시스템 현황</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="stats-number" th:text="${statistics?.totalUsers ?: 0}">0</div>
+                            <div>총 사용자 수</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stats-number" th:text="${statistics?.totalChannels ?: 0}">0</div>
+                            <div>활성 채널 수</div>
+                        </div>
+                    </div>
+                    <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="stats-number" th:text="${statistics?.onlineUsers ?: 0}">0</div>
+                            <div>온라인 사용자</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stats-number" th:text="${statistics?.totalSubscriptions ?: 0}">0</div>
+                            <div>총 구독 수</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 채널 구독 섹션 (로그인한 사용자만) -->
+        <div th:if="${currentUser != null}" class="section-card">
+            <h4 class="mb-3">
+                <i class="fas fa-plus-circle me-2"></i>채널 구독
+            </h4>
+            <form th:action="@{/users/subscribe}" method="post">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="channel" class="form-label">채널명</label>
+                        <input type="text" class="form-control" id="channel" name="channel" 
+                               placeholder="예: chat-room-1" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="roomId" class="form-label">방 ID</label>
+                        <input type="text" class="form-control" id="roomId" name="roomId" 
+                               placeholder="방 번호 (선택사항)">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="message" class="form-label">초기 메시지</label>
+                        <input type="text" class="form-control" id="message" name="message" 
+                               placeholder="첫 메시지 (선택사항)">
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-satellite-dish me-2"></i>채널 구독
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 내 구독 채널 목록 (로그인한 사용자만) -->
+        <div th:if="${currentUser != null}" class="section-card">
+            <h4 class="mb-3">
+                <i class="fas fa-list me-2"></i>내 구독 채널
+                <button type="button" class="btn btn-outline-primary btn-sm ms-2" onclick="refreshMyChannels()">
+                    <i class="fas fa-sync-alt me-1"></i>새로고침
+                </button>
+            </h4>
+            <div id="myChannelsList" class="row">
+                <div th:if="${currentUser.subscribedChannels != null and !currentUser.subscribedChannels.isEmpty()}">
+                    <div th:each="channel : ${currentUser.subscribedChannels}" class="col-md-6 mb-2">
+                        <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                            <span class="channel-badge" th:text="${channel}">채널명</span>
+                            <form th:action="@{/users/unsubscribe}" method="post" style="display: inline;">
+                                <input type="hidden" name="channel" th:value="${channel}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${currentUser.subscribedChannels == null or currentUser.subscribedChannels.isEmpty()}" 
+                     class="text-muted text-center py-3">
+                    구독 중인 채널이 없습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- 채널별 구독자 조회 섹션 -->
+        <div class="section-card">
+            <h4 class="mb-3">
+                <i class="fas fa-search me-2"></i>채널별 구독자 조회
+            </h4>
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <input type="text" class="form-control" id="channelSearchInput" 
+                           placeholder="채널명을 입력하세요">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <button type="button" class="btn btn-info w-100" onclick="searchChannelSubscribers()">
+                        <i class="fas fa-search me-1"></i>구독자 조회
+                    </button>
+                </div>
+            </div>
+            <div id="channelSearchResult" class="mt-3"></div>
+        </div>
+
+        <!-- 전체 채널 목록 -->
+        <div class="section-card">
+            <h4 class="mb-3">
+                <i class="fas fa-broadcast-tower me-2"></i>전체 채널 목록
+                <button type="button" class="btn btn-outline-primary btn-sm ms-2" onclick="refreshChannelList()">
+                    <i class="fas fa-sync-alt me-1"></i>새로고침
+                </button>
+            </h4>
+            <div id="channelList" class="row">
+                <div th:if="${channelCounts != null and !channelCounts.isEmpty()}">
+                    <div th:each="entry : ${channelCounts}" class="col-md-6 col-lg-4 mb-3">
+                        <div class="channel-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <i class="fas fa-hashtag me-1"></i>
+                                        <span th:text="${entry.key}">채널명</span>
+                                    </h6>
+                                    <span class="subscriber-count">
+                                        <span th:text="${entry.value}">0</span>명 구독
+                                    </span>
+                                </div>
+                                <button type="button" class="btn btn-outline-info btn-sm" 
+                                        th:data-channel="${entry.key}" onclick="showChannelDetails(this.dataset.channel)">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${channelCounts == null or channelCounts.isEmpty()}" 
+                     class="col-12 text-muted text-center py-3">
+                    현재 활성 채널이 없습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- 전체 사용자 목록 -->
+        <div class="section-card">
+            <h4 class="mb-3">
+                <i class="fas fa-users me-2"></i>전체 사용자 목록
+                <button type="button" class="btn btn-outline-primary btn-sm ms-2" onclick="refreshUserList()">
+                    <i class="fas fa-sync-alt me-1"></i>새로고침
+                </button>
+            </h4>
+            <div id="userList" class="row">
+                <div th:if="${allUsers != null and !allUsers.isEmpty()}">
+                    <div th:each="user : ${allUsers}" class="col-md-6 col-lg-4 mb-3">
+                        <div class="user-card" th:classappend="${user.status == 'ONLINE'} ? 'user-online' : 'user-offline'">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <i class="fas fa-user-circle me-1"></i>
+                                        <span th:text="${user.userName}">사용자명</span>
+                                        <small th:if="${user.status == 'ONLINE'}" class="badge bg-success ms-1">온라인</small>
+                                        <small th:if="${user.status == 'OFFLINE'}" class="badge bg-secondary ms-1">오프라인</small>
+                                    </h6>
+                                    <small class="text-muted d-block">
+                                        ID: <span th:text="${user.userId}">사용자ID</span>
+                                    </small>
+                                    <small class="text-muted d-block">
+                                        구독: <span th:text="${user.subscribedChannelCount}">0</span>개 채널
+                                    </small>
+                                    <div th:if="${user.subscribedChannels != null and !user.subscribedChannels.isEmpty()}" class="mt-2">
+                                        <div th:each="channel : ${user.subscribedChannels}">
+                                            <span class="badge bg-secondary me-1" style="font-size: 0.7em;" th:text="${channel}">채널</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-info btn-sm" 
+                                        th:data-userid="${user.userId}" onclick="showUserDetails(this.dataset.userid)">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${allUsers == null or allUsers.isEmpty()}" 
+                     class="col-12 text-muted text-center py-3">
+                    등록된 사용자가 없습니다.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 내 구독 채널 목록 새로고침
+        async function refreshMyChannels() {
+            try {
+                const response = await fetch('/users/my-channels');
+                const channels = await response.json();
+                
+                const container = document.getElementById('myChannelsList');
+                
+                if (channels.length === 0) {
+                    container.innerHTML = '<div class="text-muted text-center py-3">구독 중인 채널이 없습니다.</div>';
+                } else {
+                    container.innerHTML = channels.map(channel => `
+                        <div class="col-md-6 mb-2">
+                            <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                                <span class="channel-badge">${channel}</span>
+                                <form action="/users/unsubscribe" method="post" style="display: inline;">
+                                    <input type="hidden" name="channel" value="${channel}">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                console.log('내 구독 채널 목록 새로고침 완료:', channels);
+                
+            } catch (error) {
+                console.error('내 구독 채널 목록 조회 실패:', error);
+            }
+        }
+
+        // 채널별 구독자 검색
+        async function searchChannelSubscribers() {
+            const channel = document.getElementById('channelSearchInput').value.trim();
+            const resultDiv = document.getElementById('channelSearchResult');
+            
+            if (!channel) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">채널명을 입력해주세요.</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/users/channel-details?channel=${encodeURIComponent(channel)}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">오류: ${data.error}</div>`;
+                    return;
+                }
+                
+                let html = `
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-hashtag me-2"></i>${data.channel} (${data.subscriberCount}명 구독)</h5>
+                        </div>
+                        <div class="card-body">
+                `;
+                
+                if (data.subscribers.length === 0) {
+                    html += '<div class="text-muted text-center">구독자가 없습니다.</div>';
+                } else {
+                    html += '<div class="row">';
+                    data.subscribers.forEach(user => {
+                        const statusBadge = user.status === 'ONLINE' ? 
+                            '<span class="badge bg-success">온라인</span>' : 
+                            '<span class="badge bg-secondary">오프라인</span>';
+                        
+                        html += `
+                            <div class="col-md-6 mb-2">
+                                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                                    <div>
+                                        <strong>${user.userName}</strong> ${statusBadge}
+                                        <br><small class="text-muted">ID: ${user.userId}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+                
+                html += '</div></div>';
+                resultDiv.innerHTML = html;
+                
+                console.log('채널 구독자 조회 완료:', data);
+                
+            } catch (error) {
+                console.error('채널 구독자 조회 실패:', error);
+                resultDiv.innerHTML = '<div class="alert alert-danger">조회 중 오류가 발생했습니다.</div>';
+            }
+        }
+
+        // 채널 목록 새로고침
+        async function refreshChannelList() {
+            try {
+                const response = await fetch('/users/channel-stats');
+                const channelCounts = await response.json();
+                
+                const container = document.getElementById('channelList');
+                
+                if (Object.keys(channelCounts).length === 0) {
+                    container.innerHTML = '<div class="col-12 text-muted text-center py-3">현재 활성 채널이 없습니다.</div>';
+                } else {
+                    let html = '';
+                    for (const [channel, count] of Object.entries(channelCounts)) {
+                        html += `
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="channel-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">
+                                                <i class="fas fa-hashtag me-1"></i>${channel}
+                                            </h6>
+                                            <span class="subscriber-count">${count}명 구독</span>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-info btn-sm" 
+                                                onclick="showChannelDetails('${channel}')">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    container.innerHTML = html;
+                }
+                
+                console.log('채널 목록 새로고침 완료:', channelCounts);
+                
+            } catch (error) {
+                console.error('채널 목록 조회 실패:', error);
+            }
+        }
+
+        // 사용자 목록 새로고침
+        async function refreshUserList() {
+            try {
+                const response = await fetch('/users/all');
+                const users = await response.json();
+                
+                const container = document.getElementById('userList');
+                
+                if (users.length === 0) {
+                    container.innerHTML = '<div class="col-12 text-muted text-center py-3">등록된 사용자가 없습니다.</div>';
+                } else {
+                    let html = '';
+                    users.forEach(user => {
+                        const statusClass = user.status === 'ONLINE' ? 'user-online' : 'user-offline';
+                        const statusBadge = user.status === 'ONLINE' ? 
+                            '<small class="badge bg-success ms-1">온라인</small>' : 
+                            '<small class="badge bg-secondary ms-1">오프라인</small>';
+                        
+                        let channelBadges = '';
+                        if (user.subscribedChannels && user.subscribedChannels.length > 0) {
+                            channelBadges = '<div class="mt-2">';
+                            user.subscribedChannels.forEach(channel => {
+                                channelBadges += `<span class="badge bg-secondary me-1" style="font-size: 0.7em;">${channel}</span>`;
+                            });
+                            channelBadges += '</div>';
+                        }
+                        
+                        html += `
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="user-card ${statusClass}">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <i class="fas fa-user-circle me-1"></i>
+                                                ${user.userName}
+                                                ${statusBadge}
+                                            </h6>
+                                            <small class="text-muted d-block">ID: ${user.userId}</small>
+                                            <small class="text-muted d-block">구독: ${user.subscribedChannelCount}개 채널</small>
+                                            ${channelBadges}
+                                        </div>
+                                        <button type="button" class="btn btn-outline-info btn-sm" 
+                                                onclick="showUserDetails('${user.userId}')">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }
+                
+                console.log('사용자 목록 새로고침 완료:', users);
+                
+            } catch (error) {
+                console.error('사용자 목록 조회 실패:', error);
+            }
+        }
+
+        // 전체 데이터 새로고침
+        async function refreshAllData() {
+            await Promise.all([
+                refreshMyChannels(),
+                refreshChannelList(),
+                refreshUserList()
+            ]);
+            
+            // 페이지 새로고침으로 통계 정보도 업데이트
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        // 채널 상세 정보 모달
+        async function showChannelDetails(channel) {
+            document.getElementById('channelSearchInput').value = channel;
+            await searchChannelSubscribers();
+            
+            // 결과 영역으로 스크롤
+            document.getElementById('channelSearchResult').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 사용자 상세 정보 알림
+        async function showUserDetails(userId) {
+            try {
+                const response = await fetch(`/users/user/${userId}/channels`);
+                const channels = await response.json();
+                
+                alert(`사용자 구독 채널:\n${channels.length > 0 ? channels.join('\n') : '구독 중인 채널이 없습니다.'}`);
+                
+            } catch (error) {
+                console.error('사용자 상세 정보 조회 실패:', error);
+                alert('사용자 정보를 가져올 수 없습니다.');
+            }
+        }
+
+        // 비활성 사용자 정리
+        async function cleanupInactiveUsers() {
+            if (!confirm('30분 이상 비활성 상태인 사용자들을 정리하시겠습니까?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/users/cleanup', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    await refreshAllData();
+                } else {
+                    alert('정리 중 오류가 발생했습니다: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('비활성 사용자 정리 실패:', error);
+                alert('정리 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('사용자 관리 페이지 로드 완료');
+            
+            // Enter 키로 채널 검색
+            document.getElementById('channelSearchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchChannelSubscribers();
+                }
+            });
+            
+            // 10초마다 자동 업데이트 (통계 정보 제외)
+            setInterval(async () => {
+                await refreshMyChannels();
+                await refreshChannelList();
+                await refreshUserList();
+            }, 10000);
+        });
+
+        // 알림 메시지 자동 숨김
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html> 
