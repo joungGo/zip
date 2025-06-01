@@ -217,6 +217,65 @@
                             </form>
                         </div>
 
+                        <!-- 현재 구독 상태 섹션 -->
+                        <div class="form-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-satellite-dish"></i>
+                                현재 구독 상태
+                                <button type="button" class="btn btn-sm btn-outline-primary ms-auto" onclick="refreshSubscriptionStatus()">
+                                    <i class="fas fa-sync-alt me-1"></i>새로고침
+                                </button>
+                            </h4>
+                            
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <span class="me-3">
+                                            <strong>구독 중인 채널 수:</strong> 
+                                            <span id="channelCount" class="badge bg-primary">0</span>개
+                                        </span>
+                                        <button type="button" class="btn btn-sm btn-info" onclick="showSubscriptionDetails()">
+                                            <i class="fas fa-info-circle me-1"></i>상세 정보
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="channelList" class="border rounded p-3" style="min-height: 80px; background-color: #f8f9fa;">
+                                        <div th:if="${subscribedChannels != null and !subscribedChannels.isEmpty()}">
+                                            <div th:each="channel : ${subscribedChannels}" class="d-inline-block">
+                                                <span class="badge bg-secondary me-2 mb-2" style="font-size: 0.9em;">
+                                                    <i class="fas fa-hashtag me-1"></i>
+                                                    <span th:text="${channel}"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div th:if="${subscribedChannels == null or subscribedChannels.isEmpty()}" 
+                                             class="text-muted text-center py-2">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            현재 구독 중인 채널이 없습니다.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="card border-0" style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);">
+                                        <div class="card-body text-white text-center">
+                                            <h6 class="card-title">
+                                                <i class="fas fa-chart-line me-2"></i>
+                                                실시간 모니터링
+                                            </h6>
+                                            <p class="card-text small mb-2">
+                                                구독 상태가 자동으로 업데이트됩니다.
+                                            </p>
+                                            <small class="text-light">
+                                                <i class="fas fa-clock me-1"></i>
+                                                마지막 업데이트: <span id="lastUpdateTime">-</span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 로그 섹션 -->
                         <div class="form-section">
                             <h4 class="section-title">
@@ -258,7 +317,32 @@ Content-Type: application/json<br><br>
                                     <h6><i class="fas fa-times me-2"></i>구독 취소 API</h6>
                                     <div class="log-section mb-3">
                                         <code>
-POST /redis/pubsub/cancle?channel={채널명}
+POST /redis/pubsub/cancel?channel={채널명}
+                                        </code>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-list me-2"></i>구독 채널 목록 API</h6>
+                                    <div class="log-section mb-3">
+                                        <code>
+GET /redis/pubsub/subscribed-channels<br><br>
+응답: ["channel1", "channel2", ...]
+                                        </code>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-info-circle me-2"></i>구독 상태 상세 API</h6>
+                                    <div class="log-section mb-3">
+                                        <code>
+GET /redis/pubsub/subscription-status<br><br>
+응답: {<br>
+&nbsp;&nbsp;"subscribedChannels": [...],<br>
+&nbsp;&nbsp;"totalChannelCount": 2,<br>
+&nbsp;&nbsp;"isRunning": true,<br>
+&nbsp;&nbsp;...<br>
+}
                                         </code>
                                     </div>
                                 </div>
@@ -303,9 +387,184 @@ POST /redis/pubsub/cancle?channel={채널명}
             console.log('📋 사용 가능한 기능:');
             console.log('  • 메시지 발송');
             console.log('  • 구독 취소');
+            console.log('  • 구독 상태 모니터링');
             console.log('  • 실시간 로그 모니터링');
             console.groupEnd();
+            
+            // 구독 상태 초기화 및 자동 갱신 시작
+            refreshSubscriptionStatus();
+            
+            // 10초마다 자동으로 구독 상태 업데이트
+            setInterval(refreshSubscriptionStatus, 10000);
         });
+
+        // 구독 상태를 새로고침하는 함수
+        async function refreshSubscriptionStatus() {
+            try {
+                const response = await fetch('/subscribed-channels');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const channels = await response.json();
+                
+                // 채널 수 업데이트
+                document.getElementById('channelCount').textContent = channels.length;
+                
+                // 채널 목록 업데이트
+                const channelListDiv = document.getElementById('channelList');
+                
+                if (channels.length === 0) {
+                    channelListDiv.innerHTML = `
+                        <div class="text-muted text-center py-2">
+                            <i class="fas fa-info-circle me-2"></i>
+                            현재 구독 중인 채널이 없습니다.
+                        </div>
+                    `;
+                } else {
+                    channelListDiv.innerHTML = channels.map(channel => `
+                        <span class="badge bg-secondary me-2 mb-2" style="font-size: 0.9em;">
+                            <i class="fas fa-hashtag me-1"></i>
+                            ${channel}
+                        </span>
+                    `).join('');
+                }
+                
+                // 마지막 업데이트 시간 기록
+                const now = new Date().toLocaleTimeString('ko-KR');
+                document.getElementById('lastUpdateTime').textContent = now;
+                
+                logToConsole('info', `구독 상태 업데이트 완료 - ${channels.length}개 채널`, channels);
+                
+            } catch (error) {
+                console.error('구독 상태 조회 실패:', error);
+                document.getElementById('channelCount').textContent = '?';
+                document.getElementById('channelList').innerHTML = `
+                    <div class="text-danger text-center py-2">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        구독 상태를 가져올 수 없습니다.
+                    </div>
+                `;
+                document.getElementById('lastUpdateTime').textContent = '오류';
+                
+                logToConsole('error', '구독 상태 조회 실패', error.message);
+            }
+        }
+
+        // 구독 상세 정보를 보여주는 함수
+        async function showSubscriptionDetails() {
+            try {
+                const response = await fetch('/subscription-status');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const status = await response.json();
+                
+                let modalContent = '';
+                
+                if (status.error) {
+                    modalContent = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            오류 발생: ${status.error}
+                        </div>
+                    `;
+                } else {
+                    let channelDetailsHtml = '';
+                    if (status.channelSubscriptionDetails && Object.keys(status.channelSubscriptionDetails).length > 0) {
+                        channelDetailsHtml = `
+                            <h6 class="mt-3">채널별 구독 유지 시간:</h6>
+                            <div class="row">
+                                ${Object.entries(status.channelSubscriptionDetails).map(([channel, duration]) => `
+                                    <div class="col-md-6 mb-2">
+                                        <span class="badge bg-primary me-2">${channel}</span>
+                                        <small class="text-muted">${duration}</small>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                    
+                    modalContent = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>시스템 상태</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>총 구독 채널 수:</strong> ${status.totalChannelCount}개</li>
+                                    <li><strong>컨테이너 실행 상태:</strong> 
+                                        ${status.isRunning ? 
+                                            '<span class="badge bg-success">실행 중</span>' : 
+                                            '<span class="badge bg-danger">중지됨</span>'}
+                                    </li>
+                                    <li><strong>컨테이너 활성 상태:</strong> 
+                                        ${status.isActive ? 
+                                            '<span class="badge bg-success">활성</span>' : 
+                                            '<span class="badge bg-warning">비활성</span>'}
+                                    </li>
+                                    <li><strong>조회 시간:</strong> <small>${status.checkTime}</small></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>구독 중인 채널</h6>
+                                ${status.subscribedChannels && status.subscribedChannels.length > 0 ? 
+                                    '<div>' + status.subscribedChannels.map(channel => `
+                                        <span class="badge bg-secondary me-1 mb-1">${channel}</span>
+                                    `).join('') + '</div>' : 
+                                    '<span class="text-muted">구독 중인 채널이 없습니다.</span>'}
+                            </div>
+                        </div>
+                        ${channelDetailsHtml}
+                    `;
+                }
+                
+                // Bootstrap 모달을 동적으로 생성하고 표시
+                const modalHtml = `
+                    <div class="modal fade" id="subscriptionModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-chart-line me-2"></i>
+                                        구독 상태 상세 정보
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ${modalContent}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                                    <button type="button" class="btn btn-primary" onclick="refreshSubscriptionStatus(); showSubscriptionDetails();">
+                                        <i class="fas fa-sync-alt me-2"></i>새로고침
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // 기존 모달 제거 (있다면)
+                const existingModal = document.getElementById('subscriptionModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // 새 모달 추가
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                // 모달 표시
+                const modal = new bootstrap.Modal(document.getElementById('subscriptionModal'));
+                modal.show();
+                
+                logToConsole('info', '구독 상세 정보 조회 완료');
+                
+            } catch (error) {
+                console.error('구독 상세 정보 조회 실패:', error);
+                alert('구독 상세 정보를 가져올 수 없습니다: ' + error.message);
+                logToConsole('error', '구독 상세 정보 조회 실패', error.message);
+            }
+        }
 
         // 폼 제출 시 로딩 효과 및 로그
         document.querySelectorAll('form').forEach(form => {

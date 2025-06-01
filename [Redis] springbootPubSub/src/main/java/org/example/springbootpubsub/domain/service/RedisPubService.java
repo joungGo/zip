@@ -9,6 +9,12 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Redis Pub/Sub 기능을 통합 관리하는 비즈니스 서비스 클래스
  * 
@@ -21,6 +27,7 @@ import org.springframework.stereotype.Service;
  * - 채널별 구독자(Listener) 등록 및 해제
  * - Pub/Sub 워크플로우 조정
  * - 비즈니스 로직과 Redis 기술 계층 분리
+ * - 구독 중인 채널 목록 관리 및 조회
  * 
  * 사용 시나리오:
  * - 실시간 채팅 시스템
@@ -88,6 +95,23 @@ public class RedisPubService {
     private final RedisSubscribeListener redisSubscribeListener;
 
     /**
+     * 현재 구독 중인 채널 목록을 추적하는 Thread-safe 컬렉션
+     * 
+     * ConcurrentHashMap을 사용하여 멀티스레드 환경에서 안전하게
+     * 구독 채널 정보를 관리합니다.
+     * 
+     * Key: 채널명 (String)
+     * Value: 구독 시작 시간 (Long - System.currentTimeMillis())
+     * 
+     * 사용 목적:
+     * - 현재 활성 구독 채널 추적
+     * - 구독 시간 정보 제공
+     * - 중복 구독 방지
+     * - 채널별 구독 상태 관리
+     */
+    private final Map<String, Long> subscribedChannels = new ConcurrentHashMap<>();
+
+    /**
      * 지정된 채널에 메시지를 발행하고 해당 채널을 구독하는 통합 메서드
      * 
      * 이 메서드는 Pub/Sub의 핵심 워크플로우를 구현합니다:
@@ -129,6 +153,14 @@ public class RedisPubService {
         // - 해당 채널에서 발생하는 모든 메시지를 redisSubscribeListener가 수신
         // - 멀티스레드 환경에서 안전하게 메시지 처리
         redisMessageListenerContainer.addMessageListener(redisSubscribeListener, new ChannelTopic(channel));
+
+        // 구독 채널 추적 정보 업데이트
+        if (!subscribedChannels.containsKey(channel)) {
+            subscribedChannels.put(channel, System.currentTimeMillis());
+            log.info("새로운 채널 구독 시작: {} (총 구독 채널 수: {})", channel, subscribedChannels.size());
+        } else {
+            log.debug("이미 구독 중인 채널: {}", channel);
+        }
 
         // 2단계: 메시지 발행
         // RedisPublisher를 통해 실제 메시지를 Redis 채널로 전송
@@ -179,24 +211,111 @@ public class RedisPubService {
      * TODO: 현재는 모든 구독을 해제하므로, 특정 채널만 해제하도록 개선 필요
      */
     public void cancelSubChannel(String channel) {
-        // 현재 구현: 해당 리스너의 모든 구독 해제
-        // removeMessageListener(MessageListener listener)
-        // -> 지정된 리스너를 컨테이너에서 완전히 제거
-        // -> 해당 리스너가 구독하던 모든 채널에서 제거됨
-        redisMessageListenerContainer.removeMessageListener(redisSubscribeListener);
+        try {
+            // 특정 채널만 구독 해제 시도
+            redisMessageListenerContainer.removeMessageListener(redisSubscribeListener, new ChannelTopic(channel));
+            
+            // 구독 채널 추적 정보에서 제거
+            Long subscribeTime = subscribedChannels.remove(channel);
+            if (subscribeTime != null) {
+                long duration = System.currentTimeMillis() - subscribeTime;
+                log.info("채널 구독 취소 완료 - 채널: {}, 구독 유지 시간: {}ms (총 구독 채널 수: {})", 
+                         channel, duration, subscribedChannels.size());
+            } else {
+                log.warn("구독하지 않은 채널의 취소 요청: {}", channel);
+            }
+            
+        } catch (Exception e) {
+            log.error("채널 구독 취소 중 오류 발생 - 채널: {}, 오류: {}", channel, e.getMessage(), e);
+            
+            // 오류 발생시에도 추적 정보는 정리
+            subscribedChannels.remove(channel);
+        }
+    }
 
-        // 로깅: 구독 취소 작업 기록
-        log.info("채널 구독 취소 완료 - 채널: {}", channel);
-        log.warn("주의: 현재 구현에서는 모든 채널의 구독이 해제됩니다.");
+    /**
+     * 현재 구독 중인 채널 목록을 조회하는 메서드
+     * 
+     * 이 메서드는 현재 활성화된 구독 채널들의 목록을 반환합니다.
+     * 내부적으로 관리하는 subscribedChannels Map을 기반으로 정보를 제공합니다.
+     * 
+     * 반환 데이터 형태:
+     * - 빈 Set: 구독 중인 채널이 없음
+     * - 채널명 Set: {"chat-room-1", "notifications", "events"}
+     * 
+     * 사용 시나리오:
+     * - 관리자 페이지에서 현재 활성 채널 확인
+     * - 디버깅 목적으로 구독 상태 점검
+     * - 사용자에게 구독 중인 채널 목록 표시
+     * - 시스템 모니터링 및 헬스체크
+     * 
+     * 특징:
+     * - Thread-safe 하게 현재 상태 반환
+     * - 실시간 구독 상태 반영
+     * - 빠른 조회 성능 (메모리 기반)
+     * 
+     * @return Set<String> 현재 구독 중인 Redis 채널명들의 집합
+     */
+    public Set<String> getSubscribedChannels() {
+        try {
+            Set<String> channels = new HashSet<>(subscribedChannels.keySet()); // 현재 구독 중인 채널명만 추출
+            log.info("현재 구독 중인 채널 목록 조회 - 총 {}개 채널: {}", channels.size(), channels);
+            return channels;
+            
+        } catch (Exception e) {
+            log.error("구독 채널 목록 조회 중 오류 발생: {}", e.getMessage(), e);
+            return new HashSet<>();
+        }
+    }
 
-        // TODO: 개선 필요 사항
-        // 1. 채널별 개별 구독 해제 구현
-        // 2. 구독 상태 추적 및 관리
-        // 3. 구독자별 채널 관리 로직
-        //
-        // 개선 방향:
-        // - Map<String, ChannelTopic>으로 채널별 구독 상태 관리
-        // - 채널별 리스너 인스턴스 분리
-        // - 구독/구독해제 상태 모니터링
+    /**
+     * 구독 상태 정보를 상세히 조회하는 메서드
+     * 
+     * 단순한 채널 목록이 아닌, 구독 상태에 대한 상세 정보를 제공합니다.
+     * 관리자 또는 개발자가 시스템 상태를 파악하는 데 유용합니다.
+     * 
+     * 반환 정보:
+     * - 총 구독 채널 수
+     * - 채널별 구독 시간
+     * - 리스너 컨테이너 상태
+     * - 조회 시간 등
+     * 
+     * @return Map<String, Object> 구독 상태에 대한 상세 정보
+     */
+    public Map<String, Object> getSubscriptionStatus() {
+        Map<String, Object> status = new HashMap<>();
+        
+        try {
+            // 현재 구독 중인 채널 목록
+            Set<String> channels = getSubscribedChannels();
+            status.put("subscribedChannels", channels);
+            status.put("totalChannelCount", channels.size());
+            
+            // 채널별 구독 시간 정보
+            Map<String, String> channelDetails = new HashMap<>();
+            for (Map.Entry<String, Long> entry : subscribedChannels.entrySet()) {
+                String channel = entry.getKey();
+                Long subscribeTime = entry.getValue();
+                long duration = System.currentTimeMillis() - subscribeTime;
+                channelDetails.put(channel, duration + "ms");
+            }
+            status.put("channelSubscriptionDetails", channelDetails);
+            
+            // 리스너 컨테이너 상태 정보
+            status.put("isRunning", redisMessageListenerContainer.isRunning());
+            status.put("isActive", redisMessageListenerContainer.isActive());
+            
+            // 현재 시간 정보
+            status.put("checkTime", java.time.LocalDateTime.now());
+            
+            log.info("구독 상태 조회 완료: {} 채널", channels.size());
+            
+        } catch (Exception e) {
+            log.error("구독 상태 조회 중 오류 발생: {}", e.getMessage(), e);
+            status.put("error", e.getMessage());
+            status.put("errorTime", java.time.LocalDateTime.now());
+        }
+        
+        return status;
     }
 }

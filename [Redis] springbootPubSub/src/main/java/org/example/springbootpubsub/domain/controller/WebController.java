@@ -8,6 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Redis Pub/Sub 기능을 웹 UI로 제공하는 MVC 컨트롤러
  * 
@@ -117,7 +122,7 @@ public class WebController {
     @PostMapping("/send-message") // HTTP POST 메서드로 /send-message 경로 매핑
     public String sendMessage(@RequestParam String channel, // 폼의 name="channel" 필드와 매핑
                             @ModelAttribute MessageDto messageDto, // 폼의 MessageDto 객체와 매핑
-                            Model model) { // 뷰에 전달할 데이터 컨테이너
+                            Model model) { // 뷰에 전달할 데이터를 저장하는 Model 객체
         try {
             // 메시지 발송 요청 로깅 (디버깅 및 모니터링)
             log.info("Sending message to channel: {}, message: {}", channel, messageDto);
@@ -205,7 +210,87 @@ public class WebController {
         // 폼 초기화를 위한 새로운 빈 객체 추가
         model.addAttribute("messageDto", new MessageDto());
         
+        // 현재 구독 중인 채널 목록 추가
+        try {
+            Set<String> subscribedChannels = redisPubService.getSubscribedChannels();
+            model.addAttribute("subscribedChannels", subscribedChannels);
+        } catch (Exception e) {
+            log.error("Error getting subscribed channels", e);
+            model.addAttribute("subscribedChannels", new HashSet<>());
+        }
+        
         // 동일한 페이지로 돌아가서 결과 표시
         return "index";
+    }
+
+    /**
+     * 구독 중인 채널 목록을 조회하는 웹 API 엔드포인트
+     * 
+     * 이 엔드포인트는 웹 페이지에서 Ajax 요청을 통해
+     * 현재 구독 중인 채널 목록을 실시간으로 조회할 수 있도록 합니다.
+     * 
+     * HTTP 요청 형태:
+     * GET /subscribed-channels
+     * 
+     * 응답 형태:
+     * ```json
+     * [
+     *   "chat-room-1",
+     *   "notifications",
+     *   "events"
+     * ]
+     * ```
+     * 
+     * 사용 시나리오:
+     * - 웹 페이지에서 실시간 구독 상태 업데이트
+     * - JavaScript를 통한 동적 UI 구성
+     * - 페이지 새로고침 없이 구독 상태 확인
+     * 
+     * @return Set<String> 현재 구독 중인 채널명들의 집합
+     */
+    @GetMapping("/subscribed-channels")
+    @ResponseBody // JSON 응답을 위한 어노테이션
+    public Set<String> getSubscribedChannels() {
+        log.info("웹에서 구독 채널 목록 조회 요청");
+        
+        try {
+            Set<String> subscribedChannels = redisPubService.getSubscribedChannels();
+            log.info("웹 구독 채널 목록 조회 성공 - {}개 채널", subscribedChannels.size());
+            return subscribedChannels;
+            
+        } catch (Exception e) {
+            log.error("웹 구독 채널 목록 조회 실패", e);
+            return new HashSet<>();
+        }
+    }
+
+    /**
+     * 구독 상태 상세 정보를 조회하는 웹 API 엔드포인트
+     * 
+     * 이 엔드포인트는 웹 페이지에서 Ajax 요청을 통해
+     * 구독 상태에 대한 상세 정보를 조회할 수 있도록 합니다.
+     * 
+     * HTTP 요청 형태:
+     * GET /subscription-status
+     * 
+     * @return Map<String, Object> 구독 상태에 대한 상세 정보
+     */
+    @GetMapping("/subscription-status")
+    @ResponseBody // JSON 응답을 위한 어노테이션
+    public Map<String, Object> getSubscriptionStatus() {
+        log.info("웹에서 구독 상태 상세 정보 조회 요청");
+        
+        try {
+            Map<String, Object> subscriptionStatus = redisPubService.getSubscriptionStatus();
+            log.info("웹 구독 상태 상세 정보 조회 성공");
+            return subscriptionStatus;
+            
+        } catch (Exception e) {
+            log.error("웹 구독 상태 상세 정보 조회 실패", e);
+            Map<String, Object> errorStatus = new HashMap<>();
+            errorStatus.put("error", e.getMessage());
+            errorStatus.put("errorTime", java.time.LocalDateTime.now());
+            return errorStatus;
+        }
     }
 } 

@@ -6,6 +6,9 @@ import org.example.springbootpubsub.domain.dto.MessageDto;
 import org.example.springbootpubsub.domain.service.RedisPubService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Redis Pub/Sub 기능을 제공하는 REST API 컨트롤러
  * 
@@ -144,17 +147,119 @@ public class RedisPubSubController {
      * 
      * TODO: URL 경로 수정 ("/cancle" -> "/cancel")
      */
-    @PostMapping("/cancle") // HTTP POST 메서드로 /redis/pubsub/cancle 경로 매핑 (오타: cancle -> cancel)
-    public void cancelSubChannel(@RequestParam String channel) { // URL 쿼리 파라미터에서 채널명 추출
-        
+    @PostMapping("/cancel") // TODO: 오타 수정 필요 -> "/cancel"
+    public void cancelSubChannel(@RequestParam String channel) {
         // 요청 정보 로깅
-        log.info("채널 구독 취소 요청 - 채널: {}", channel);
+        log.info("Redis SUB Cancel Channel = {}", channel);
         
         // 실제 비즈니스 로직 실행 (서비스 계층으로 위임)
-        // RedisMessageListenerContainer에서 리스너 제거
+        // RedisMessageListenerContainer에서 지정된 채널의 구독 해제
         redisSubscribeService.cancelSubChannel(channel);
         
         // 성공 응답 (void 반환이므로 200 OK 상태 코드 자동 반환)
-        log.info("채널 구독 취소 API 처리 완료 - 채널: {}", channel);
+        log.info("구독 취소 API 처리 완료");
+    }
+
+    /**
+     * 현재 구독 중인 Redis 채널 목록을 조회하는 API 엔드포인트
+     * 
+     * 이 엔드포인트는 현재 애플리케이션에서 구독하고 있는 
+     * 모든 Redis 채널들의 목록을 반환합니다.
+     * 
+     * HTTP 요청 형태:
+     * GET /redis/pubsub/subscribed-channels
+     * 
+     * 응답 형태:
+     * ```json
+     * [
+     *   "chat-room-1",
+     *   "notifications", 
+     *   "events"
+     * ]
+     * ```
+     * 
+     * 사용 시나리오:
+     * - 현재 활성 채널 확인
+     * - 관리자 대시보드에서 구독 상태 모니터링
+     * - 디버깅 및 시스템 상태 점검
+     * - 클라이언트에서 구독 채널 목록 표시
+     * 
+     * 특징:
+     * - 실시간 구독 상태 반영
+     * - 빠른 응답 속도 (메모리 기반 조회)
+     * - JSON 형태로 구조화된 응답
+     * 
+     * @return Set<String> 현재 구독 중인 채널명들의 집합
+     * 
+     * @throws org.springframework.data.redis.RedisConnectionFailureException Redis 연결 실패 시
+     */
+    @GetMapping("/subscribed-channels")
+    public Set<String> getSubscribedChannels() {
+        // 요청 로깅
+        log.info("구독 중인 채널 목록 조회 요청");
+        
+        // 구독 채널 목록 조회 (서비스 계층으로 위임)
+        Set<String> subscribedChannels = redisSubscribeService.getSubscribedChannels();
+        
+        // 응답 로깅
+        log.info("구독 채널 목록 API 응답 - 총 {}개 채널: {}", 
+                 subscribedChannels.size(), subscribedChannels);
+        
+        return subscribedChannels;
+    }
+
+    /**
+     * 구독 상태에 대한 상세 정보를 조회하는 API 엔드포인트
+     * 
+     * 이 엔드포인트는 단순한 채널 목록이 아닌, 구독 상태에 대한
+     * 종합적인 정보를 제공합니다. 관리자나 개발자가 시스템 상태를
+     * 자세히 파악하는 데 유용합니다.
+     * 
+     * HTTP 요청 형태:
+     * GET /redis/pubsub/subscription-status
+     * 
+     * 응답 형태:
+     * ```json
+     * {
+     *   "subscribedChannels": ["chat-room-1", "notifications"],
+     *   "totalChannelCount": 2,
+     *   "channelSubscriptionDetails": {
+     *     "chat-room-1": "1500ms",
+     *     "notifications": "3000ms"
+     *   },
+     *   "isRunning": true,
+     *   "isActive": true,
+     *   "checkTime": "2024-01-15T10:30:45"
+     * }
+     * ```
+     * 
+     * 포함 정보:
+     * - subscribedChannels: 현재 구독 중인 채널 목록
+     * - totalChannelCount: 총 구독 채널 수
+     * - channelSubscriptionDetails: 채널별 구독 유지 시간
+     * - isRunning: 리스너 컨테이너 실행 상태
+     * - isActive: 리스너 컨테이너 활성 상태
+     * - checkTime: 조회 시간
+     * 
+     * 사용 시나리오:
+     * - 시스템 헬스체크
+     * - 성능 모니터링
+     * - 장애 진단
+     * - 관리자 대시보드 데이터 제공
+     * 
+     * @return Map<String, Object> 구독 상태에 대한 상세 정보
+     */
+    @GetMapping("/subscription-status")
+    public Map<String, Object> getSubscriptionStatus() {
+        // 요청 로깅
+        log.info("구독 상태 상세 정보 조회 요청");
+        
+        // 구독 상태 상세 정보 조회 (서비스 계층으로 위임)
+        Map<String, Object> subscriptionStatus = redisSubscribeService.getSubscriptionStatus();
+        
+        // 응답 로깅
+        log.info("구독 상태 상세 정보 API 응답 완료");
+        
+        return subscriptionStatus;
     }
 }
