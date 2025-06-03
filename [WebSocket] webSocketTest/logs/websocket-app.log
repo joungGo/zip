@@ -471,3 +471,476 @@ Caused by: java.nio.channels.ClosedChannelException: null
 2025-06-03 23:11:41.551 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f
 2025-06-03 23:13:01.667 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
 2025-06-03 23:13:01.687 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-06-03 23:29:17.178 [main] INFO  c.example.websockettest.WebSocketTestApplication - Starting WebSocketTestApplication using Java 21.0.6 with PID 2260 (C:\Users\jounghyeonNB\zip\[WebSocket] webSocketTest\build\classes\java\main started by jounghyeonNB in C:\Users\jounghyeonNB\zip\[WebSocket] webSocketTest)
+2025-06-03 23:29:17.182 [main] INFO  c.example.websockettest.WebSocketTestApplication - No active profile set, falling back to 1 default profile: "default"
+2025-06-03 23:29:19.289 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-06-03 23:29:19.327 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2025-06-03 23:29:19.328 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-03 23:29:19.468 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-06-03 23:29:19.470 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2174 ms
+2025-06-03 23:29:19.975 [main] INFO  o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-06-03 23:29:20.278 [main] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2025-06-03 23:29:20.535 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-06-03 23:29:20.556 [main] INFO  c.example.websockettest.WebSocketTestApplication - Started WebSocketTestApplication in 4.792 seconds (process running for 6.454)
+2025-06-03 23:29:20.568 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:29:25.564 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:29:29.466 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-06-03 23:29:29.467 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-06-03 23:29:29.469 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-06-03 23:29:30.579 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:29:35.565 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:29:40.559 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:29:45.554 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:29:50.555 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:29:55.554 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:29:59.931 [http-nio-8080-exec-7] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec, remoteAddress=/[0:0:0:0:0:0:0:1]:54044
+2025-06-03 23:29:59.932 [http-nio-8080-exec-7] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec, remoteAddress=/[0:0:0:0:0:0:0:1]:54044
+2025-06-03 23:29:59.932 [http-nio-8080-exec-7] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec
+2025-06-03 23:29:59.933 [http-nio-8080-exec-7] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec, totalActiveSessions=1
+2025-06-03 23:29:59.933 [http-nio-8080-exec-7] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:29:59.935 [http-nio-8080-exec-7] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec, totalActiveSessions=1
+2025-06-03 23:29:59.935 [http-nio-8080-exec-7] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec
+2025-06-03 23:30:00.561 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:00.587 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:00
+2025-06-03 23:30:00.587 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:00.588 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:00.596 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:00.601 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:05.557 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:05.557 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:05
+2025-06-03 23:30:05.557 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:05.557 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:05.559 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:05.559 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:10.566 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:10.567 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:10
+2025-06-03 23:30:10.567 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:10.567 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:10.567 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:10.567 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:15.553 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:15.554 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:15
+2025-06-03 23:30:15.554 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:15.554 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:15.556 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:15.556 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:20.559 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:20.559 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:20
+2025-06-03 23:30:20.559 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:20.559 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:20.561 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:20.581 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:25.557 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:25.557 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:25
+2025-06-03 23:30:25.557 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:25.557 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:25.559 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:25.559 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:30.562 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:30.564 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:30
+2025-06-03 23:30:30.565 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:30.565 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:30.566 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:30.574 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:35.561 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:35.562 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:35
+2025-06-03 23:30:35.562 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:35.562 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:35.562 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:35.562 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:40.553 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:40.554 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:40
+2025-06-03 23:30:40.555 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:40.556 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:40.557 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:40.558 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:45.556 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:45.558 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:45
+2025-06-03 23:30:45.558 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:45.558 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:45.560 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:45.560 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:50.568 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:50.570 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:50
+2025-06-03 23:30:50.570 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:50.571 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:50.572 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:50.574 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:30:55.556 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:30:55.556 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:30:55
+2025-06-03 23:30:55.556 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:30:55.556 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:30:55.556 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:30:55.556 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:00.554 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:00.555 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:00
+2025-06-03 23:31:00.555 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:00.555 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:00.557 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:00.557 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:05.551 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:05.552 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:05
+2025-06-03 23:31:05.552 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:05.552 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:05.553 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:05.553 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:10.557 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:10.558 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:10
+2025-06-03 23:31:10.558 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:10.558 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:10.559 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:10.559 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:15.557 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:15.558 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:15
+2025-06-03 23:31:15.562 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:15.571 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:15.572 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:15.574 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:20.561 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:20.563 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:20
+2025-06-03 23:31:20.564 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:20.564 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:20.565 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:20.565 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:25.555 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:25.557 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:25
+2025-06-03 23:31:25.557 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:25.557 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:25.558 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:25.558 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:30.560 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:30.561 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:30
+2025-06-03 23:31:30.561 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:30.561 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:30.561 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:30.562 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:35.558 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:35.559 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:35
+2025-06-03 23:31:35.559 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:35.559 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:35.560 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:35.560 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:40.560 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:40.560 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:40
+2025-06-03 23:31:40.561 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:40.561 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:40.562 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:40.562 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:45.555 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:45.555 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:45
+2025-06-03 23:31:45.555 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:45.562 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:45.570 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:45.571 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:50.679 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:50.680 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:50
+2025-06-03 23:31:50.680 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:50.681 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:50.685 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:50.687 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:31:55.562 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:31:55.566 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:31:55
+2025-06-03 23:31:55.567 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:31:55.567 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:31:55.572 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:31:55.585 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:32:00.560 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:32:00.561 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:32:00
+2025-06-03 23:32:00.562 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:32:00.562 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:32:00.562 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:32:00.562 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:32:05.556 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:32:05.557 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:32:05
+2025-06-03 23:32:05.558 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:32:05.558 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:32:05.560 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:32:05.560 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:32:10.553 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:32:10.554 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:32:10
+2025-06-03 23:32:10.555 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:32:10.555 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:32:10.555 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:32:10.555 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:32:15.563 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:32:15.570 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:32:15
+2025-06-03 23:32:15.571 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:32:15.571 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:32:15.574 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:32:15.575 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:32:20.560 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:32:20.561 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:32:20
+2025-06-03 23:32:20.561 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:32:20.561 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:32:20.562 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:32:20.563 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:32:25.558 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:32:25.559 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:32:25
+2025-06-03 23:32:25.559 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:32:25.559 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:32:25.559 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:32:25.559 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:32:30.567 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:32:30.569 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:32:30
+2025-06-03 23:32:30.569 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:32:30.569 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:32:30.579 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:32:30.581 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:32:35.559 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:32:35.560 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:32:35
+2025-06-03 23:32:35.560 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:32:35.560 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:32:35.561 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:32:35.562 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:32:40.566 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:32:40.567 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:32:40
+2025-06-03 23:32:40.568 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:32:40.569 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=140
+2025-06-03 23:32:40.573 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:32:40.574 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:32:44.746 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-06-03 23:32:44.766 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-06-03 23:32:44.794 [SpringApplicationShutdownHook] ERROR c.e.websockettest.controller.WebSocketController - ❌ WebSocket 전송 에러: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec, errorType=IOException, message=java.nio.channels.ClosedChannelException
+java.io.IOException: java.nio.channels.ClosedChannelException
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:326)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlock(WsRemoteEndpointImplBase.java:266)
+	at org.apache.tomcat.websocket.WsSession.sendCloseMessage(WsSession.java:778)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:575)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:542)
+	at org.apache.tomcat.websocket.WsSession.close(WsSession.java:530)
+	at org.apache.tomcat.websocket.WsWebSocketContainer.destroy(WsWebSocketContainer.java:1022)
+	at org.apache.tomcat.websocket.server.WsContextListener.contextDestroyed(WsContextListener.java:46)
+	at org.apache.catalina.core.StandardContext.listenerStop(StandardContext.java:4090)
+	at org.apache.catalina.core.StandardContext.stopInternal(StandardContext.java:4700)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardService.stopInternal(StandardService.java:468)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardServer.stopInternal(StandardServer.java:915)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.startup.Tomcat.stop(Tomcat.java:448)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.stopTomcat(TomcatWebServer.java:301)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.destroy(TomcatWebServer.java:374)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:182)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1126)
+	at org.springframework.boot.SpringApplicationShutdownHook.closeAndWait(SpringApplicationShutdownHook.java:147)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:116)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.ClosedChannelException: null
+	at org.apache.tomcat.util.net.NioChannel$1.write(NioChannel.java:272)
+	at org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper$NioOperationState.run(NioEndpoint.java:1634)
+	at org.apache.tomcat.util.net.SocketWrapperBase$OperationState.start(SocketWrapperBase.java:1037)
+	at org.apache.tomcat.util.net.SocketWrapperBase.vectoredOperation(SocketWrapperBase.java:1426)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1352)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1323)
+	at org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer.doWrite(WsRemoteEndpointImplServer.java:171)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.writeMessagePart(WsRemoteEndpointImplBase.java:521)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:313)
+	... 37 common frames omitted
+2025-06-03 23:32:44.805 [SpringApplicationShutdownHook] ERROR c.example.websockettest.service.WebSocketService - ❌ WebSocket 에러 처리 시작: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec, errorType=IOException, message=java.nio.channels.ClosedChannelException
+java.io.IOException: java.nio.channels.ClosedChannelException
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:326)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlock(WsRemoteEndpointImplBase.java:266)
+	at org.apache.tomcat.websocket.WsSession.sendCloseMessage(WsSession.java:778)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:575)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:542)
+	at org.apache.tomcat.websocket.WsSession.close(WsSession.java:530)
+	at org.apache.tomcat.websocket.WsWebSocketContainer.destroy(WsWebSocketContainer.java:1022)
+	at org.apache.tomcat.websocket.server.WsContextListener.contextDestroyed(WsContextListener.java:46)
+	at org.apache.catalina.core.StandardContext.listenerStop(StandardContext.java:4090)
+	at org.apache.catalina.core.StandardContext.stopInternal(StandardContext.java:4700)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardService.stopInternal(StandardService.java:468)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardServer.stopInternal(StandardServer.java:915)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.startup.Tomcat.stop(Tomcat.java:448)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.stopTomcat(TomcatWebServer.java:301)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.destroy(TomcatWebServer.java:374)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:182)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1126)
+	at org.springframework.boot.SpringApplicationShutdownHook.closeAndWait(SpringApplicationShutdownHook.java:147)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:116)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.ClosedChannelException: null
+	at org.apache.tomcat.util.net.NioChannel$1.write(NioChannel.java:272)
+	at org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper$NioOperationState.run(NioEndpoint.java:1634)
+	at org.apache.tomcat.util.net.SocketWrapperBase$OperationState.start(SocketWrapperBase.java:1037)
+	at org.apache.tomcat.util.net.SocketWrapperBase.vectoredOperation(SocketWrapperBase.java:1426)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1352)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1323)
+	at org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer.doWrite(WsRemoteEndpointImplServer.java:171)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.writeMessagePart(WsRemoteEndpointImplBase.java:521)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:313)
+	... 37 common frames omitted
+2025-06-03 23:32:44.807 [SpringApplicationShutdownHook] WARN  c.e.w.repository.WebSocketSessionRepository - ⚠️ 세션 에러 마킹: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec
+2025-06-03 23:32:44.807 [SpringApplicationShutdownHook] INFO  c.e.w.repository.WebSocketSessionRepository - ❌ 세션 에러 마킹 완료: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec, totalErrorSessions=1
+2025-06-03 23:32:44.807 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 에러 세션 마킹 완료: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec
+2025-06-03 23:32:44.807 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 에러 처리 완료: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec
+2025-06-03 23:32:44.808 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec, closeCode=1001, reason=The web application is stopping
+2025-06-03 23:32:44.809 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec
+2025-06-03 23:32:44.809 [SpringApplicationShutdownHook] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec
+2025-06-03 23:32:44.809 [SpringApplicationShutdownHook] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec, lastActivity=2025-06-03T23:29:59.933383100, wasErrorSession=true, remainingSessions=0
+2025-06-03 23:32:44.809 [SpringApplicationShutdownHook] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:32:44.809 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec, remainingActiveSessions=0
+2025-06-03 23:32:44.810 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=80779728-c218-8ece-1788-1a8a9cfb20ec
+2025-06-03 23:32:55.949 [restartedMain] INFO  c.example.websockettest.WebSocketTestApplication - Starting WebSocketTestApplication using Java 21.0.6 with PID 24688 (C:\Users\jounghyeonNB\zip\[WebSocket] webSocketTest\build\classes\java\main started by jounghyeonNB in C:\Users\jounghyeonNB\zip\[WebSocket] webSocketTest)
+2025-06-03 23:32:55.954 [restartedMain] INFO  c.example.websockettest.WebSocketTestApplication - No active profile set, falling back to 1 default profile: "default"
+2025-06-03 23:32:56.080 [restartedMain] INFO  o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-06-03 23:32:56.081 [restartedMain] INFO  o.s.b.d.env.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-06-03 23:32:58.421 [restartedMain] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-06-03 23:32:58.459 [restartedMain] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2025-06-03 23:32:58.460 [restartedMain] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-03 23:32:58.580 [restartedMain] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-06-03 23:32:58.581 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2498 ms
+2025-06-03 23:32:59.151 [restartedMain] INFO  o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-06-03 23:32:59.459 [restartedMain] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2025-06-03 23:32:59.706 [restartedMain] INFO  o.s.b.d.autoconfigure.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-06-03 23:32:59.805 [restartedMain] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-06-03 23:32:59.845 [restartedMain] INFO  c.example.websockettest.WebSocketTestApplication - Started WebSocketTestApplication in 5.209 seconds (process running for 7.922)
+2025-06-03 23:32:59.883 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:04.839 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:09.837 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:14.846 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:19.841 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:24.844 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:29.845 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:34.848 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:39.853 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:44.837 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:49.844 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:54.847 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:33:59.841 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:04.839 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:09.837 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:14.843 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:19.838 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:24.849 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:29.859 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:34.838 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:39.845 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:44.853 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:48.855 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-06-03 23:34:48.856 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-06-03 23:34:48.860 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2025-06-03 23:34:49.837 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:34:51.095 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=f20371ab-7546-be3b-8354-85a5028788bf, remoteAddress=/[0:0:0:0:0:0:0:1]:54442
+2025-06-03 23:34:51.096 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=f20371ab-7546-be3b-8354-85a5028788bf, remoteAddress=/[0:0:0:0:0:0:0:1]:54442
+2025-06-03 23:34:51.096 [http-nio-8080-exec-3] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=f20371ab-7546-be3b-8354-85a5028788bf
+2025-06-03 23:34:51.096 [http-nio-8080-exec-3] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=f20371ab-7546-be3b-8354-85a5028788bf, totalActiveSessions=1
+2025-06-03 23:34:51.096 [http-nio-8080-exec-3] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:34:51.096 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=f20371ab-7546-be3b-8354-85a5028788bf, totalActiveSessions=1
+2025-06-03 23:34:51.096 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=f20371ab-7546-be3b-8354-85a5028788bf
+2025-06-03 23:34:54.847 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:34:54.917 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:34:54
+2025-06-03 23:34:54.918 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:34:54.918 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=142
+2025-06-03 23:34:54.928 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:34:54.936 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:34:59.837 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:34:59.837 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 1, 시간: 2025-06-03 23:34:59
+2025-06-03 23:34:59.837 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=1
+2025-06-03 23:34:59.837 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=1, messageLength=142
+2025-06-03 23:34:59.839 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=1, success=1, failure=0
+2025-06-03 23:34:59.844 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 1
+2025-06-03 23:35:00.994 [http-nio-8080-exec-5] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=f20371ab-7546-be3b-8354-85a5028788bf, closeCode=1001, reason=null
+2025-06-03 23:35:00.996 [http-nio-8080-exec-5] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=f20371ab-7546-be3b-8354-85a5028788bf
+2025-06-03 23:35:00.996 [http-nio-8080-exec-5] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=f20371ab-7546-be3b-8354-85a5028788bf
+2025-06-03 23:35:00.997 [http-nio-8080-exec-5] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=f20371ab-7546-be3b-8354-85a5028788bf, lastActivity=2025-06-03T23:34:51.096833100, wasErrorSession=false, remainingSessions=0
+2025-06-03 23:35:00.997 [http-nio-8080-exec-5] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:35:00.997 [http-nio-8080-exec-5] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=f20371ab-7546-be3b-8354-85a5028788bf, remainingActiveSessions=0
+2025-06-03 23:35:00.997 [http-nio-8080-exec-5] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=f20371ab-7546-be3b-8354-85a5028788bf
+2025-06-03 23:35:04.675 [http-nio-8080-exec-7] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209, remoteAddress=/[0:0:0:0:0:0:0:1]:54457
+2025-06-03 23:35:04.675 [http-nio-8080-exec-7] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209, remoteAddress=/[0:0:0:0:0:0:0:1]:54457
+2025-06-03 23:35:04.678 [http-nio-8080-exec-7] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209
+2025-06-03 23:35:04.678 [http-nio-8080-exec-7] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209, totalActiveSessions=1
+2025-06-03 23:35:04.680 [http-nio-8080-exec-7] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:35:04.680 [http-nio-8080-exec-7] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209, totalActiveSessions=1
+2025-06-03 23:35:04.680 [http-nio-8080-exec-7] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209
+2025-06-03 23:35:04.752 [http-nio-8080-exec-10] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08, remoteAddress=/[0:0:0:0:0:0:0:1]:54458
+2025-06-03 23:35:04.752 [http-nio-8080-exec-10] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08, remoteAddress=/[0:0:0:0:0:0:0:1]:54458
+2025-06-03 23:35:04.754 [http-nio-8080-exec-10] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08
+2025-06-03 23:35:04.754 [http-nio-8080-exec-10] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08, totalActiveSessions=2
+2025-06-03 23:35:04.754 [http-nio-8080-exec-10] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=2
+2025-06-03 23:35:04.756 [http-nio-8080-exec-10] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08, totalActiveSessions=2
+2025-06-03 23:35:04.757 [http-nio-8080-exec-10] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08
+2025-06-03 23:35:04.763 [http-nio-8080-exec-1] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0, remoteAddress=/[0:0:0:0:0:0:0:1]:54459
+2025-06-03 23:35:04.765 [http-nio-8080-exec-1] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0, remoteAddress=/[0:0:0:0:0:0:0:1]:54459
+2025-06-03 23:35:04.765 [http-nio-8080-exec-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0
+2025-06-03 23:35:04.765 [http-nio-8080-exec-1] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0, totalActiveSessions=3
+2025-06-03 23:35:04.765 [http-nio-8080-exec-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:35:04.765 [http-nio-8080-exec-1] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0, totalActiveSessions=3
+2025-06-03 23:35:04.767 [http-nio-8080-exec-1] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0
+2025-06-03 23:35:04.846 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:35:04.848 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 3, 시간: 2025-06-03 23:35:04
+2025-06-03 23:35:04.848 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=3
+2025-06-03 23:35:04.848 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=3, messageLength=142
+2025-06-03 23:35:04.850 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=3, success=3, failure=0
+2025-06-03 23:35:04.852 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 3
+2025-06-03 23:35:09.849 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:35:09.849 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 3, 시간: 2025-06-03 23:35:09
+2025-06-03 23:35:09.851 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=3
+2025-06-03 23:35:09.853 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=3, messageLength=142
+2025-06-03 23:35:09.861 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=3, success=3, failure=0
+2025-06-03 23:35:09.862 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 3
+2025-06-03 23:35:14.846 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:35:14.846 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ⏱️ 스케줄러: 브로드캐스트 메시지 전송 시작 - 활성세션: 3, 시간: 2025-06-03 23:35:14
+2025-06-03 23:35:14.846 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=3
+2025-06-03 23:35:14.846 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=3, messageLength=142
+2025-06-03 23:35:14.849 [scheduling-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=3, success=3, failure=0
+2025-06-03 23:35:14.850 [scheduling-1] INFO  c.e.w.service.WebSocketSchedulerService - ✅ 스케줄러: 브로드캐스트 메시지 전송 완료 - 대상세션: 3
+2025-06-03 23:35:15.998 [http-nio-8080-exec-2] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08, closeCode=1001, reason=null
+2025-06-03 23:35:15.998 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209, closeCode=1001, reason=null
+2025-06-03 23:35:16.000 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0, closeCode=1001, reason=null
+2025-06-03 23:35:16.001 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0
+2025-06-03 23:35:16.001 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0
+2025-06-03 23:35:16.001 [http-nio-8080-exec-4] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0, lastActivity=2025-06-03T23:35:04.765140500, wasErrorSession=false, remainingSessions=2
+2025-06-03 23:35:16.001 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=2
+2025-06-03 23:35:16.001 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0, remainingActiveSessions=2
+2025-06-03 23:35:16.000 [http-nio-8080-exec-2] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08
+2025-06-03 23:35:16.001 [http-nio-8080-exec-2] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08
+2025-06-03 23:35:16.000 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209
+2025-06-03 23:35:16.001 [http-nio-8080-exec-2] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08, lastActivity=2025-06-03T23:35:04.754925800, wasErrorSession=false, remainingSessions=1
+2025-06-03 23:35:16.001 [http-nio-8080-exec-3] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209
+2025-06-03 23:35:16.001 [http-nio-8080-exec-2] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:35:16.001 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=c91f1a0c-6949-20a2-c7be-82814e06acc0
+2025-06-03 23:35:16.001 [http-nio-8080-exec-3] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209, lastActivity=2025-06-03T23:35:04.678378, wasErrorSession=false, remainingSessions=0
+2025-06-03 23:35:16.001 [http-nio-8080-exec-3] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:35:16.001 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209, remainingActiveSessions=0
+2025-06-03 23:35:16.001 [http-nio-8080-exec-2] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08, remainingActiveSessions=1
+2025-06-03 23:35:16.001 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=1a4a471d-06b5-b83f-4a22-19e7cb1f3209
+2025-06-03 23:35:16.003 [http-nio-8080-exec-2] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=fc1ca118-218b-f424-a52b-2de7526a3e08
+2025-06-03 23:35:19.841 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:35:24.845 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:35:29.885 [scheduling-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:35:32.349 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-06-03 23:35:32.405 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete

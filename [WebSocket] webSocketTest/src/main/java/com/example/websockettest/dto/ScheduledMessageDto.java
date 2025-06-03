@@ -1,5 +1,6 @@
 package com.example.websockettest.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,12 +37,16 @@ public class ScheduledMessageDto {
     /**
      * 사람이 읽기 쉬운 형태의 서버 시간
      * 예: "2024-01-15 14:30:25"
+     * JSON에서는 "server_time"으로 직렬화됨
      */
+    @JsonProperty("server_time")
     private String serverTime;
     
     /**
      * 현재 활성 WebSocket 세션 수
+     * JSON에서는 "active_sessions"으로 직렬화됨
      */
+    @JsonProperty("active_sessions")
     private Integer activeSessions;
     
     /**

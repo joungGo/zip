@@ -26,6 +26,9 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 /logs/*
+/logs/websocket-app.log
+/logs/websocket-app.log.*
+
 
 ### NetBeans ###
 /nbproject/private/

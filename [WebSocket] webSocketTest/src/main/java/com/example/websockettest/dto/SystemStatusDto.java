@@ -1,5 +1,6 @@
 package com.example.websockettest.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,21 +29,29 @@ public class SystemStatusDto {
     
     /**
      * 현재 활성 WebSocket 세션 수
+     * JSON에서는 "active_sessions"으로 직렬화됨
      */
+    @JsonProperty("active_sessions")
     private Integer activeSessions;
     
     /**
      * 사용 중인 메모리 (MB 단위)
+     * JSON에서는 "memory_used_mb"로 직렬화됨
      */
+    @JsonProperty("memory_used_mb")
     private Double memoryUsedMb;
     
     /**
      * 전체 메모리 (MB 단위)
+     * JSON에서는 "memory_total_mb"로 직렬화됨
      */
+    @JsonProperty("memory_total_mb")
     private Double memoryTotalMb;
     
     /**
      * 메모리 사용률 (퍼센트)
+     * JSON에서는 "memory_usage_percent"로 직렬화됨
      */
+    @JsonProperty("memory_usage_percent")
     private Double memoryUsagePercent;
 } 
