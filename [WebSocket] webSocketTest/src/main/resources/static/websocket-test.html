@@ -197,8 +197,28 @@
             websocket.onmessage = function(event) {
                 console.log('📨 서버로부터 메시지 수신:', event.data);
                 
-                // 서버에서 받은 메시지를 화면에 표시
-                addMessage('서버: ' + event.data, 'received');
+                try {
+                    // JSON 메시지인지 확인하여 파싱 시도
+                    const messageData = JSON.parse(event.data);
+                    
+                    // 스케줄러에서 보낸 메시지인지 확인
+                    if (messageData.type === 'scheduled_message') {
+                        // 스케줄러 메시지를 특별히 포맷팅해서 표시
+                        const formattedMessage = `🔔 자동 메시지 [${messageData.server_time}] - 활성 세션: ${messageData.active_sessions}개`;
+                        addMessage(formattedMessage, 'scheduled');
+                    } else if (messageData.type === 'system_status') {
+                        // 시스템 상태 메시지 포맷팅
+                        const memoryUsage = `${messageData.memory_usage_percent}%`;
+                        const formattedMessage = `📊 시스템 상태 - 메모리 사용률: ${memoryUsage}, 활성 세션: ${messageData.active_sessions}개`;
+                        addMessage(formattedMessage, 'system');
+                    } else {
+                        // 다른 JSON 메시지는 일반적으로 표시
+                        addMessage('서버: ' + JSON.stringify(messageData, null, 2), 'received');
+                    }
+                } catch (e) {
+                    // JSON이 아닌 일반 텍스트 메시지는 기존처럼 처리
+                    addMessage('서버: ' + event.data, 'received');
+                }
             };
             
             /**
@@ -308,7 +328,7 @@
         /**
          * 메시지 영역에 새로운 메시지를 추가하는 함수
          * @param {string} message - 표시할 메시지 내용
-         * @param {string} type - 메시지 타입 ('sent', 'received', 'system', 'error')
+         * @param {string} type - 메시지 타입 ('sent', 'received', 'system', 'error', 'scheduled')
          */
         function addMessage(message, type) {
             // 새로운 메시지 요소 생성
@@ -332,6 +352,13 @@
                     break;
                 case 'error':       // 에러 메시지 (빨간색)
                     messageElement.style.color = '#dc3545';
+                    break;
+                case 'scheduled':   // 스케줄러 자동 메시지 (주황색, 굵게)
+                    messageElement.style.color = '#fd7e14';
+                    messageElement.style.fontWeight = 'bold';
+                    messageElement.style.backgroundColor = '#fff3cd';
+                    messageElement.style.padding = '5px';
+                    messageElement.style.borderRadius = '3px';
                     break;
             }
             
