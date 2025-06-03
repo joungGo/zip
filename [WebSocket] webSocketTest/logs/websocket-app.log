@@ -469,3 +469,5 @@ Caused by: java.nio.channels.ClosedChannelException: null
 2025-06-03 23:11:41.551 [http-nio-8080-exec-3] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
 2025-06-03 23:11:41.551 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, remainingActiveSessions=0
 2025-06-03 23:11:41.551 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f
+2025-06-03 23:13:01.667 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-06-03 23:13:01.687 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
