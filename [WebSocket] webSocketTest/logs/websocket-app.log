@@ -1,129 +1,471 @@
-2025-06-01 01:59:32.111 [main] INFO  c.example.websockettest.WebSocketTestApplication - Starting WebSocketTestApplication using Java 21.0.6 with PID 18480 (C:\Users\jounghyeonNB\webSocketTest\build\classes\java\main started by jounghyeonNB in C:\Users\jounghyeonNB\webSocketTest)
-2025-06-01 01:59:32.111 [main] INFO  c.example.websockettest.WebSocketTestApplication - No active profile set, falling back to 1 default profile: "default"
-2025-06-01 01:59:32.875 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2025-06-01 01:59:32.880 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
-2025-06-01 01:59:32.894 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.41]
-2025-06-01 01:59:32.929 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2025-06-01 01:59:32.929 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 772 ms
-2025-06-01 01:59:33.026 [main] INFO  o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
-2025-06-01 01:59:33.132 [main] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
-2025-06-01 01:59:33.200 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2025-06-01 01:59:33.207 [main] INFO  c.example.websockettest.WebSocketTestApplication - Started WebSocketTestApplication in 1.49 seconds (process running for 3.466)
-2025-06-01 01:59:40.981 [http-nio-8080-exec-2] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2025-06-01 01:59:40.981 [http-nio-8080-exec-2] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2025-06-01 01:59:40.982 [http-nio-8080-exec-2] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 1 ms
-2025-06-01 01:59:48.189 [http-nio-8080-exec-5] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3, remoteAddress=/[0:0:0:0:0:0:0:1]:56186
-2025-06-01 01:59:48.189 [http-nio-8080-exec-5] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3, remoteAddress=/[0:0:0:0:0:0:0:1]:56186
-2025-06-01 01:59:48.189 [http-nio-8080-exec-5] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3
-2025-06-01 01:59:48.189 [http-nio-8080-exec-5] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3, totalActiveSessions=1
-2025-06-01 01:59:48.189 [http-nio-8080-exec-5] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
-2025-06-01 01:59:48.189 [http-nio-8080-exec-5] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3, totalActiveSessions=1
-2025-06-01 01:59:48.189 [http-nio-8080-exec-5] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3
-2025-06-01 01:59:58.745 [http-nio-8080-exec-6] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3, closeCode=1001, reason=null
-2025-06-01 01:59:58.745 [http-nio-8080-exec-6] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3
-2025-06-01 01:59:58.746 [http-nio-8080-exec-6] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3
-2025-06-01 01:59:58.747 [http-nio-8080-exec-6] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3, lastActivity=2025-06-01T01:59:48.189642100, wasErrorSession=false, remainingSessions=0
-2025-06-01 01:59:58.747 [http-nio-8080-exec-6] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
-2025-06-01 01:59:58.747 [http-nio-8080-exec-6] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3, remainingActiveSessions=0
-2025-06-01 01:59:58.747 [http-nio-8080-exec-6] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=a21eb32e-73c0-c4ee-3a8f-f6fcd51399f3
-2025-06-01 02:00:17.847 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d, remoteAddress=/[0:0:0:0:0:0:0:1]:56212
-2025-06-01 02:00:17.847 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d, remoteAddress=/[0:0:0:0:0:0:0:1]:56212
-2025-06-01 02:00:17.847 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d
-2025-06-01 02:00:17.847 [http-nio-8080-exec-4] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d, totalActiveSessions=1
-2025-06-01 02:00:17.847 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
-2025-06-01 02:00:17.847 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d, totalActiveSessions=1
-2025-06-01 02:00:17.847 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d
-2025-06-01 02:00:20.378 [http-nio-8080-exec-9] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d, closeCode=1000, reason=null
-2025-06-01 02:00:20.378 [http-nio-8080-exec-9] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d
-2025-06-01 02:00:20.378 [http-nio-8080-exec-9] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d
-2025-06-01 02:00:20.378 [http-nio-8080-exec-9] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d, lastActivity=2025-06-01T02:00:17.847574300, wasErrorSession=false, remainingSessions=0
-2025-06-01 02:00:20.378 [http-nio-8080-exec-9] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
-2025-06-01 02:00:20.378 [http-nio-8080-exec-9] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d, remainingActiveSessions=0
-2025-06-01 02:00:20.378 [http-nio-8080-exec-9] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=8a66683f-9821-c34e-f5ee-4c748d71d57d
-2025-06-01 02:05:52.145 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2025-06-01 02:05:52.157 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
-2025-06-01 02:05:55.549 [main] INFO  c.example.websockettest.WebSocketTestApplication - Starting WebSocketTestApplication using Java 21.0.6 with PID 14564 (C:\Users\jounghyeonNB\webSocketTest\build\classes\java\main started by jounghyeonNB in C:\Users\jounghyeonNB\webSocketTest)
-2025-06-01 02:05:55.549 [main] INFO  c.example.websockettest.WebSocketTestApplication - No active profile set, falling back to 1 default profile: "default"
-2025-06-01 02:05:56.309 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2025-06-01 02:05:56.317 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
-2025-06-01 02:05:56.317 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.41]
-2025-06-01 02:05:56.341 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2025-06-01 02:05:56.341 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 750 ms
-2025-06-01 02:05:56.432 [main] INFO  o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
-2025-06-01 02:05:56.540 [main] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
-2025-06-01 02:05:56.618 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2025-06-01 02:05:56.621 [main] INFO  c.example.websockettest.WebSocketTestApplication - Started WebSocketTestApplication in 1.464 seconds (process running for 2.441)
-2025-06-01 02:05:59.934 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2025-06-01 02:05:59.934 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2025-06-01 02:05:59.934 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 0 ms
-2025-06-01 02:06:29.960 [http-nio-8080-exec-7] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, remoteAddress=/[0:0:0:0:0:0:0:1]:56935
-2025-06-01 02:06:29.965 [http-nio-8080-exec-7] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, remoteAddress=/[0:0:0:0:0:0:0:1]:56935
-2025-06-01 02:06:29.965 [http-nio-8080-exec-7] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940
-2025-06-01 02:06:29.965 [http-nio-8080-exec-7] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, totalActiveSessions=1
-2025-06-01 02:06:29.965 [http-nio-8080-exec-7] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
-2025-06-01 02:06:29.965 [http-nio-8080-exec-7] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, totalActiveSessions=1
-2025-06-01 02:06:29.965 [http-nio-8080-exec-7] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940
-2025-06-01 02:06:29.965 [http-nio-8080-exec-9] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0, remoteAddress=/[0:0:0:0:0:0:0:1]:56936
-2025-06-01 02:06:29.965 [http-nio-8080-exec-9] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0, remoteAddress=/[0:0:0:0:0:0:0:1]:56936
-2025-06-01 02:06:29.965 [http-nio-8080-exec-9] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0
-2025-06-01 02:06:29.965 [http-nio-8080-exec-9] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0, totalActiveSessions=2
-2025-06-01 02:06:29.965 [http-nio-8080-exec-9] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=2
-2025-06-01 02:06:29.965 [http-nio-8080-exec-9] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0, totalActiveSessions=2
-2025-06-01 02:06:29.965 [http-nio-8080-exec-9] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0
-2025-06-01 02:06:29.992 [http-nio-8080-exec-8] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1, remoteAddress=/[0:0:0:0:0:0:0:1]:56937
-2025-06-01 02:06:29.992 [http-nio-8080-exec-8] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1, remoteAddress=/[0:0:0:0:0:0:0:1]:56937
-2025-06-01 02:06:29.992 [http-nio-8080-exec-8] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1
-2025-06-01 02:06:29.992 [http-nio-8080-exec-8] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1, totalActiveSessions=3
-2025-06-01 02:06:29.992 [http-nio-8080-exec-8] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
-2025-06-01 02:06:29.992 [http-nio-8080-exec-8] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1, totalActiveSessions=3
-2025-06-01 02:06:29.993 [http-nio-8080-exec-8] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1
-2025-06-01 02:06:30.019 [http-nio-8080-exec-10] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9, remoteAddress=/[0:0:0:0:0:0:0:1]:56939
-2025-06-01 02:06:30.019 [http-nio-8080-exec-10] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9, remoteAddress=/[0:0:0:0:0:0:0:1]:56939
-2025-06-01 02:06:30.019 [http-nio-8080-exec-10] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9
-2025-06-01 02:06:30.019 [http-nio-8080-exec-10] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9, totalActiveSessions=4
-2025-06-01 02:06:30.019 [http-nio-8080-exec-10] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=4
-2025-06-01 02:06:30.019 [http-nio-8080-exec-10] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9, totalActiveSessions=4
-2025-06-01 02:06:30.019 [http-nio-8080-exec-10] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9
-2025-06-01 02:06:38.463 [http-nio-8080-exec-1] INFO  c.e.w.controller.WebSocketRestController - 📡 API 호출: 브로드캐스트 메시지 전송 요청, messageLength=2
-2025-06-01 02:06:38.463 [http-nio-8080-exec-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=4
-2025-06-01 02:06:38.463 [http-nio-8080-exec-1] INFO  c.e.w.controller.WebSocketRestController - 📡 브로드캐스트 전송 시작: targetSessions=4, message=안녕
-2025-06-01 02:06:38.463 [http-nio-8080-exec-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=4
-2025-06-01 02:06:38.463 [http-nio-8080-exec-1] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=4, messageLength=2
-2025-06-01 02:06:38.463 [http-nio-8080-exec-1] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=4, success=4, failure=0
-2025-06-01 02:06:38.463 [http-nio-8080-exec-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=4
-2025-06-01 02:06:38.463 [http-nio-8080-exec-1] INFO  c.e.w.controller.WebSocketRestController - ✅ 브로드캐스트 전송 완료: sentTo=4 sessions
-2025-06-01 02:07:01.432 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - 📨 메시지 수신: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, messageLength=2, payload=좋아
-2025-06-01 02:07:01.432 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - 🔄 메시지 처리 시작: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, messageLength=2
-2025-06-01 02:07:01.432 [http-nio-8080-exec-3] DEBUG c.e.w.repository.WebSocketSessionRepository - ⏰ 세션 활동 시간 업데이트: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, time=2025-06-01T02:07:01.432787800
-2025-06-01 02:07:01.432 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - ✅ 메시지 처리 완료: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, response=Processed: 좋아 - Hello from WebSocket Service!
-2025-06-01 02:07:01.432 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - 📤 응답 전송 완료: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, response=Processed: 좋아 - Hello from WebSocket Service!
-2025-06-01 02:07:14.049 [http-nio-8080-exec-5] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9, closeCode=1000, reason=null
-2025-06-01 02:07:14.049 [http-nio-8080-exec-5] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9
-2025-06-01 02:07:14.049 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0, closeCode=1000, reason=null
-2025-06-01 02:07:14.049 [http-nio-8080-exec-7] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, closeCode=1000, reason=null
-2025-06-01 02:07:14.049 [http-nio-8080-exec-2] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1, closeCode=1000, reason=null
-2025-06-01 02:07:14.049 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0
-2025-06-01 02:07:14.049 [http-nio-8080-exec-5] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9
-2025-06-01 02:07:14.049 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0
-2025-06-01 02:07:14.049 [http-nio-8080-exec-5] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9, lastActivity=2025-06-01T02:06:30.019692400, wasErrorSession=false, remainingSessions=3
-2025-06-01 02:07:14.049 [http-nio-8080-exec-5] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=2
-2025-06-01 02:07:14.049 [http-nio-8080-exec-4] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0, lastActivity=2025-06-01T02:06:29.965348200, wasErrorSession=false, remainingSessions=2
-2025-06-01 02:07:14.049 [http-nio-8080-exec-5] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9, remainingActiveSessions=2
-2025-06-01 02:07:14.049 [http-nio-8080-exec-5] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=99dd76c4-73d9-46f7-8b79-04dee8956bd9
-2025-06-01 02:07:14.049 [http-nio-8080-exec-7] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940
-2025-06-01 02:07:14.049 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=2
-2025-06-01 02:07:14.049 [http-nio-8080-exec-2] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1
-2025-06-01 02:07:14.049 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0, remainingActiveSessions=2
-2025-06-01 02:07:14.049 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=336ff54d-b56a-2f35-dbe8-999ed520acc0
-2025-06-01 02:07:14.049 [http-nio-8080-exec-2] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1
-2025-06-01 02:07:14.049 [http-nio-8080-exec-7] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940
-2025-06-01 02:07:14.049 [http-nio-8080-exec-7] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, lastActivity=2025-06-01T02:07:01.432787800, wasErrorSession=false, remainingSessions=0
-2025-06-01 02:07:14.049 [http-nio-8080-exec-2] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1, lastActivity=2025-06-01T02:06:29.992383600, wasErrorSession=false, remainingSessions=1
-2025-06-01 02:07:14.051 [http-nio-8080-exec-7] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
-2025-06-01 02:07:14.051 [http-nio-8080-exec-7] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940, remainingActiveSessions=0
-2025-06-01 02:07:14.051 [http-nio-8080-exec-2] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
-2025-06-01 02:07:14.051 [http-nio-8080-exec-7] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=fe78b9a1-fa0b-3b56-de09-fa9ed1e8a940
-2025-06-01 02:07:14.051 [http-nio-8080-exec-2] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1, remainingActiveSessions=0
-2025-06-01 02:07:14.051 [http-nio-8080-exec-2] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=1f8ae83d-e412-09ff-74b8-e0e1c755dbf1
-2025-06-01 02:07:23.135 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-2025-06-01 02:07:23.152 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-06-03 22:40:12.049 [main] INFO  c.example.websockettest.WebSocketTestApplication - Starting WebSocketTestApplication using Java 21.0.6 with PID 18660 (C:\Users\jounghyeonNB\zip\[WebSocket] webSocketTest\build\classes\java\main started by jounghyeonNB in C:\Users\jounghyeonNB\zip\[WebSocket] webSocketTest)
+2025-06-03 22:40:12.062 [main] INFO  c.example.websockettest.WebSocketTestApplication - No active profile set, falling back to 1 default profile: "default"
+2025-06-03 22:40:14.478 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-06-03 22:40:14.512 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2025-06-03 22:40:14.513 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-03 22:40:14.613 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-06-03 22:40:14.615 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2416 ms
+2025-06-03 22:40:14.922 [main] INFO  o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-06-03 22:40:15.311 [main] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2025-06-03 22:40:15.548 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-06-03 22:40:15.571 [main] INFO  c.example.websockettest.WebSocketTestApplication - Started WebSocketTestApplication in 5.157 seconds (process running for 6.916)
+2025-06-03 22:40:31.644 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-06-03 22:40:31.644 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-06-03 22:40:31.652 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 0 ms
+2025-06-03 22:40:38.912 [http-nio-8080-exec-5] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366, remoteAddress=/[0:0:0:0:0:0:0:1]:51417
+2025-06-03 22:40:38.918 [http-nio-8080-exec-5] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366, remoteAddress=/[0:0:0:0:0:0:0:1]:51417
+2025-06-03 22:40:38.918 [http-nio-8080-exec-5] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366
+2025-06-03 22:40:38.918 [http-nio-8080-exec-5] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366, totalActiveSessions=1
+2025-06-03 22:40:38.918 [http-nio-8080-exec-5] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 22:40:38.920 [http-nio-8080-exec-5] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366, totalActiveSessions=1
+2025-06-03 22:40:38.920 [http-nio-8080-exec-5] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366
+2025-06-03 22:40:40.492 [http-nio-8080-exec-6] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366, closeCode=1000, reason=null
+2025-06-03 22:40:40.494 [http-nio-8080-exec-6] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366
+2025-06-03 22:40:40.495 [http-nio-8080-exec-6] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366
+2025-06-03 22:40:40.495 [http-nio-8080-exec-6] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366, lastActivity=2025-06-03T22:40:38.918052900, wasErrorSession=false, remainingSessions=0
+2025-06-03 22:40:40.495 [http-nio-8080-exec-6] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 22:40:40.495 [http-nio-8080-exec-6] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366, remainingActiveSessions=0
+2025-06-03 22:40:40.495 [http-nio-8080-exec-6] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=88e576e8-bb0d-c2b8-b6b0-3b0ae4a43366
+2025-06-03 22:48:04.267 [http-nio-8080-exec-2] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, remoteAddress=/[0:0:0:0:0:0:0:1]:52120
+2025-06-03 22:48:04.276 [http-nio-8080-exec-2] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, remoteAddress=/[0:0:0:0:0:0:0:1]:52120
+2025-06-03 22:48:04.279 [http-nio-8080-exec-2] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006
+2025-06-03 22:48:04.279 [http-nio-8080-exec-2] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, totalActiveSessions=1
+2025-06-03 22:48:04.279 [http-nio-8080-exec-2] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 22:48:04.279 [http-nio-8080-exec-2] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, totalActiveSessions=1
+2025-06-03 22:48:04.279 [http-nio-8080-exec-2] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006
+2025-06-03 22:48:04.297 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb, remoteAddress=/[0:0:0:0:0:0:0:1]:52121
+2025-06-03 22:48:04.302 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb, remoteAddress=/[0:0:0:0:0:0:0:1]:52121
+2025-06-03 22:48:04.304 [http-nio-8080-exec-3] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb
+2025-06-03 22:48:04.306 [http-nio-8080-exec-3] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb, totalActiveSessions=2
+2025-06-03 22:48:04.306 [http-nio-8080-exec-3] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=2
+2025-06-03 22:48:04.308 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb, totalActiveSessions=2
+2025-06-03 22:48:04.311 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb
+2025-06-03 22:48:04.315 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134, remoteAddress=/[0:0:0:0:0:0:0:1]:52122
+2025-06-03 22:48:04.315 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134, remoteAddress=/[0:0:0:0:0:0:0:1]:52122
+2025-06-03 22:48:04.318 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134
+2025-06-03 22:48:04.318 [http-nio-8080-exec-4] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134, totalActiveSessions=3
+2025-06-03 22:48:04.318 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 22:48:04.318 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134, totalActiveSessions=3
+2025-06-03 22:48:04.318 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134
+2025-06-03 22:48:18.156 [http-nio-8080-exec-6] INFO  c.e.websockettest.controller.WebSocketController - 📨 메시지 수신: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, messageLength=2, payload=안녕
+2025-06-03 22:48:18.158 [http-nio-8080-exec-6] INFO  c.example.websockettest.service.WebSocketService - 🔄 메시지 처리 시작: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, messageLength=2
+2025-06-03 22:48:18.172 [http-nio-8080-exec-6] DEBUG c.e.w.repository.WebSocketSessionRepository - ⏰ 세션 활동 시간 업데이트: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, time=2025-06-03T22:48:18.172914
+2025-06-03 22:48:18.174 [http-nio-8080-exec-6] INFO  c.example.websockettest.service.WebSocketService - ✅ 메시지 처리 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, response=Processed: 안녕 - Hello from WebSocket Service!
+2025-06-03 22:48:18.174 [http-nio-8080-exec-6] INFO  c.e.websockettest.controller.WebSocketController - 📤 응답 전송 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, response=Processed: 안녕 - Hello from WebSocket Service!
+2025-06-03 23:09:21.763 [SpringApplicationShutdownHook] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-06-03 23:09:21.785 [tomcat-shutdown] INFO  o.s.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-06-03 23:09:21.798 [SpringApplicationShutdownHook] ERROR c.e.websockettest.controller.WebSocketController - ❌ WebSocket 전송 에러: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134, errorType=IOException, message=java.nio.channels.ClosedChannelException
+java.io.IOException: java.nio.channels.ClosedChannelException
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:326)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlock(WsRemoteEndpointImplBase.java:266)
+	at org.apache.tomcat.websocket.WsSession.sendCloseMessage(WsSession.java:778)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:575)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:542)
+	at org.apache.tomcat.websocket.WsSession.close(WsSession.java:530)
+	at org.apache.tomcat.websocket.WsWebSocketContainer.destroy(WsWebSocketContainer.java:1022)
+	at org.apache.tomcat.websocket.server.WsContextListener.contextDestroyed(WsContextListener.java:46)
+	at org.apache.catalina.core.StandardContext.listenerStop(StandardContext.java:4090)
+	at org.apache.catalina.core.StandardContext.stopInternal(StandardContext.java:4700)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardService.stopInternal(StandardService.java:468)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardServer.stopInternal(StandardServer.java:915)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.startup.Tomcat.stop(Tomcat.java:448)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.stopTomcat(TomcatWebServer.java:301)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.destroy(TomcatWebServer.java:374)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:182)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1126)
+	at org.springframework.boot.SpringApplicationShutdownHook.closeAndWait(SpringApplicationShutdownHook.java:147)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:116)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.ClosedChannelException: null
+	at org.apache.tomcat.util.net.NioChannel$1.write(NioChannel.java:272)
+	at org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper$NioOperationState.run(NioEndpoint.java:1634)
+	at org.apache.tomcat.util.net.SocketWrapperBase$OperationState.start(SocketWrapperBase.java:1037)
+	at org.apache.tomcat.util.net.SocketWrapperBase.vectoredOperation(SocketWrapperBase.java:1426)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1352)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1323)
+	at org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer.doWrite(WsRemoteEndpointImplServer.java:171)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.writeMessagePart(WsRemoteEndpointImplBase.java:521)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:313)
+	... 37 common frames omitted
+2025-06-03 23:09:21.809 [SpringApplicationShutdownHook] ERROR c.example.websockettest.service.WebSocketService - ❌ WebSocket 에러 처리 시작: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134, errorType=IOException, message=java.nio.channels.ClosedChannelException
+java.io.IOException: java.nio.channels.ClosedChannelException
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:326)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlock(WsRemoteEndpointImplBase.java:266)
+	at org.apache.tomcat.websocket.WsSession.sendCloseMessage(WsSession.java:778)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:575)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:542)
+	at org.apache.tomcat.websocket.WsSession.close(WsSession.java:530)
+	at org.apache.tomcat.websocket.WsWebSocketContainer.destroy(WsWebSocketContainer.java:1022)
+	at org.apache.tomcat.websocket.server.WsContextListener.contextDestroyed(WsContextListener.java:46)
+	at org.apache.catalina.core.StandardContext.listenerStop(StandardContext.java:4090)
+	at org.apache.catalina.core.StandardContext.stopInternal(StandardContext.java:4700)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardService.stopInternal(StandardService.java:468)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardServer.stopInternal(StandardServer.java:915)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.startup.Tomcat.stop(Tomcat.java:448)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.stopTomcat(TomcatWebServer.java:301)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.destroy(TomcatWebServer.java:374)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:182)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1126)
+	at org.springframework.boot.SpringApplicationShutdownHook.closeAndWait(SpringApplicationShutdownHook.java:147)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:116)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.ClosedChannelException: null
+	at org.apache.tomcat.util.net.NioChannel$1.write(NioChannel.java:272)
+	at org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper$NioOperationState.run(NioEndpoint.java:1634)
+	at org.apache.tomcat.util.net.SocketWrapperBase$OperationState.start(SocketWrapperBase.java:1037)
+	at org.apache.tomcat.util.net.SocketWrapperBase.vectoredOperation(SocketWrapperBase.java:1426)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1352)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1323)
+	at org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer.doWrite(WsRemoteEndpointImplServer.java:171)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.writeMessagePart(WsRemoteEndpointImplBase.java:521)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:313)
+	... 37 common frames omitted
+2025-06-03 23:09:21.811 [SpringApplicationShutdownHook] WARN  c.e.w.repository.WebSocketSessionRepository - ⚠️ 세션 에러 마킹: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134
+2025-06-03 23:09:21.812 [SpringApplicationShutdownHook] INFO  c.e.w.repository.WebSocketSessionRepository - ❌ 세션 에러 마킹 완료: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134, totalErrorSessions=1
+2025-06-03 23:09:21.812 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 에러 세션 마킹 완료: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134
+2025-06-03 23:09:21.812 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 에러 처리 완료: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134
+2025-06-03 23:09:21.812 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134, closeCode=1001, reason=The web application is stopping
+2025-06-03 23:09:21.812 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134
+2025-06-03 23:09:21.813 [SpringApplicationShutdownHook] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134
+2025-06-03 23:09:21.813 [SpringApplicationShutdownHook] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134, lastActivity=2025-06-03T22:48:04.318118300, wasErrorSession=true, remainingSessions=2
+2025-06-03 23:09:21.813 [SpringApplicationShutdownHook] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=2
+2025-06-03 23:09:21.813 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134, remainingActiveSessions=2
+2025-06-03 23:09:21.813 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=a46a1200-cf1f-3e36-a80d-3c5a1600f134
+2025-06-03 23:09:21.814 [SpringApplicationShutdownHook] ERROR c.e.websockettest.controller.WebSocketController - ❌ WebSocket 전송 에러: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb, errorType=IOException, message=java.nio.channels.ClosedChannelException
+java.io.IOException: java.nio.channels.ClosedChannelException
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:326)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlock(WsRemoteEndpointImplBase.java:266)
+	at org.apache.tomcat.websocket.WsSession.sendCloseMessage(WsSession.java:778)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:575)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:542)
+	at org.apache.tomcat.websocket.WsSession.close(WsSession.java:530)
+	at org.apache.tomcat.websocket.WsWebSocketContainer.destroy(WsWebSocketContainer.java:1022)
+	at org.apache.tomcat.websocket.server.WsContextListener.contextDestroyed(WsContextListener.java:46)
+	at org.apache.catalina.core.StandardContext.listenerStop(StandardContext.java:4090)
+	at org.apache.catalina.core.StandardContext.stopInternal(StandardContext.java:4700)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardService.stopInternal(StandardService.java:468)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardServer.stopInternal(StandardServer.java:915)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.startup.Tomcat.stop(Tomcat.java:448)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.stopTomcat(TomcatWebServer.java:301)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.destroy(TomcatWebServer.java:374)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:182)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1126)
+	at org.springframework.boot.SpringApplicationShutdownHook.closeAndWait(SpringApplicationShutdownHook.java:147)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:116)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.ClosedChannelException: null
+	at org.apache.tomcat.util.net.NioChannel$1.write(NioChannel.java:272)
+	at org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper$NioOperationState.run(NioEndpoint.java:1634)
+	at org.apache.tomcat.util.net.SocketWrapperBase$OperationState.start(SocketWrapperBase.java:1037)
+	at org.apache.tomcat.util.net.SocketWrapperBase.vectoredOperation(SocketWrapperBase.java:1426)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1352)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1323)
+	at org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer.doWrite(WsRemoteEndpointImplServer.java:171)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.writeMessagePart(WsRemoteEndpointImplBase.java:521)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:313)
+	... 37 common frames omitted
+2025-06-03 23:09:21.817 [SpringApplicationShutdownHook] ERROR c.example.websockettest.service.WebSocketService - ❌ WebSocket 에러 처리 시작: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb, errorType=IOException, message=java.nio.channels.ClosedChannelException
+java.io.IOException: java.nio.channels.ClosedChannelException
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:326)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlock(WsRemoteEndpointImplBase.java:266)
+	at org.apache.tomcat.websocket.WsSession.sendCloseMessage(WsSession.java:778)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:575)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:542)
+	at org.apache.tomcat.websocket.WsSession.close(WsSession.java:530)
+	at org.apache.tomcat.websocket.WsWebSocketContainer.destroy(WsWebSocketContainer.java:1022)
+	at org.apache.tomcat.websocket.server.WsContextListener.contextDestroyed(WsContextListener.java:46)
+	at org.apache.catalina.core.StandardContext.listenerStop(StandardContext.java:4090)
+	at org.apache.catalina.core.StandardContext.stopInternal(StandardContext.java:4700)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardService.stopInternal(StandardService.java:468)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardServer.stopInternal(StandardServer.java:915)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.startup.Tomcat.stop(Tomcat.java:448)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.stopTomcat(TomcatWebServer.java:301)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.destroy(TomcatWebServer.java:374)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:182)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1126)
+	at org.springframework.boot.SpringApplicationShutdownHook.closeAndWait(SpringApplicationShutdownHook.java:147)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:116)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.ClosedChannelException: null
+	at org.apache.tomcat.util.net.NioChannel$1.write(NioChannel.java:272)
+	at org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper$NioOperationState.run(NioEndpoint.java:1634)
+	at org.apache.tomcat.util.net.SocketWrapperBase$OperationState.start(SocketWrapperBase.java:1037)
+	at org.apache.tomcat.util.net.SocketWrapperBase.vectoredOperation(SocketWrapperBase.java:1426)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1352)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1323)
+	at org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer.doWrite(WsRemoteEndpointImplServer.java:171)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.writeMessagePart(WsRemoteEndpointImplBase.java:521)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:313)
+	... 37 common frames omitted
+2025-06-03 23:09:21.819 [SpringApplicationShutdownHook] WARN  c.e.w.repository.WebSocketSessionRepository - ⚠️ 세션 에러 마킹: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb
+2025-06-03 23:09:21.819 [SpringApplicationShutdownHook] INFO  c.e.w.repository.WebSocketSessionRepository - ❌ 세션 에러 마킹 완료: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb, totalErrorSessions=1
+2025-06-03 23:09:21.819 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 에러 세션 마킹 완료: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb
+2025-06-03 23:09:21.819 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 에러 처리 완료: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb
+2025-06-03 23:09:21.819 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb, closeCode=1001, reason=The web application is stopping
+2025-06-03 23:09:21.820 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb
+2025-06-03 23:09:21.820 [SpringApplicationShutdownHook] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb
+2025-06-03 23:09:21.820 [SpringApplicationShutdownHook] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb, lastActivity=2025-06-03T22:48:04.306756600, wasErrorSession=true, remainingSessions=1
+2025-06-03 23:09:21.821 [SpringApplicationShutdownHook] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:09:21.822 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb, remainingActiveSessions=1
+2025-06-03 23:09:21.822 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=24aa5732-1b6d-29a3-addf-45d2247a25eb
+2025-06-03 23:09:21.822 [SpringApplicationShutdownHook] ERROR c.e.websockettest.controller.WebSocketController - ❌ WebSocket 전송 에러: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, errorType=IOException, message=java.nio.channels.ClosedChannelException
+java.io.IOException: java.nio.channels.ClosedChannelException
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:326)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlock(WsRemoteEndpointImplBase.java:266)
+	at org.apache.tomcat.websocket.WsSession.sendCloseMessage(WsSession.java:778)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:575)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:542)
+	at org.apache.tomcat.websocket.WsSession.close(WsSession.java:530)
+	at org.apache.tomcat.websocket.WsWebSocketContainer.destroy(WsWebSocketContainer.java:1022)
+	at org.apache.tomcat.websocket.server.WsContextListener.contextDestroyed(WsContextListener.java:46)
+	at org.apache.catalina.core.StandardContext.listenerStop(StandardContext.java:4090)
+	at org.apache.catalina.core.StandardContext.stopInternal(StandardContext.java:4700)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardService.stopInternal(StandardService.java:468)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardServer.stopInternal(StandardServer.java:915)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.startup.Tomcat.stop(Tomcat.java:448)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.stopTomcat(TomcatWebServer.java:301)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.destroy(TomcatWebServer.java:374)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:182)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1126)
+	at org.springframework.boot.SpringApplicationShutdownHook.closeAndWait(SpringApplicationShutdownHook.java:147)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:116)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.ClosedChannelException: null
+	at org.apache.tomcat.util.net.NioChannel$1.write(NioChannel.java:272)
+	at org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper$NioOperationState.run(NioEndpoint.java:1634)
+	at org.apache.tomcat.util.net.SocketWrapperBase$OperationState.start(SocketWrapperBase.java:1037)
+	at org.apache.tomcat.util.net.SocketWrapperBase.vectoredOperation(SocketWrapperBase.java:1426)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1352)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1323)
+	at org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer.doWrite(WsRemoteEndpointImplServer.java:171)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.writeMessagePart(WsRemoteEndpointImplBase.java:521)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:313)
+	... 37 common frames omitted
+2025-06-03 23:09:21.824 [SpringApplicationShutdownHook] ERROR c.example.websockettest.service.WebSocketService - ❌ WebSocket 에러 처리 시작: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, errorType=IOException, message=java.nio.channels.ClosedChannelException
+java.io.IOException: java.nio.channels.ClosedChannelException
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:326)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlock(WsRemoteEndpointImplBase.java:266)
+	at org.apache.tomcat.websocket.WsSession.sendCloseMessage(WsSession.java:778)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:575)
+	at org.apache.tomcat.websocket.WsSession.doClose(WsSession.java:542)
+	at org.apache.tomcat.websocket.WsSession.close(WsSession.java:530)
+	at org.apache.tomcat.websocket.WsWebSocketContainer.destroy(WsWebSocketContainer.java:1022)
+	at org.apache.tomcat.websocket.server.WsContextListener.contextDestroyed(WsContextListener.java:46)
+	at org.apache.catalina.core.StandardContext.listenerStop(StandardContext.java:4090)
+	at org.apache.catalina.core.StandardContext.stopInternal(StandardContext.java:4700)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1219)
+	at org.apache.catalina.core.ContainerBase$StopChild.call(ContainerBase.java:1208)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:75)
+	at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+	at org.apache.catalina.core.ContainerBase.stopInternal(ContainerBase.java:814)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardService.stopInternal(StandardService.java:468)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.core.StandardServer.stopInternal(StandardServer.java:915)
+	at org.apache.catalina.util.LifecycleBase.stop(LifecycleBase.java:235)
+	at org.apache.catalina.startup.Tomcat.stop(Tomcat.java:448)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.stopTomcat(TomcatWebServer.java:301)
+	at org.springframework.boot.web.embedded.tomcat.TomcatWebServer.destroy(TomcatWebServer.java:374)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.doClose(ServletWebServerApplicationContext.java:182)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1126)
+	at org.springframework.boot.SpringApplicationShutdownHook.closeAndWait(SpringApplicationShutdownHook.java:147)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:116)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.channels.ClosedChannelException: null
+	at org.apache.tomcat.util.net.NioChannel$1.write(NioChannel.java:272)
+	at org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper$NioOperationState.run(NioEndpoint.java:1634)
+	at org.apache.tomcat.util.net.SocketWrapperBase$OperationState.start(SocketWrapperBase.java:1037)
+	at org.apache.tomcat.util.net.SocketWrapperBase.vectoredOperation(SocketWrapperBase.java:1426)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1352)
+	at org.apache.tomcat.util.net.SocketWrapperBase.write(SocketWrapperBase.java:1323)
+	at org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer.doWrite(WsRemoteEndpointImplServer.java:171)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.writeMessagePart(WsRemoteEndpointImplBase.java:521)
+	at org.apache.tomcat.websocket.WsRemoteEndpointImplBase.sendMessageBlockInternal(WsRemoteEndpointImplBase.java:313)
+	... 37 common frames omitted
+2025-06-03 23:09:21.826 [SpringApplicationShutdownHook] WARN  c.e.w.repository.WebSocketSessionRepository - ⚠️ 세션 에러 마킹: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006
+2025-06-03 23:09:21.827 [SpringApplicationShutdownHook] INFO  c.e.w.repository.WebSocketSessionRepository - ❌ 세션 에러 마킹 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, totalErrorSessions=1
+2025-06-03 23:09:21.827 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 에러 세션 마킹 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006
+2025-06-03 23:09:21.827 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 에러 처리 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006
+2025-06-03 23:09:21.827 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, closeCode=1001, reason=The web application is stopping
+2025-06-03 23:09:21.827 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006
+2025-06-03 23:09:21.827 [SpringApplicationShutdownHook] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006
+2025-06-03 23:09:21.827 [SpringApplicationShutdownHook] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, lastActivity=2025-06-03T22:48:18.172914, wasErrorSession=true, remainingSessions=0
+2025-06-03 23:09:21.828 [SpringApplicationShutdownHook] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:09:21.828 [SpringApplicationShutdownHook] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006, remainingActiveSessions=0
+2025-06-03 23:09:21.828 [SpringApplicationShutdownHook] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=1455bf3e-b5db-f4cc-73f8-c00695a7a006
+2025-06-03 23:09:31.771 [main] INFO  c.example.websockettest.WebSocketTestApplication - Starting WebSocketTestApplication using Java 21.0.6 with PID 29680 (C:\Users\jounghyeonNB\zip\[WebSocket] webSocketTest\build\classes\java\main started by jounghyeonNB in C:\Users\jounghyeonNB\zip\[WebSocket] webSocketTest)
+2025-06-03 23:09:31.776 [main] INFO  c.example.websockettest.WebSocketTestApplication - No active profile set, falling back to 1 default profile: "default"
+2025-06-03 23:09:34.030 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-06-03 23:09:34.064 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2025-06-03 23:09:34.069 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-06-03 23:09:34.181 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-06-03 23:09:34.182 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2290 ms
+2025-06-03 23:09:34.556 [main] INFO  o.s.b.a.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-06-03 23:09:34.997 [main] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2025-06-03 23:09:35.210 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-06-03 23:09:35.229 [main] INFO  c.example.websockettest.WebSocketTestApplication - Started WebSocketTestApplication in 4.876 seconds (process running for 6.944)
+2025-06-03 23:09:44.525 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-06-03 23:09:44.527 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-06-03 23:09:44.531 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2025-06-03 23:09:53.634 [http-nio-8080-exec-6] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275, remoteAddress=/[0:0:0:0:0:0:0:1]:53026
+2025-06-03 23:09:53.634 [http-nio-8080-exec-5] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d, remoteAddress=/[0:0:0:0:0:0:0:1]:53025
+2025-06-03 23:09:53.640 [http-nio-8080-exec-6] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275, remoteAddress=/[0:0:0:0:0:0:0:1]:53026
+2025-06-03 23:09:53.641 [http-nio-8080-exec-5] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d, remoteAddress=/[0:0:0:0:0:0:0:1]:53025
+2025-06-03 23:09:53.641 [http-nio-8080-exec-6] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275
+2025-06-03 23:09:53.634 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - 🔗 WebSocket 연결 수립: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, remoteAddress=/[0:0:0:0:0:0:0:1]:53024
+2025-06-03 23:09:53.644 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - 🔗 새 WebSocket 연결 처리 시작: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, remoteAddress=/[0:0:0:0:0:0:0:1]:53024
+2025-06-03 23:09:53.644 [http-nio-8080-exec-6] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275, totalActiveSessions=1
+2025-06-03 23:09:53.644 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f
+2025-06-03 23:09:53.641 [http-nio-8080-exec-5] DEBUG c.e.w.repository.WebSocketSessionRepository - 💾 세션 저장소 추가 시작: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d
+2025-06-03 23:09:53.644 [http-nio-8080-exec-4] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, totalActiveSessions=2
+2025-06-03 23:09:53.644 [http-nio-8080-exec-5] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 추가 완료: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d, totalActiveSessions=3
+2025-06-03 23:09:53.644 [http-nio-8080-exec-6] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:09:53.646 [http-nio-8080-exec-6] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275, totalActiveSessions=3
+2025-06-03 23:09:53.644 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:09:53.647 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, totalActiveSessions=3
+2025-06-03 23:09:53.647 [http-nio-8080-exec-5] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:09:53.647 [http-nio-8080-exec-6] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275
+2025-06-03 23:09:53.647 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f
+2025-06-03 23:09:53.647 [http-nio-8080-exec-5] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 저장 완료: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d, totalActiveSessions=3
+2025-06-03 23:09:53.647 [http-nio-8080-exec-5] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 처리 완료: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d
+2025-06-03 23:10:04.630 [http-nio-8080-exec-7] INFO  c.e.websockettest.controller.WebSocketController - 📨 메시지 수신: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, messageLength=2, payload=안녕
+2025-06-03 23:10:04.633 [http-nio-8080-exec-7] INFO  c.example.websockettest.service.WebSocketService - 🔄 메시지 처리 시작: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, messageLength=2
+2025-06-03 23:10:04.633 [http-nio-8080-exec-7] DEBUG c.e.w.repository.WebSocketSessionRepository - ⏰ 세션 활동 시간 업데이트: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, time=2025-06-03T23:10:04.633772500
+2025-06-03 23:10:04.633 [http-nio-8080-exec-7] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=3
+2025-06-03 23:10:04.642 [http-nio-8080-exec-7] INFO  c.example.websockettest.service.WebSocketService - ✅ 메시지 처리 및 브로드캐스트 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, response=Processed: 안녕 - Hello from WebSocket Service!
+2025-06-03 23:10:04.642 [http-nio-8080-exec-7] INFO  c.e.websockettest.controller.WebSocketController - 📤 응답 전송 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, response=Processed: 안녕 - Hello from WebSocket Service!
+2025-06-03 23:11:25.922 [http-nio-8080-exec-10] INFO  c.e.w.controller.WebSocketRestController - 📡 API 호출: 브로드캐스트 메시지 전송 요청, messageLength=37
+2025-06-03 23:11:25.922 [http-nio-8080-exec-10] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:11:25.922 [http-nio-8080-exec-10] INFO  c.e.w.controller.WebSocketRestController - 📡 브로드캐스트 전송 시작: targetSessions=3, message=📌시스템 공지: 금일 오후 1시부터 30분간 서버를 내리겠습니다.
+2025-06-03 23:11:25.924 [http-nio-8080-exec-10] DEBUG c.e.w.repository.WebSocketSessionRepository - 📋 전체 활성 세션 조회: count=3
+2025-06-03 23:11:25.924 [http-nio-8080-exec-10] INFO  c.example.websockettest.service.WebSocketService - 📡 브로드캐스트 메시지 전송 시작: targetSessions=3, messageLength=37
+2025-06-03 23:11:25.927 [http-nio-8080-exec-10] INFO  c.example.websockettest.service.WebSocketService - ✅ 브로드캐스트 메시지 전송 완료: totalSessions=3, success=3, failure=0
+2025-06-03 23:11:25.927 [http-nio-8080-exec-10] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:11:25.927 [http-nio-8080-exec-10] INFO  c.e.w.controller.WebSocketRestController - ✅ 브로드캐스트 전송 완료: sentTo=3 sessions
+2025-06-03 23:11:34.325 [http-nio-8080-exec-1] INFO  c.e.w.controller.WebSocketRestController - 🔍 API 호출: WebSocket 서비스 상태 조회 요청
+2025-06-03 23:11:34.325 [http-nio-8080-exec-1] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:11:34.332 [http-nio-8080-exec-1] INFO  c.e.w.controller.WebSocketRestController - 📊 WebSocket 서비스 상태 조회 완료: activeConnections=3
+2025-06-03 23:11:37.669 [http-nio-8080-exec-2] INFO  c.e.w.controller.WebSocketRestController - 🔍 API 호출: 활성 세션 수 조회 요청
+2025-06-03 23:11:37.669 [http-nio-8080-exec-2] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=3
+2025-06-03 23:11:37.669 [http-nio-8080-exec-2] INFO  c.e.w.controller.WebSocketRestController - 📊 활성 세션 수 조회 완료: count=3
+2025-06-03 23:11:41.545 [http-nio-8080-exec-6] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275, closeCode=1000, reason=null
+2025-06-03 23:11:41.545 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d, closeCode=1000, reason=null
+2025-06-03 23:11:41.547 [http-nio-8080-exec-6] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275
+2025-06-03 23:11:41.547 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d
+2025-06-03 23:11:41.547 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d
+2025-06-03 23:11:41.545 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - 🔌 WebSocket 연결 종료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, closeCode=1000, reason=null
+2025-06-03 23:11:41.547 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - 🔌 WebSocket 연결 종료 처리 시작: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f
+2025-06-03 23:11:41.547 [http-nio-8080-exec-4] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d, lastActivity=2025-06-03T23:09:53.644734800, wasErrorSession=false, remainingSessions=2
+2025-06-03 23:11:41.547 [http-nio-8080-exec-6] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275
+2025-06-03 23:11:41.548 [http-nio-8080-exec-6] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275, lastActivity=2025-06-03T23:09:53.644734800, wasErrorSession=false, remainingSessions=1
+2025-06-03 23:11:41.548 [http-nio-8080-exec-4] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=2
+2025-06-03 23:11:41.548 [http-nio-8080-exec-6] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=1
+2025-06-03 23:11:41.548 [http-nio-8080-exec-4] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d, remainingActiveSessions=2
+2025-06-03 23:11:41.548 [http-nio-8080-exec-6] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275, remainingActiveSessions=1
+2025-06-03 23:11:41.548 [http-nio-8080-exec-6] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=7edbaecb-aca6-15b4-e81f-08e926a26275
+2025-06-03 23:11:41.548 [http-nio-8080-exec-4] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=bc3c3f50-8010-ea60-7a1d-92a0144df02d
+2025-06-03 23:11:41.548 [http-nio-8080-exec-3] DEBUG c.e.w.repository.WebSocketSessionRepository - 🗑️ 세션 저장소 제거 시작: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f
+2025-06-03 23:11:41.548 [http-nio-8080-exec-3] INFO  c.e.w.repository.WebSocketSessionRepository - ✅ 세션 저장소 제거 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, lastActivity=2025-06-03T23:10:04.633772500, wasErrorSession=false, remainingSessions=0
+2025-06-03 23:11:41.551 [http-nio-8080-exec-3] DEBUG c.e.w.repository.WebSocketSessionRepository - 📊 활성 세션 수 조회: count=0
+2025-06-03 23:11:41.551 [http-nio-8080-exec-3] INFO  c.example.websockettest.service.WebSocketService - ✅ WebSocket 세션 제거 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f, remainingActiveSessions=0
+2025-06-03 23:11:41.551 [http-nio-8080-exec-3] INFO  c.e.websockettest.controller.WebSocketController - ✅ WebSocket 연결 종료 처리 완료: sessionId=c2e23393-4fa5-aed5-78fa-0de53b6a260f
