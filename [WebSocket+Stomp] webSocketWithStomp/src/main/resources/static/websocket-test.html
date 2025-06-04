@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+    <style>
+        /* 전체 페이지 스타일 설정 */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        /* 메인 컨테이너 스타일 */
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* 연결 상태 표시 영역 기본 스타일 */
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        /* WebSocket 연결됨 상태 스타일 (녹색) */
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        /* WebSocket 연결 해제됨 상태 스타일 (빨간색) */
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* 메시지 표시 영역 스타일 */
+        .message-area {
+            height: 300px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow-y: auto;  /* 세로 스크롤 자동 생성 */
+            background-color: #f9f9f9;
+            margin: 10px 0;
+        }
+        
+        /* 입력 그룹 (버튼과 입력 필드를 한 줄에 배치) */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        /* 텍스트 입력 필드 스타일 */
+        input[type="text"] {
+            flex: 1;  /* 남은 공간을 모두 차지 */
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        /* 버튼 기본 스타일 */
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* 버튼 호버 효과 */
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* 비활성화된 버튼 스타일 */
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        /* REST API 테스트 섹션 구분선 */
+        .api-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebSocket Test Page</h1>
+        
+        <!-- WebSocket 연결 상태 표시 영역 -->
+        <div id="status" class="status disconnected">연결되지 않음</div>
+        
+        <!-- WebSocket 연결/해제 버튼 그룹 -->
+        <div class="input-group">
+            <button id="connectBtn" onclick="connect()">연결</button>
+            <button id="disconnectBtn" onclick="disconnect()" disabled>연결 해제</button>
+        </div>
+        
+        <!-- 메시지 표시 영역 (송수신된 모든 메시지 표시) -->
+        <div class="message-area" id="messages"></div>
+        
+        <!-- 메시지 입력 및 전송 그룹 -->
+        <div class="input-group">
+            <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." disabled>
+            <button id="sendBtn" onclick="sendMessage()" disabled>전송</button>
+        </div>
+        
+        <!-- REST API 테스트 섹션 -->
+        <div class="api-section">
+            <h3>REST API 테스트</h3>
+            <!-- API 조회 버튼 그룹 -->
+            <div class="input-group">
+                <button onclick="getSessionCount()">활성 세션 수 조회</button>
+                <button onclick="getStatus()">서비스 상태 조회</button>
+            </div>
+            <!-- 브로드캐스트 메시지 전송 그룹 -->
+            <div class="input-group">
+                <input type="text" id="broadcastInput" placeholder="브로드캐스트 메시지...">
+                <button onclick="sendBroadcast()">브로드캐스트 전송</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 전역 변수 선언 ==========
+        
+        /**
+         * WebSocket 연결 객체
+         * null: 연결되지 않음, WebSocket 객체: 연결됨
+         */
+        let websocket = null;
+        
+        // DOM 요소들을 변수에 저장 (성능 최적화 및 코드 가독성 향상)
+        const statusDiv = document.getElementById('status');           // 연결 상태 표시 영역
+        const messagesDiv = document.getElementById('messages');       // 메시지 표시 영역
+        const messageInput = document.getElementById('messageInput');   // 메시지 입력 필드
+        const connectBtn = document.getElementById('connectBtn');       // 연결 버튼
+        const disconnectBtn = document.getElementById('disconnectBtn'); // 연결 해제 버튼
+        const sendBtn = document.getElementById('sendBtn');             // 메시지 전송 버튼
+
+        // ========== WebSocket 연결 관리 함수 ==========
+        
+        /**
+         * WebSocket 서버에 연결을 시도하는 함수
+         * 
+         * 연결 과정:
+         * 1. 현재 페이지의 호스트를 기반으로 WebSocket URL 생성
+         * 2. WebSocket 객체 생성 및 이벤트 핸들러 등록
+         * 3. 연결 상태에 따른 UI 업데이트
+         */
+        function connect() {
+            // WebSocket URL 생성 (현재 페이지의 호스트 + WebSocket 엔드포인트)
+            // 예: ws://localhost:8080/my-websocket
+            const wsUrl = `ws://${window.location.host}/my-websocket`;
+            
+            console.log(`🔗 WebSocket 연결 시도: ${wsUrl}`);
+            
+            // WebSocket 객체 생성 및 연결 시도
+            websocket = new WebSocket(wsUrl);
+            
+            /**
+             * WebSocket 연결 성공 시 호출되는 이벤트 핸들러
+             * @param {Event} event - WebSocket 연결 이벤트 객체
+             */
+            websocket.onopen = function(event) {
+                console.log('✅ WebSocket 연결 성공:', event);
+                
+                // UI 상태를 연결됨으로 업데이트
+                updateStatus('연결됨', true);
+                
+                // 연결 성공 메시지를 메시지 영역에 표시
+                addMessage('시스템: WebSocket 연결이 성공했습니다.', 'system');
+                
+                // 연결 후 사용 가능한 컨트롤들 활성화
+                enableControls(true);
+            };
+            
+            /**
+             * 서버로부터 메시지를 받았을 때 호출되는 이벤트 핸들러
+             * @param {MessageEvent} event - 수신된 메시지 이벤트 객체
+             */
+            websocket.onmessage = function(event) {
+                console.log('📨 서버로부터 메시지 수신:', event.data);
+                
+                try {
+                    // JSON 메시지인지 확인하여 파싱 시도
+                    const messageData = JSON.parse(event.data);
+                    
+                    // 스케줄러에서 보낸 메시지인지 확인
+                    if (messageData.type === 'scheduled_message') {
+                        // 스케줄러 메시지를 특별히 포맷팅해서 표시
+                        const formattedMessage = `🔔 자동 메시지 [${messageData.server_time}] - 활성 세션: ${messageData.active_sessions}개`;
+                        addMessage(formattedMessage, 'scheduled');
+                    } else if (messageData.type === 'system_status') {
+                        // 시스템 상태 메시지 포맷팅
+                        const memoryUsage = `${messageData.memory_usage_percent}%`;
+                        const formattedMessage = `📊 시스템 상태 - 메모리 사용률: ${memoryUsage}, 활성 세션: ${messageData.active_sessions}개`;
+                        addMessage(formattedMessage, 'system');
+                    } else {
+                        // 다른 JSON 메시지는 일반적으로 표시
+                        addMessage('서버: ' + JSON.stringify(messageData, null, 2), 'received');
+                    }
+                } catch (e) {
+                    // JSON이 아닌 일반 텍스트 메시지는 기존처럼 처리
+                    addMessage('서버: ' + event.data, 'received');
+                }
+            };
+            
+            /**
+             * WebSocket 연결이 종료되었을 때 호출되는 이벤트 핸들러
+             * @param {CloseEvent} event - 연결 종료 이벤트 객체
+             */
+            websocket.onclose = function(event) {
+                console.log('🔌 WebSocket 연결 종료:', event.code, event.reason);
+                
+                // UI 상태를 연결 해제됨으로 업데이트
+                updateStatus('연결 해제됨', false);
+                
+                // 연결 종료 메시지 표시
+                addMessage('시스템: WebSocket 연결이 종료되었습니다.', 'system');
+                
+                // 연결 종료 후 관련 컨트롤들 비활성화
+                enableControls(false);
+            };
+            
+            /**
+             * WebSocket 에러 발생 시 호출되는 이벤트 핸들러
+             * @param {Event} error - 에러 이벤트 객체
+             */
+            websocket.onerror = function(error) {
+                console.error('❌ WebSocket 에러 발생:', error);
+                
+                // 에러 메시지를 화면에 표시
+                addMessage('시스템: 오류가 발생했습니다 - ' + error, 'error');
+            };
+        }
+
+        /**
+         * WebSocket 연결을 종료하는 함수
+         * 사용자가 명시적으로 연결을 끊을 때 호출
+         */
+        function disconnect() {
+            if (websocket) {
+                console.log('🔌 WebSocket 연결 해제 요청');
+                
+                // WebSocket 연결 종료 (정상 종료 코드 전송)
+                websocket.close();
+            }
+        }
+
+        /**
+         * 서버에 메시지를 전송하는 함수
+         * 
+         * 전송 조건:
+         * 1. 메시지가 비어있지 않음
+         * 2. WebSocket이 연결된 상태
+         * 3. WebSocket 연결 상태가 OPEN
+         */
+        function sendMessage() {
+            // 입력 필드에서 메시지 내용 가져오기 (앞뒤 공백 제거)
+            const message = messageInput.value.trim();
+            
+            // 메시지 유효성 검사 및 WebSocket 연결 상태 확인
+            if (message && websocket && websocket.readyState === WebSocket.OPEN) {
+                console.log('📤 서버로 메시지 전송:', message);
+                
+                // 서버에 메시지 전송
+                websocket.send(message);
+                
+                // 전송한 메시지를 화면에 표시 (사용자 확인용)
+                addMessage('나: ' + message, 'sent');
+                
+                // 입력 필드 초기화
+                messageInput.value = '';
+            } else {
+                console.warn('⚠️ 메시지 전송 실패: 연결되지 않았거나 메시지가 비어있음');
+            }
+        }
+
+        // ========== UI 업데이트 함수 ==========
+        
+        /**
+         * 연결 상태 표시를 업데이트하는 함수
+         * @param {string} text - 표시할 상태 텍스트
+         * @param {boolean} connected - 연결 여부 (true: 연결됨, false: 연결 안됨)
+         */
+        function updateStatus(text, connected) {
+            // 상태 텍스트 업데이트
+            statusDiv.textContent = text;
+            
+            // 연결 상태에 따른 CSS 클래스 적용
+            statusDiv.className = 'status ' + (connected ? 'connected' : 'disconnected');
+        }
+
+        /**
+         * 연결 상태에 따라 UI 컨트롤들의 활성화/비활성화를 제어하는 함수
+         * @param {boolean} connected - 연결 여부
+         */
+        function enableControls(connected) {
+            // 연결 버튼: 연결되지 않았을 때만 활성화
+            connectBtn.disabled = connected;
+            
+            // 연결 해제 버튼: 연결되었을 때만 활성화
+            disconnectBtn.disabled = !connected;
+            
+            // 메시지 입력 필드: 연결되었을 때만 활성화
+            messageInput.disabled = !connected;
+            
+            // 메시지 전송 버튼: 연결되었을 때만 활성화
+            sendBtn.disabled = !connected;
+        }
+
+        /**
+         * 메시지 영역에 새로운 메시지를 추가하는 함수
+         * @param {string} message - 표시할 메시지 내용
+         * @param {string} type - 메시지 타입 ('sent', 'received', 'system', 'error', 'scheduled')
+         */
+        function addMessage(message, type) {
+            // 새로운 메시지 요소 생성
+            const messageElement = document.createElement('div');
+            
+            // 시간 정보와 함께 메시지 내용 설정
+            messageElement.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            messageElement.style.marginBottom = '5px';
+            
+            // 메시지 타입에 따른 색상 적용
+            switch(type) {
+                case 'sent':        // 사용자가 보낸 메시지 (파란색)
+                    messageElement.style.color = '#007bff';
+                    break;
+                case 'received':    // 서버에서 받은 메시지 (녹색)
+                    messageElement.style.color = '#28a745';
+                    break;
+                case 'system':      // 시스템 메시지 (회색, 이탤릭)
+                    messageElement.style.color = '#6c757d';
+                    messageElement.style.fontStyle = 'italic';
+                    break;
+                case 'error':       // 에러 메시지 (빨간색)
+                    messageElement.style.color = '#dc3545';
+                    break;
+                case 'scheduled':   // 스케줄러 자동 메시지 (주황색, 굵게)
+                    messageElement.style.color = '#fd7e14';
+                    messageElement.style.fontWeight = 'bold';
+                    messageElement.style.backgroundColor = '#fff3cd';
+                    messageElement.style.padding = '5px';
+                    messageElement.style.borderRadius = '3px';
+                    break;
+            }
+            
+            // 메시지 영역에 새 메시지 추가
+            messagesDiv.appendChild(messageElement);
+            
+            // 스크롤을 맨 아래로 이동 (최신 메시지가 보이도록)
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // ========== REST API 호출 함수 ==========
+        
+        /**
+         * 현재 활성 WebSocket 세션 수를 조회하는 REST API 호출 함수
+         * GET /api/websocket/sessions/count
+         */
+        async function getSessionCount() {
+            try {
+                console.log('🔍 API 호출: 활성 세션 수 조회');
+                
+                // REST API 호출 (GET 요청)
+                const response = await fetch('/api/websocket/sessions/count');
+                
+                // JSON 응답 파싱
+                const data = await response.json();
+                
+                console.log('📊 활성 세션 수 조회 결과:', data);
+                
+                // 조회 결과를 메시지 영역에 표시
+                addMessage(`API: 활성 세션 수 - ${data.activeSessionCount}`, 'system');
+            } catch (error) {
+                console.error('❌ API 호출 실패 (세션 수 조회):', error);
+                
+                // API 호출 실패 시 에러 메시지 표시
+                addMessage('API 오류: ' + error.message, 'error');
+            }
+        }
+
+        /**
+         * WebSocket 서비스 상태를 조회하는 REST API 호출 함수
+         * GET /api/websocket/status
+         */
+        async function getStatus() {
+            try {
+                console.log('🔍 API 호출: 서비스 상태 조회');
+                
+                // REST API 호출 (GET 요청)
+                const response = await fetch('/api/websocket/status');
+                
+                // JSON 응답 파싱
+                const data = await response.json();
+                
+                console.log('📊 서비스 상태 조회 결과:', data);
+                
+                // 서비스 상태 정보를 메시지 영역에 표시
+                addMessage(`API: 서비스 상태 - ${data.status}, 연결 수: ${data.activeConnections}`, 'system');
+            } catch (error) {
+                console.error('❌ API 호출 실패 (서비스 상태 조회):', error);
+                
+                // API 호출 실패 시 에러 메시지 표시
+                addMessage('API 오류: ' + error.message, 'error');
+            }
+        }
+
+        /**
+         * 모든 활성 세션에 브로드캐스트 메시지를 전송하는 REST API 호출 함수
+         * POST /api/websocket/broadcast
+         */
+        async function sendBroadcast() {
+            // 브로드캐스트 입력 필드에서 메시지 가져오기
+            const message = document.getElementById('broadcastInput').value.trim();
+            
+            // 메시지 유효성 검사
+            if (!message) {
+                console.warn('⚠️ 브로드캐스트 메시지가 비어있음');
+                alert('브로드캐스트 메시지를 입력하세요.');
+                return;
+            }
+
+            try {
+                console.log('📡 API 호출: 브로드캐스트 메시지 전송:', message);
+                
+                // REST API 호출 (POST 요청)
+                const response = await fetch('/api/websocket/broadcast', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',  // JSON 형태로 전송
+                    },
+                    body: JSON.stringify({ message: message })  // 메시지를 JSON으로 변환
+                });
+                
+                // JSON 응답 파싱
+                const data = await response.json();
+                
+                console.log('📡 브로드캐스트 전송 결과:', data);
+                
+                // 브로드캐스트 전송 결과를 메시지 영역에 표시
+                addMessage(`API: 브로드캐스트 전송 완료 - ${data.sentTo}개 세션에 전송`, 'system');
+                
+                // 브로드캐스트 입력 필드 초기화
+                document.getElementById('broadcastInput').value = '';
+            } catch (error) {
+                console.error('❌ API 호출 실패 (브로드캐스트 전송):', error);
+                
+                // API 호출 실패 시 에러 메시지 표시
+                addMessage('API 오류: ' + error.message, 'error');
+            }
+        }
+
+        // ========== 이벤트 리스너 등록 ==========
+        
+        /**
+         * 메시지 입력 필드에서 Enter 키 입력 시 메시지 전송
+         * 사용자 편의성 향상을 위한 키보드 단축키
+         */
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                console.log('⌨️ Enter 키로 메시지 전송');
+                sendMessage();
+            }
+        });
+
+        /**
+         * 브로드캐스트 입력 필드에서 Enter 키 입력 시 브로드캐스트 전송
+         * 사용자 편의성 향상을 위한 키보드 단축키
+         */
+        document.getElementById('broadcastInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                console.log('⌨️ Enter 키로 브로드캐스트 전송');
+                sendBroadcast();
+            }
+        });
+        
+        // 페이지 로드 완료 시 초기화 로그
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 WebSocket Test 페이지 로드 완료');
+        });
+    </script>
+</body>
+</html> 
