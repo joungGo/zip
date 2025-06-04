@@ -74,6 +74,7 @@ public class WebSocketService {
      * 1. 메시지에 대한 비즈니스 로직 적용
      * 2. 세션의 마지막 활동 시간 업데이트
      * 3. 처리된 응답 메시지 반환
+     * 4. 다른 모든 세션에게 메시지 브로드캐스트 (채팅 기능)
      * 
      * @param session 메시지를 보낸 클라이언트의 세션
      * @param message 클라이언트가 보낸 원본 메시지
@@ -97,7 +98,15 @@ public class WebSocketService {
             // 세션 타임아웃 관리 및 비활성 세션 정리에 사용
             sessionRepository.updateSessionLastActivity(session);
             
-            log.info("✅ 메시지 처리 완료: sessionId={}, response={}", 
+            // 🆕 다른 모든 세션에게 메시지 브로드캐스트 (채팅 기능)
+            // 보낸 세션 정보와 함께 원본 메시지를 모든 세션에게 전송
+            String broadcastMessage = String.format("[세션 %s]: %s", 
+                    session.getId().substring(0, 8), message); // 세션 ID의 앞 8자리만 표시
+            
+            // 모든 활성 세션에게 브로드캐스트 (보낸 세션 포함)
+            broadcastToAllSessions(broadcastMessage);
+            
+            log.info("✅ 메시지 처리 및 브로드캐스트 완료: sessionId={}, response={}", 
                     session.getId(), processedMessage);
             
             // 처리된 메시지를 클라이언트에게 반환
@@ -265,6 +274,43 @@ public class WebSocketService {
         }
         
         log.info("✅ 브로드캐스트 메시지 전송 완료: totalSessions={}, success={}, failure={}", 
+                totalSessions, successCount, failureCount);
+    }
+
+    /**
+     * 모든 활성 세션에게 메시지를 브로드캐스트하는 private 메서드
+     * broadcastMessage와 동일한 기능이지만 내부적으로 사용되는 메서드
+     * 
+     * @param message 브로드캐스트할 메시지
+     */
+    private void broadcastToAllSessions(String message) {
+        var activeSessions = sessionRepository.getAllActiveSessions();
+        int totalSessions = activeSessions.size();
+        
+        log.debug("📡 내부 브로드캐스트 시작: targetSessions={}, messageLength={}", 
+                totalSessions, message.length());
+        
+        int successCount = 0;
+        int failureCount = 0;
+        
+        // 모든 활성 세션을 조회하여 각각에 메시지 전송
+        for (var session : activeSessions) {
+            try {
+                // TextMessage 객체로 래핑하여 전송
+                session.sendMessage(new org.springframework.web.socket.TextMessage(message));
+                successCount++;
+                
+                log.debug("✅ 내부 브로드캐스트 전송 성공: sessionId={}", session.getId());
+            } catch (Exception e) {
+                failureCount++;
+                
+                // 개별 세션 전송 실패 시 에러 로그 출력
+                log.error("❌ 내부 브로드캐스트 전송 실패: sessionId={}, error={}", 
+                        session.getId(), e.getMessage());
+            }
+        }
+        
+        log.debug("✅ 내부 브로드캐스트 완료: totalSessions={}, success={}, failure={}", 
                 totalSessions, successCount, failureCount);
     }
 } 
