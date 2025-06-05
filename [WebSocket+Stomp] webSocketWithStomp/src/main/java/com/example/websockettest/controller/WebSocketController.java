@@ -39,7 +39,7 @@ public class WebSocketController extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         log.info("🔗 WebSocket 연결 수립: sessionId={}, remoteAddress={}", 
-                session.getId(), session.getRemoteAddress());
+                session.getId(), session.getRemoteAddress()); // getRemoteAddress()로 클라이언트 IP 주소 확인
         
         try {
             // 서비스 계층에 연결 처리 위임
