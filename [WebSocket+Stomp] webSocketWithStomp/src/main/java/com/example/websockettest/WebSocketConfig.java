@@ -1,99 +1,124 @@
 package com.example.websockettest;
 
-import com.example.websockettest.controller.WebSocketController;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 /**
- * WebSocketConfig는 Spring WebSocket을 설정하는 구성 클래스입니다.
+ * WebSocketConfig는 Spring WebSocket STOMP를 설정하는 구성 클래스입니다.
  * 
  * 주요 기능:
- * 1. WebSocket 기능 활성화
- * 2. WebSocket 핸들러 등록 및 URL 매핑
- * 3. CORS 설정 및 보안 정책 구성
- * 4. WebSocket 연결 엔드포인트 정의
+ * 1. STOMP 메시지 브로커 활성화
+ * 2. STOMP 엔드포인트 등록 및 URL 매핑
+ * 3. 메시지 브로커 설정 (destination 패턴)
+ * 4. CORS 설정 및 보안 정책 구성
  * 
- * 설정 내용:
- * - WebSocket 연결 경로: "/my-websocket"
+ * STOMP 설정 내용:
+ * - WebSocket 연결 경로: "/ws"
+ * - 브로커 destination: "/topic" (브로드캐스트), "/queue" (개별 메시지)
+ * - 애플리케이션 destination: "/app" (클라이언트→서버 메시지)
  * - 모든 Origin 허용 (개발 환경용, 운영 환경에서는 제한 필요)
- * - WebSocketController를 통한 연결 처리
  * 
- * Spring WebSocket 구성 요소:
- * - @Configuration: Spring 설정 클래스로 등록
- * - @EnableWebSocket: WebSocket 기능 활성화
- * - WebSocketConfigurer: WebSocket 설정을 위한 인터페이스 구현
+ * STOMP 아키텍처:
+ * - 클라이언트 → /app/xxx → @MessageMapping 메서드
+ * - 서버 → /topic/xxx → 구독 중인 모든 클라이언트
+ * - 서버 → /queue/xxx → 특정 사용자
  * 
  * 보안 고려사항:
  * - 운영 환경에서는 setAllowedOrigins("*") 대신 특정 도메인만 허용
- * - 인증/인가 로직 추가 고려
+ * - 인증/인가 로직 추가 고려 (WebSocket 세션 인터셉터)
  * - Rate Limiting 및 Connection Limit 설정 고려
  */
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer {
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     /**
-     * WebSocketController 인스턴스를 Spring Bean으로 등록하는 메서드
+     * 메시지 브로커를 설정하는 메서드
+     * STOMP destination 패턴과 브로커 타입을 정의합니다.
      * 
-     * Spring Bean 등록 이유:
-     * 1. Spring의 의존성 주입 기능 활용
-     * 2. WebSocketController 내부의 @Autowired 어노테이션 동작 보장
-     * 3. Spring 컨테이너에 의한 생명주기 관리
-     * 4. AOP, 트랜잭션 등 Spring 기능 활용 가능
+     * 브로커 설정:
+     * 1. Simple Broker: Spring 내장 브로커 사용
+     * 2. Destination 패턴:
+     *    - /topic: 브로드캐스트 메시지 (1:N 통신)
+     *    - /queue: 개별 사용자 메시지 (1:1 통신)
+     * 3. 애플리케이션 Destination Prefix: /app
      * 
-     * @Bean 어노테이션:
-     * - 메서드가 반환하는 객체를 Spring 컨테이너에 Bean으로 등록
-     * - 싱글톤 패턴으로 관리 (기본값)
-     * - 다른 Bean에서 의존성 주입 시 이 인스턴스 사용
+     * 메시지 흐름:
+     * - 클라이언트 → /app/chat → @MessageMapping("/chat") → 처리 후 /topic/messages
+     * - 클라이언트 → /app/private → @MessageMapping("/private") → 처리 후 /queue/reply-{userId}
      * 
-     * @return WebSocketController 인스턴스
+     * @param registry 메시지 브로커 레지스트리 객체
      */
-    @Bean
-    public WebSocketController webSocketController() {
-        // WebSocketController 인스턴스 생성 및 반환
-        // Spring이 이 객체를 관리하며, 필요한 의존성을 자동 주입
-        return new WebSocketController();
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        // Simple Message Broker 활성화
+        // /topic: 브로드캐스트 메시지용 (채팅방, 공지사항 등)
+        // /queue: 개별 사용자 메시지용 (1:1 메시지, 알림 등)
+        registry.enableSimpleBroker("/topic", "/queue");
+        
+        // 클라이언트에서 서버로 보내는 메시지의 destination prefix 설정
+        // 예: 클라이언트가 /app/chat으로 메시지 전송 → @MessageMapping("/chat") 메서드 호출
+        registry.setApplicationDestinationPrefixes("/app");
+        
+        // 사용자별 개별 메시지 전송을 위한 prefix 설정
+        // /queue/reply-{userId} 형태로 개별 사용자에게 메시지 전송 가능
+        registry.setUserDestinationPrefix("/queue");
+        
+        // 외부 메시지 브로커 설정 (Redis, RabbitMQ 등) - 필요시 활성화
+        // registry.enableStompBrokerRelay("/topic", "/queue")
+        //     .setRelayHost("localhost")
+        //     .setRelayPort(61613)
+        //     .setClientLogin("guest")
+        //     .setClientPasscode("guest");
     }
 
     /**
-     * WebSocket 핸들러를 등록하고 URL 매핑을 설정하는 메서드
-     * WebSocketConfigurer 인터페이스의 필수 구현 메서드입니다.
+     * STOMP 엔드포인트를 등록하고 설정하는 메서드
+     * 클라이언트가 WebSocket 연결을 수립할 때 사용하는 엔드포인트를 정의합니다.
      * 
-     * 설정 내용:
-     * 1. WebSocket 연결 엔드포인트 정의
-     * 2. 각 엔드포인트에 대한 핸들러 지정
-     * 3. CORS 정책 설정
-     * 4. 기타 WebSocket 연결 옵션 구성
+     * 엔드포인트 설정:
+     * 1. WebSocket 연결 경로: "/ws"
+     * 2. SockJS 지원: WebSocket을 지원하지 않는 브라우저를 위한 폴백
+     * 3. CORS 정책: 모든 Origin 허용 (개발환경용)
      * 
      * 연결 흐름:
-     * 1. 클라이언트가 "ws://domain/my-websocket"으로 연결 요청
-     * 2. Spring이 이 요청을 WebSocketController로 라우팅
-     * 3. WebSocketController가 연결을 처리하고 세션 관리
+     * 1. 클라이언트가 "ws://domain/ws"로 WebSocket 연결 요청
+     * 2. STOMP 핸드셰이크 수행
+     * 3. STOMP 세션 수립 완료
+     * 4. destination 구독 및 메시지 송수신 시작
      * 
-     * @param registry WebSocket 핸들러를 등록하기 위한 레지스트리 객체
-     *                Spring이 제공하며, 핸들러와 URL 매핑을 관리
+     * @param registry STOMP 엔드포인트 레지스트리 객체
      */
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        // WebSocket 핸들러 등록 및 설정
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // STOMP 엔드포인트 등록
         registry
-            // WebSocketController를 "/my-websocket" 경로에 매핑
-            // 클라이언트는 이 경로로 WebSocket 연결을 수립
-            .addHandler(webSocketController(), "/my-websocket")
+            // "/ws" 경로로 STOMP WebSocket 연결 엔드포인트 설정
+            .addEndpoint("/ws")
             
             // CORS (Cross-Origin Resource Sharing) 설정
             // "*": 모든 Origin에서의 연결을 허용
             // 개발 환경용 설정이며, 운영 환경에서는 보안을 위해 특정 도메인만 허용 권장
             // 예: .setAllowedOrigins("https://mydomain.com", "https://www.mydomain.com")
-            .setAllowedOrigins("*");
+            .setAllowedOriginPatterns("*")
+            
+            // SockJS 지원 활성화
+            // WebSocket을 지원하지 않는 구형 브라우저에서 폴백 옵션 제공
+            // HTTP 롱 폴링, JSONP 폴링 등의 대체 전송 방법 사용
+            .withSockJS();
         
-        // 추가 설정 가능 옵션들 (필요시 체이닝으로 추가):
-        // .setAllowedOriginPatterns("https://*.mydomain.com")  // 패턴 기반 Origin 허용
-        // .withSockJS()  // SockJS 폴백 지원 (WebSocket 미지원 브라우저 대응)
-        // .setHandshakeInterceptors(...)  // 핸드셰이크 인터셉터 추가 // 이 기능은 WebSocket 연결 시 추가적인 인증이나 로깅 등을 처리할 수 있다.
-        // .setAllowedHeaders(...)  // 허용할 HTTP 헤더 설정 // WebSocket 연결 시 클라이언트가 보낼 수 있는 HTTP 헤더를 제한할 수 있다.
+        // 추가 엔드포인트 설정 가능 (필요시):
+        // registry.addEndpoint("/ws-native")  // SockJS 없는 순수 WebSocket 엔드포인트
+        //     .setAllowedOriginPatterns("*");
+        
+        // 핸드셰이크 인터셉터 설정 (인증, 로깅 등):
+        // .setHandshakeInterceptors(new HttpSessionHandshakeInterceptor())
+        
+        // WebSocket 전송 옵션 설정:
+        // .setTransportHandlers(...)  // 사용자 정의 전송 핸들러
+        // .setTaskScheduler(...)      // 스케줄러 설정
     }
 }
