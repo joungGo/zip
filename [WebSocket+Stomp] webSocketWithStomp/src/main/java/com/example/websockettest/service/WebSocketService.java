@@ -46,9 +46,7 @@ public class WebSocketService {
     private final WebSocketSessionRepository sessionRepository;
     
     /**
-     * 처리된 총 메시지 수를 추적하는 원자적 카운터\
-     * 처리된 총 메시지 수는 WebSocket 서버가 지금까지 클라이언트에게 전송한 모든 STOMP 메시지의 누적 개수를 의미.
-     * 즉, broadcastMessage, sendPrivateMessage, broadcastSystemMessage 등에서 메시지를 전송할 때마다 1씩 증가하며, 서버가 얼마나 많은 메시지를 실제로 처리(전송)했는지 추적하는 용도
+     * 처리된 총 메시지 수를 추적하는 원자적 카운터
      * 멀티스레드 환경에서 안전한 카운팅
      */
     private final AtomicLong totalMessagesProcessed = new AtomicLong(0);
@@ -67,11 +65,10 @@ public class WebSocketService {
             StompMessage stompMessage = StompMessage.createChatMessage("SYSTEM", content);
             stompMessage.setMessageId(generateMessageId());
             
-            // /topic/messages로 브로드캐스트 >> (서버 -> 클라이언트)
+            // /topic/messages로 브로드캐스트
             messagingTemplate.convertAndSend("/topic/messages", stompMessage);
             
             // 메시지 처리 카운터 증가
-            // AtomicLong 타입의 totalMessagesProcessed 값을 1 증가시키고, 증가된 값을 반환합니다. 이 코드는 멀티스레드 환경에서 안전하게(동기화 문제 없이) 메시지 처리 횟수를 카운트하기 위해 사용
             totalMessagesProcessed.incrementAndGet();
             
             log.info("✅ 브로드캐스트 메시지 전송 완료: messageId={}, content={}", 
