@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi WebSocket Session Test (STOMP)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .sessions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .session-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            border: 2px solid #ddd;
+        }
+        
+        .session-card.connected {
+            border-color: #28a745;
+        }
+        
+        .session-card.disconnected {
+            border-color: #dc3545;
+        }
+        
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .session-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .session-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .session-controls {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .session-controls button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .btn-connect {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-disconnect {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-connect:disabled, .btn-disconnect:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .message-area {
+            height: 200px;
+            border: 1px solid #ddd;
+            padding: 8px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        
+        .message-input-group {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .btn-send {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .btn-send:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .global-controls {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .global-controls h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .global-button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .global-button-group button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .broadcast-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .broadcast-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .stats {
+            background-color: #e7f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .message {
+            margin-bottom: 3px;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .message.sent {
+            color: #007bff;
+        }
+        
+        .message.received {
+            color: #28a745;
+        }
+        
+        .message.system {
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .message.error {
+            color: #dc3545;
+        }
+        
+        .message.scheduled {
+            color: #fd7e14;
+            font-weight: bold;
+            background-color: #fff3cd;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        
+        .message.heartbeat {
+            color: #e91e63;
+            font-size: 0.9em;
+            font-style: italic;
+            background-color: #fce4ec;
+            padding: 3px 5px;
+            border-radius: 3px;
+            opacity: 0.8;
+        }
+        
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔗 Multi WebSocket Session Test (STOMP)</h1>
+        <p>여러 STOMP WebSocket 세션을 동시에 관리하고 브로드캐스트 메시지를 테스트합니다.</p>
+    </div>
+    
+    <div class="global-controls">
+        <h3>전역 제어</h3>
+        <div class="global-button-group">
+            <button class="btn-primary" onclick="addSession()">새 세션 추가</button>
+            <button class="btn-success" onclick="connectAllSessions()">모든 세션 연결</button>
+            <button class="btn-danger" onclick="disconnectAllSessions()">모든 세션 연결 해제</button>
+            <button class="btn-warning" onclick="clearAllMessages()">모든 메시지 지우기</button>
+            <button class="btn-info" onclick="getSessionCount()">세션 수 조회</button>
+        </div>
+        
+        <div class="broadcast-input-group">
+            <input type="text" id="globalBroadcastInput" class="broadcast-input" placeholder="모든 세션에 브로드캐스트할 메시지를 입력하세요...">
+            <button class="btn-success" onclick="sendGlobalBroadcast()">브로드캐스트 전송</button>
+        </div>
+        
+        <div class="stats" id="globalStats">
+            총 세션: 0개 | 연결된 세션: 0개 | 연결 해제된 세션: 0개
+        </div>
+    </div>
+    
+    <div class="sessions-container" id="sessionsContainer">
+        <!-- 세션 카드들이 동적으로 생성됩니다 -->
+    </div>
+
+    <!-- STOMP.js와 SockJS CDN 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+
+    <script>
+        // ========== 전역 변수 및 세션 관리 ==========
+        
+        /**
+         * 세션 저장소 - 각 세션의 정보를 관리
+         * @type {Array<Object>} sessions
+         */
+        let sessions = [];
+        
+        /**
+         * 세션 ID 카운터 - 새로운 세션에 고유 ID 부여
+         * @type {number}
+         */
+        let sessionIdCounter = 0;
+
+        // ========== 세션 생성 및 관리 함수 ==========
+        
+        /**
+         * 새로운 STOMP WebSocket 세션을 추가하는 함수
+         */
+        function addSession() {
+            const sessionId = ++sessionIdCounter;
+            
+            // 세션 객체 생성
+            const session = {
+                id: sessionId,
+                stompClient: null,
+                connected: false,
+                messageCount: 0
+            };
+            
+            // 세션 배열에 추가
+            sessions.push(session);
+            
+            // UI에 세션 카드 생성
+            createSessionCard(session);
+            
+            // 통계 업데이트
+            updateGlobalStats();
+            
+            console.log(`➕ 새 세션 추가: Session-${sessionId}`);
+        }
+
+        /**
+         * 세션 카드 UI를 생성하는 함수
+         * @param {Object} session - 세션 객체
+         */
+        function createSessionCard(session) {
+            const container = document.getElementById('sessionsContainer');
+            
+            const sessionCard = document.createElement('div');
+            sessionCard.className = 'session-card disconnected';
+            sessionCard.id = `session-${session.id}`;
+            
+            sessionCard.innerHTML = `
+                <div class="session-header">
+                    <span class="session-title">Session-${session.id}</span>
+                    <span class="session-status status-disconnected" id="status-${session.id}">연결 해제</span>
+                </div>
+                
+                <div class="session-controls">
+                    <button class="btn-connect" onclick="connectSession(${session.id})" id="connect-btn-${session.id}">연결</button>
+                    <button class="btn-disconnect" onclick="disconnectSession(${session.id})" id="disconnect-btn-${session.id}" disabled>연결 해제</button>
+                    <button class="btn-danger" onclick="removeSession(${session.id})">세션 삭제</button>
+                </div>
+                
+                <div class="message-area" id="messages-${session.id}"></div>
+                
+                <div class="message-input-group">
+                    <input type="text" class="message-input" id="input-${session.id}" placeholder="메시지 입력..." disabled>
+                    <button class="btn-send" onclick="sendMessage(${session.id})" id="send-btn-${session.id}" disabled>전송</button>
+                </div>
+            `;
+            
+            container.appendChild(sessionCard);
+            
+            // Enter 키 이벤트 리스너 추가
+            document.getElementById(`input-${session.id}`).addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage(session.id);
+                }
+            });
+        }
+
+        /**
+         * 특정 세션을 STOMP로 연결하는 함수
+         * @param {number} sessionId - 연결할 세션의 ID
+         */
+        function connectSession(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) {
+                console.error(`❌ 세션을 찾을 수 없음: ${sessionId}`);
+                return;
+            }
+            
+            console.log(`🔗 세션 연결 시도: Session-${sessionId}`);
+            
+            // SockJS 소켓 생성
+            const socket = new SockJS('/ws');
+            
+            // STOMP 클라이언트 생성
+            session.stompClient = new StompJs.Client({
+                webSocketFactory: () => socket,
+                debug: (str) => {
+                    console.log(`🔍 STOMP Debug [Session-${sessionId}]:`, str);
+                },
+                onConnect: (frame) => {
+                    console.log(`✅ STOMP 연결 성공 [Session-${sessionId}]:`, frame);
+                    
+                    // 세션 상태 업데이트
+                    session.connected = true;
+                    updateSessionUI(sessionId, true);
+                    
+                    // 연결 성공 메시지 표시
+                    addMessageToSession(sessionId, '시스템: STOMP 연결 성공', 'system');
+                    
+                    // 토픽 구독 설정
+                    subscribeToTopics(sessionId);
+                    
+                    // 통계 업데이트
+                    updateGlobalStats();
+                },
+                onDisconnect: (frame) => {
+                    console.log(`🔌 STOMP 연결 종료 [Session-${sessionId}]:`, frame);
+                    
+                    // 세션 상태 업데이트
+                    session.connected = false;
+                    updateSessionUI(sessionId, false);
+                    
+                    // 연결 종료 메시지 표시
+                    addMessageToSession(sessionId, '시스템: STOMP 연결 종료', 'system');
+                    
+                    // 통계 업데이트
+                    updateGlobalStats();
+                },
+                onStompError: (frame) => {
+                    console.error(`❌ STOMP 에러 [Session-${sessionId}]:`, frame);
+                    
+                    // 에러 메시지 표시
+                    addMessageToSession(sessionId, `시스템: STOMP 오류 - ${frame.body}`, 'error');
+                }
+            });
+            
+            // STOMP 클라이언트 활성화
+            session.stompClient.activate();
+        }
+
+        /**
+         * 특정 세션의 토픽 구독을 설정하는 함수
+         * @param {number} sessionId - 구독을 설정할 세션의 ID
+         */
+        function subscribeToTopics(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session || !session.stompClient || !session.stompClient.connected) {
+                console.warn(`⚠️ 세션 구독 실패: Session-${sessionId}`);
+                return;
+            }
+            
+            // 1. 일반 메시지 토픽 구독
+            session.stompClient.subscribe('/topic/messages', (message) => {
+                try {
+                    const messageData = JSON.parse(message.body);
+                    addMessageToSession(sessionId, `서버: ${messageData.content}`, 'received');
+                } catch (e) {
+                    addMessageToSession(sessionId, `서버: ${message.body}`, 'received');
+                }
+            });
+            
+            // 2. 하트비트 토픽 구독
+            session.stompClient.subscribe('/topic/heartbeat', (message) => {
+                console.log(`💗 하트비트 [Session-${sessionId}]:`, message.body);
+                
+                try {
+                    const heartbeatData = JSON.parse(message.body);
+                    // 하트비트 메시지를 화면에도 표시
+                    const formattedMessage = `💗 ${heartbeatData.content}`;
+                    addMessageToSession(sessionId, formattedMessage, 'heartbeat');
+                } catch (e) {
+                    // JSON 파싱 실패 시 원본 메시지 표시
+                    addMessageToSession(sessionId, `💗 하트비트: ${message.body}`, 'heartbeat');
+                }
+            });
+            
+            // 3. 시스템 상태 토픽 구독
+            session.stompClient.subscribe('/topic/status', (message) => {
+                try {
+                    const statusData = JSON.parse(message.body);
+                    console.log(`🔍 파싱된 시스템 상태 데이터 [Session-${sessionId}]:`, statusData);
+                    
+                    // STOMP 메시지에서 extraData 필드에 실제 시스템 정보가 들어있음
+                    // Jackson이 extraData를 extra_data로 직렬화할 수 있음
+                    const systemInfo = statusData.extraData || statusData.extra_data || statusData;
+                    
+                    const memoryUsage = systemInfo.memory_usage_percent || systemInfo.memoryUsagePercent || 'N/A';
+                    const activeSessions = systemInfo.active_sessions || systemInfo.activeSessions || 'N/A';
+                    const memoryUsedMb = systemInfo.memory_used_mb || systemInfo.memoryUsedMb || 'N/A';
+                    const memoryTotalMb = systemInfo.memory_total_mb || systemInfo.memoryTotalMb || 'N/A';
+                    
+                    const formattedMessage = `📊 시스템 상태 - 메모리: ${memoryUsedMb}/${memoryTotalMb}MB (${memoryUsage}%), 활성 세션: ${activeSessions}개`;
+                    addMessageToSession(sessionId, formattedMessage, 'system');
+                } catch (e) {
+                    console.error(`❌ 시스템 상태 파싱 오류 [Session-${sessionId}]:`, e);
+                    addMessageToSession(sessionId, `📊 시스템 상태: ${message.body}`, 'system');
+                }
+            });
+            
+            // 4. 알림 토픽 구독
+            session.stompClient.subscribe('/topic/notifications', (message) => {
+                try {
+                    const notificationData = JSON.parse(message.body);
+                    const formattedMessage = `🔔 알림 [${notificationData.timestamp}] - ${notificationData.content}`;
+                    addMessageToSession(sessionId, formattedMessage, 'scheduled');
+                } catch (e) {
+                    addMessageToSession(sessionId, `🔔 알림: ${message.body}`, 'scheduled');
+                }
+            });
+            
+            // 5. 사용자 개인 메시지 토픽 구독
+            session.stompClient.subscribe('/user/queue/messages', (message) => {
+                try {
+                    const privateData = JSON.parse(message.body);
+                    addMessageToSession(sessionId, `개인 메시지: ${privateData.content}`, 'received');
+                } catch (e) {
+                    addMessageToSession(sessionId, `개인 메시지: ${message.body}`, 'received');
+                }
+            });
+            
+            console.log(`✅ 토픽 구독 완료 [Session-${sessionId}]`);
+        }
+
+        /**
+         * 특정 세션의 STOMP 연결을 종료하는 함수
+         * @param {number} sessionId - 연결을 종료할 세션의 ID
+         */
+        function disconnectSession(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) {
+                console.error(`❌ 세션을 찾을 수 없음: ${sessionId}`);
+                return;
+            }
+            
+            if (session.stompClient && session.stompClient.connected) {
+                console.log(`🔌 세션 연결 해제: Session-${sessionId}`);
+                session.stompClient.deactivate();
+            }
+        }
+
+        /**
+         * 특정 세션에서 메시지를 전송하는 함수
+         * @param {number} sessionId - 메시지를 전송할 세션의 ID
+         */
+        function sendMessage(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) {
+                console.error(`❌ 세션을 찾을 수 없음: ${sessionId}`);
+                return;
+            }
+            
+            const input = document.getElementById(`input-${sessionId}`);
+            const message = input.value.trim();
+            
+            if (message && session.stompClient && session.stompClient.connected) {
+                console.log(`📤 메시지 전송 [Session-${sessionId}]:`, message);
+                
+                // STOMP 메시지 전송
+                session.stompClient.publish({
+                    destination: '/app/message',
+                    body: JSON.stringify({
+                        content: message,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                // 전송한 메시지를 UI에 표시
+                addMessageToSession(sessionId, `나: ${message}`, 'sent');
+                
+                // 입력 필드 초기화
+                input.value = '';
+                
+                // 메시지 카운트 증가
+                session.messageCount++;
+            } else {
+                console.warn(`⚠️ 메시지 전송 실패 [Session-${sessionId}]: 연결되지 않았거나 메시지가 비어있음`);
+            }
+        }
+
+        /**
+         * 특정 세션을 삭제하는 함수
+         * @param {number} sessionId - 삭제할 세션의 ID
+         */
+        function removeSession(sessionId) {
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) {
+                console.error(`❌ 세션을 찾을 수 없음: ${sessionId}`);
+                return;
+            }
+            
+            // 연결된 경우 먼저 연결 해제
+            if (session.connected) {
+                disconnectSession(sessionId);
+            }
+            
+            // 세션 배열에서 제거
+            sessions = sessions.filter(s => s.id !== sessionId);
+            
+            // UI에서 세션 카드 제거
+            const sessionCard = document.getElementById(`session-${sessionId}`);
+            if (sessionCard) {
+                sessionCard.remove();
+            }
+            
+            // 통계 업데이트
+            updateGlobalStats();
+            
+            console.log(`🗑️ 세션 삭제: Session-${sessionId}`);
+        }
+
+        // ========== UI 업데이트 함수 ==========
+        
+        /**
+         * 세션 UI 상태를 업데이트하는 함수
+         * @param {number} sessionId - 업데이트할 세션의 ID
+         * @param {boolean} connected - 연결 상태
+         */
+        function updateSessionUI(sessionId, connected) {
+            const sessionCard = document.getElementById(`session-${sessionId}`);
+            const statusSpan = document.getElementById(`status-${sessionId}`);
+            const connectBtn = document.getElementById(`connect-btn-${sessionId}`);
+            const disconnectBtn = document.getElementById(`disconnect-btn-${sessionId}`);
+            const input = document.getElementById(`input-${sessionId}`);
+            const sendBtn = document.getElementById(`send-btn-${sessionId}`);
+            
+            if (connected) {
+                sessionCard.className = 'session-card connected';
+                statusSpan.textContent = '연결됨';
+                statusSpan.className = 'session-status status-connected';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                input.disabled = false;
+                sendBtn.disabled = false;
+            } else {
+                sessionCard.className = 'session-card disconnected';
+                statusSpan.textContent = '연결 해제';
+                statusSpan.className = 'session-status status-disconnected';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                input.disabled = true;
+                sendBtn.disabled = true;
+            }
+        }
+
+        /**
+         * 특정 세션의 메시지 영역에 메시지를 추가하는 함수
+         * @param {number} sessionId - 메시지를 추가할 세션의 ID
+         * @param {string} message - 메시지 내용
+         * @param {string} type - 메시지 타입
+         */
+        function addMessageToSession(sessionId, message, type) {
+            const messagesDiv = document.getElementById(`messages-${sessionId}`);
+            if (!messagesDiv) return;
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type}`;
+            messageElement.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+            
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        /**
+         * 전역 통계를 업데이트하는 함수
+         */
+        function updateGlobalStats() {
+            const totalSessions = sessions.length;
+            const connectedSessions = sessions.filter(s => s.connected).length;
+            const disconnectedSessions = totalSessions - connectedSessions;
+            
+            const statsDiv = document.getElementById('globalStats');
+            statsDiv.textContent = `총 세션: ${totalSessions}개 | 연결된 세션: ${connectedSessions}개 | 연결 해제된 세션: ${disconnectedSessions}개`;
+        }
+
+        // ========== 전역 제어 함수 ==========
+        
+        /**
+         * 모든 세션을 연결하는 함수
+         */
+        function connectAllSessions() {
+            console.log('🔗 모든 세션 연결 시작');
+            sessions.forEach(session => {
+                if (!session.connected) {
+                    connectSession(session.id);
+                }
+            });
+        }
+
+        /**
+         * 모든 세션의 연결을 해제하는 함수
+         */
+        function disconnectAllSessions() {
+            console.log('🔌 모든 세션 연결 해제 시작');
+            sessions.forEach(session => {
+                if (session.connected) {
+                    disconnectSession(session.id);
+                }
+            });
+        }
+
+        /**
+         * 모든 세션의 메시지를 지우는 함수
+         */
+        function clearAllMessages() {
+            console.log('🧹 모든 메시지 지우기');
+            sessions.forEach(session => {
+                const messagesDiv = document.getElementById(`messages-${session.id}`);
+                if (messagesDiv) {
+                    messagesDiv.innerHTML = '';
+                }
+                session.messageCount = 0;
+            });
+        }
+
+        /**
+         * 전역 브로드캐스트 메시지를 전송하는 함수
+         */
+        function sendGlobalBroadcast() {
+            const input = document.getElementById('globalBroadcastInput');
+            const message = input.value.trim();
+            
+            if (!message) {
+                alert('브로드캐스트 메시지를 입력하세요.');
+                return;
+            }
+            
+            console.log('📡 전역 브로드캐스트 전송:', message);
+            
+            // 모든 연결된 세션에서 메시지 전송
+            sessions.forEach(session => {
+                if (session.connected && session.stompClient) {
+                    session.stompClient.publish({
+                        destination: '/app/message',
+                        body: JSON.stringify({
+                            content: `[브로드캐스트] ${message}`,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+                    
+                    addMessageToSession(session.id, `나 (브로드캐스트): ${message}`, 'sent');
+                    session.messageCount++;
+                }
+            });
+            
+            input.value = '';
+        }
+
+        /**
+         * 활성 세션 수를 조회하는 REST API 호출
+         */
+        async function getSessionCount() {
+            try {
+                console.log('🔍 API 호출: 활성 세션 수 조회');
+                
+                const response = await fetch('/api/websocket/sessions/count');
+                const data = await response.json();
+                
+                console.log('📊 활성 세션 수 조회 결과:', data);
+                
+                // 모든 세션에 결과 표시
+                sessions.forEach(session => {
+                    addMessageToSession(session.id, `API: 서버 활성 세션 수 - ${data.activeSessionCount}`, 'system');
+                });
+            } catch (error) {
+                console.error('❌ API 호출 실패:', error);
+                
+                sessions.forEach(session => {
+                    addMessageToSession(session.id, `API 오류: ${error.message}`, 'error');
+                });
+            }
+        }
+
+        // ========== 초기화 ==========
+        
+        /**
+         * 페이지 로드 시 초기 세션 생성
+         */
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Multi STOMP WebSocket Test 페이지 로드 완료');
+            
+            // 초기 세션 2개 생성
+            addSession();
+            addSession();
+            
+            // 전역 브로드캐스트 입력 필드 Enter 키 이벤트
+            document.getElementById('globalBroadcastInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendGlobalBroadcast();
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,595 @@
+{
+	"info": {
+		"_postman_id": "websocket-stomp-collection",
+		"name": "WebSocket STOMP Test Collection",
+		"description": "Spring Boot WebSocket + STOMP 프로젝트 테스트용 Collection\n\n이 Collection은 다음 기능들을 테스트할 수 있습니다:\n- WebSocket 세션 관리 API\n- 브로드캐스트 메시지 전송\n- 채팅방 관리 API\n- 실시간 상태 조회\n\n사용 방법:\n1. 서버를 http://localhost:8080 에서 실행\n2. Collection을 Import\n3. 각 API를 순서대로 테스트",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "WebSocket 세션 관리",
+			"item": [
+				{
+					"name": "활성 세션 수 조회",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has activeSessionCount\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('activeSessionCount');",
+									"    pm.expect(jsonData.activeSessionCount).to.be.a('number');",
+									"});",
+									"",
+									"pm.test(\"Response has timestamp\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('timestamp');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/websocket/sessions/count",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"websocket",
+								"sessions",
+								"count"
+							]
+						},
+						"description": "현재 활성 WebSocket 세션 수를 조회합니다.\n\n예상 응답:\n```json\n{\n    \"activeSessionCount\": 0,\n    \"timestamp\": 1699123456789\n}\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "WebSocket 서비스 상태 확인",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Service is running\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql('running');",
+									"    pm.expect(jsonData.service).to.eql('WebSocket Service');",
+									"});",
+									"",
+									"pm.test(\"Has activeConnections field\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('activeConnections');",
+									"    pm.expect(jsonData.activeConnections).to.be.a('number');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/websocket/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"websocket",
+								"status"
+							]
+						},
+						"description": "WebSocket 서비스의 전체 상태를 확인합니다.\n\n예상 응답:\n```json\n{\n    \"service\": \"WebSocket Service\",\n    \"status\": \"running\",\n    \"activeConnections\": 0,\n    \"timestamp\": 1699123456789\n}\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "브로드캐스트 메시지 전송",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Broadcast was successful\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"    pm.expect(jsonData.message).to.include('successfully');",
+									"});",
+									"",
+									"pm.test(\"Has sentTo field\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('sentTo');",
+									"    pm.expect(jsonData.sentTo).to.be.a('number');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"message\": \"🔔 시스템 공지: Postman에서 전송된 브로드캐스트 메시지입니다!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/websocket/broadcast",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"websocket",
+								"broadcast"
+							]
+						},
+						"description": "모든 활성 WebSocket 연결에 브로드캐스트 메시지를 전송합니다.\n\n요청 본문:\n```json\n{\n    \"message\": \"전송할 메시지 내용\"\n}\n```\n\n예상 응답:\n```json\n{\n    \"success\": true,\n    \"message\": \"Broadcast message sent successfully\",\n    \"sentTo\": 3,\n    \"timestamp\": 1699123456789\n}\n```"
+					},
+					"response": []
+				}
+			],
+			"description": "WebSocket 세션의 생성, 관리, 상태 조회 관련 API들을 테스트합니다."
+		},
+		{
+			"name": "채팅방 관리",
+			"item": [
+				{
+					"name": "모든 채팅방 조회",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has totalRooms field\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('totalRooms');",
+									"    pm.expect(jsonData.totalRooms).to.be.a('number');",
+									"});",
+									"",
+									"pm.test(\"Response has rooms object\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('rooms');",
+									"    pm.expect(jsonData.rooms).to.be.an('object');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/websocket/rooms",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"websocket",
+								"rooms"
+							]
+						},
+						"description": "현재 생성된 모든 채팅방의 정보를 조회합니다.\n\n예상 응답:\n```json\n{\n    \"totalRooms\": 2,\n    \"rooms\": {\n        \"room1\": {\n            \"participantCount\": 3,\n            \"participants\": [\"user1\", \"user2\", \"user3\"]\n        },\n        \"room2\": {\n            \"participantCount\": 1,\n            \"participants\": [\"user4\"]\n        }\n    },\n    \"timestamp\": 1699123456789\n}\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "특정 채팅방 참여자 조회",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has roomId\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('roomId');",
+									"    pm.expect(jsonData.roomId).to.eql('testroom');",
+									"});",
+									"",
+									"pm.test(\"Has participant information\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('participantCount');",
+									"    pm.expect(jsonData).to.have.property('participants');",
+									"    pm.expect(jsonData.participantCount).to.be.a('number');",
+									"    pm.expect(jsonData.participants).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/websocket/rooms/testroom/participants",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"websocket",
+								"rooms",
+								"testroom",
+								"participants"
+							]
+						},
+						"description": "특정 채팅방에 현재 참여 중인 사용자 목록을 조회합니다.\n\n예상 응답:\n```json\n{\n    \"roomId\": \"testroom\",\n    \"participantCount\": 3,\n    \"participants\": [\"user1\", \"user2\", \"user3\"],\n    \"timestamp\": 1699123456789\n}\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "특정 채팅방 상태 조회",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has room status\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('roomId');",
+									"    pm.expect(jsonData).to.have.property('participantCount');",
+									"    pm.expect(jsonData).to.have.property('isActive');",
+									"    pm.expect(jsonData.roomId).to.eql('testroom');",
+									"    pm.expect(jsonData.participantCount).to.be.a('number');",
+									"    pm.expect(jsonData.isActive).to.be.a('boolean');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/websocket/rooms/testroom/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"websocket",
+								"rooms",
+								"testroom",
+								"status"
+							]
+						},
+						"description": "특정 채팅방의 현재 상태를 조회합니다.\n\n예상 응답:\n```json\n{\n    \"roomId\": \"testroom\",\n    \"participantCount\": 3,\n    \"isActive\": true,\n    \"timestamp\": 1699123456789\n}\n```"
+					},
+					"response": []
+				}
+			],
+			"description": "채팅방 생성, 참여자 관리, 상태 조회 관련 API들을 테스트합니다."
+		},
+		{
+			"name": "테스트 시나리오",
+			"item": [
+				{
+					"name": "시나리오 1: 전체 서비스 상태 확인",
+					"item": [
+						{
+							"name": "1. 서버 상태 확인",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"서버가 정상 동작 중\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.status).to.eql('running');",
+											"});",
+											"",
+											"console.log('✅ 서버 상태 확인 완료');"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/websocket/status",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"websocket",
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. 현재 세션 수 확인",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"세션 수 조회 성공\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property('activeSessionCount');",
+											"    console.log('현재 활성 세션 수:', jsonData.activeSessionCount);",
+											"});",
+											"",
+											"console.log('✅ 세션 수 확인 완료');"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/websocket/sessions/count",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"websocket",
+										"sessions",
+										"count"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "3. 채팅방 현황 확인",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"채팅방 목록 조회 성공\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property('totalRooms');",
+											"    console.log('총 채팅방 수:', jsonData.totalRooms);",
+											"    console.log('채팅방 목록:', Object.keys(jsonData.rooms));",
+											"});",
+											"",
+											"console.log('✅ 채팅방 현황 확인 완료');"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/websocket/rooms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"websocket",
+										"rooms"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "서버의 전체 상태를 순차적으로 확인하는 시나리오입니다."
+				},
+				{
+					"name": "시나리오 2: 브로드캐스트 기능 테스트",
+					"item": [
+						{
+							"name": "1. 브로드캐스트 전 세션 수 확인",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"pm.globals.set('sessionCountBefore', jsonData.activeSessionCount);",
+											"console.log('브로드캐스트 전 세션 수:', jsonData.activeSessionCount);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/websocket/sessions/count",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"websocket",
+										"sessions",
+										"count"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2. 브로드캐스트 메시지 전송",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"브로드캐스트 전송 성공\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.success).to.be.true;",
+											"    console.log('브로드캐스트 대상 세션 수:', jsonData.sentTo);",
+											"});",
+											"",
+											"console.log('✅ 브로드캐스트 메시지 전송 완료');"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"message\": \"📢 [테스트 시나리오] 브로드캐스트 기능 테스트 메시지입니다. 현재 시간: {{$timestamp}}\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/websocket/broadcast",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"websocket",
+										"broadcast"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "브로드캐스트 기능을 테스트하는 시나리오입니다."
+				}
+			],
+			"description": "실제 사용 사례를 기반으로 한 종합적인 테스트 시나리오들입니다."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// 전역 변수 초기화",
+					"pm.globals.set('testStartTime', new Date().toISOString());",
+					"console.log('🚀 WebSocket STOMP 테스트 시작:', pm.globals.get('testStartTime'));"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// 응답 시간 체크",
+					"pm.test(\"응답 시간 확인 (2초 이내)\", function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+					"});",
+					"",
+					"// 공통 헤더 체크",
+					"pm.test(\"Content-Type 헤더 확인\", function () {",
+					"    if (pm.response.headers.get('Content-Type')) {",
+					"        pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+					"    }",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string",
+			"description": "Spring Boot 서버의 기본 URL"
+		},
+		{
+			"key": "wsUrl",
+			"value": "ws://localhost:8080/ws",
+			"type": "string",
+			"description": "WebSocket 연결 URL"
+		},
+		{
+			"key": "testRoomId",
+			"value": "testroom",
+			"type": "string",
+			"description": "테스트용 채팅방 ID"
+		}
+	]
+} 

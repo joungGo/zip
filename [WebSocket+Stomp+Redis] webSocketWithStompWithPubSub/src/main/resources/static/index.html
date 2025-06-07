@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test Hub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 18px;
+        }
+        
+        .test-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .test-card {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .test-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .test-card h3 {
+            color: #007bff;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .test-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .features {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+        
+        .features li {
+            padding: 5px 0;
+            color: #555;
+        }
+        
+        .features li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #0056b3;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #28a745;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #1e7e34;
+        }
+        
+        .info-section {
+            background-color: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .info-section h4 {
+            color: #0056b3;
+            margin-bottom: 15px;
+        }
+        
+        .step {
+            margin-bottom: 10px;
+            padding-left: 20px;
+        }
+        
+        .step:before {
+            content: counter(step-counter) ". ";
+            counter-increment: step-counter;
+            font-weight: bold;
+            color: #007bff;
+            margin-left: -20px;
+        }
+        
+        .steps {
+            counter-reset: step-counter;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 WebSocket Test Hub (STOMP)</h1>
+        <p class="subtitle">Controller-Service-Repository 패턴으로 구현된 STOMP WebSocket 애플리케이션 테스트</p>
+        
+        <div class="test-options">
+            <a href="/websocket-test.html" class="test-card">
+                <h3>📱 단일 세션 테스트</h3>
+                <p>기본적인 STOMP WebSocket 연결과 메시지 송수신을 테스트합니다.</p>
+                <ul class="features">
+                    <li>STOMP WebSocket 연결/해제</li>
+                    <li>실시간 메시지 송수신</li>
+                    <li>토픽 기반 메시지 수신</li>
+                    <li>REST API 테스트</li>
+                    <li>브로드캐스트 메시지 수신</li>
+                </ul>
+                <div style="margin-top: 20px;">
+                    <span class="btn">테스트 시작</span>
+                </div>
+            </a>
+            
+            <a href="/multi-session-test.html" class="test-card">
+                <h3>🔗 다중 세션 테스트</h3>
+                <p>여러 STOMP WebSocket 세션을 동시에 관리하고 브로드캐스트를 테스트합니다.</p>
+                <ul class="features">
+                    <li>다중 STOMP 세션 동시 관리</li>
+                    <li>세션별 개별 메시지 전송</li>
+                    <li>토픽 기반 브로드캐스트 메시지</li>
+                    <li>실시간 세션 통계</li>
+                </ul>
+                <div style="margin-top: 20px;">
+                    <span class="btn btn-secondary">테스트 시작</span>
+                </div>
+            </a>
+            
+            <a href="/room-chat-test.html" class="test-card">
+                <h3>🏠 룸 기반 채팅 테스트</h3>
+                <p>STOMP를 이용한 룸별 격리된 채팅 시스템을 테스트합니다.</p>
+                <ul class="features">
+                    <li>룸별 완전 격리된 채팅</li>
+                    <li>실시간 참여자 목록 관리</li>
+                    <li>입장/퇴장 알림 시스템</li>
+                    <li>읽지 않은 메시지 배지</li>
+                    <li>직관적인 채팅방 UI</li>
+                </ul>
+                <div style="margin-top: 20px;">
+                    <span class="btn" style="background-color: #9b59b6;">테스트 시작</span>
+                </div>
+            </a>
+        </div>
+        
+        <div class="info-section">
+            <h4>🎯 다중 세션 브로드캐스트 테스트 방법</h4>
+            <div class="steps">
+                <div class="step">애플리케이션 실행: <code>./gradlew bootRun</code></div>
+                <div class="step"><strong>다중 세션 테스트</strong> 페이지 접속</div>
+                <div class="step">"새 세션 추가" 버튼으로 원하는 만큼 세션 생성</div>
+                <div class="step">"모든 세션 연결" 버튼으로 모든 세션을 WebSocket 서버에 연결</div>
+                <div class="step">브로드캐스트 메시지 입력 후 "브로드캐스트 전송" 클릭</div>
+                <div class="step">모든 연결된 세션에서 동시에 메시지 수신 확인</div>
+            </div>
+        </div>
+        
+        <div class="info-section" style="background-color: #fff3cd;">
+            <h4>💡 추가 테스트 방법</h4>
+            <p><strong>여러 브라우저 탭으로 테스트:</strong></p>
+            <div class="steps">
+                <div class="step">여러 브라우저 탭에서 <strong>단일 세션 테스트</strong> 또는 <strong>룸 채팅 테스트</strong> 페이지 열기</div>
+                <div class="step">각 탭에서 WebSocket 연결</div>
+                <div class="step">한 탭에서 브로드캐스트 메시지 전송 또는 같은 룸에서 채팅</div>
+                <div class="step">다른 모든 탭에서 메시지 수신 확인</div>
+            </div>
+        </div>
+        
+        <div class="info-section" style="background-color: #e8f5e8;">
+            <h4>🏠 룸 채팅 테스트 방법</h4>
+            <div class="steps">
+                <div class="step">애플리케이션 실행: <code>./gradlew bootRun</code></div>
+                <div class="step"><strong>룸 기반 채팅 테스트</strong> 페이지 접속</div>
+                <div class="step">사용자명 입력 후 WebSocket 연결</div>
+                <div class="step">좌측에서 원하는 채팅방 선택 (일반 채팅방 또는 개발자 채팅방)</div>
+                <div class="step">"입장" 버튼 클릭하여 채팅방 참여</div>
+                <div class="step">여러 브라우저 탭에서 같은 룸 또는 다른 룸으로 테스트</div>
+                <div class="step">실시간 참여자 목록과 읽지 않은 메시지 배지 확인</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 페이지 로드 완료 시 초기화 로그
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏠 WebSocket Test Hub 페이지 로드 완료');
+            console.log('📋 사용 가능한 테스트:');
+            console.log('  - 단일 세션 테스트: /websocket-test.html');
+            console.log('  - 다중 세션 테스트: /multi-session-test.html');
+            console.log('  - 룸 채팅 테스트: /room-chat-test.html');
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채팅방 테스트 (STOMP)</title>
+    <style>
+        /* ========== 전체 페이지 기본 스타일 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        /* ========== 좌측 사이드바 (채팅방 목록) ========== */
+        .sidebar {
+            width: 300px;
+            background: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #3c4f66;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .connection-status {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .status-connected {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .status-disconnected {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .status-connecting {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .connection-controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-connection {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-connect {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-connect:hover:not(:disabled) {
+            background: #219a52;
+        }
+        
+        .btn-disconnect {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-disconnect:hover:not(:disabled) {
+            background: #c0392b;
+        }
+        
+        .btn-connection:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        /* 사용자 정보 섹션 */
+        .user-section {
+            padding: 20px;
+            border-bottom: 1px solid #3c4f66;
+        }
+        
+        .username-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #3c4f66;
+            border-radius: 4px;
+            background: #34495e;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .username-input::placeholder {
+            color: #bdc3c7;
+        }
+        
+        .username-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        /* 채팅방 목록 섹션 */
+        .rooms-section {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .section-title {
+            padding: 15px 20px 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #bdc3c7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .room-list {
+            list-style: none;
+        }
+        
+        .room-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #3c4f66;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .room-item:hover {
+            background: #34495e;
+        }
+        
+        .room-item.active {
+            background: #3498db;
+            border-left: 4px solid #2980b9;
+        }
+        
+        .room-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .room-info {
+            font-size: 12px;
+            color: #bdc3c7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .participant-count {
+            background: #27ae60;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .unread-badge {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* ========== 메인 채팅 영역 ========== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .chat-header {
+            padding: 20px;
+            background: #ecf0f1;
+            border-bottom: 1px solid #bdc3c7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .room-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .room-subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+        
+        .room-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .room-participants {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+        
+        .btn-room-action {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-join {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-join:hover:not(:disabled) {
+            background: #219a52;
+        }
+        
+        .btn-leave {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-leave:hover:not(:disabled) {
+            background: #c0392b;
+        }
+        
+        .btn-room-action:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        /* 채팅 메시지 영역 */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 50px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.own {
+            margin-left: auto;
+        }
+        
+        .message.system {
+            max-width: 100%;
+            text-align: center;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .message-sender {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+        
+        .message-content {
+            padding: 12px 15px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        .message.own .message-content {
+            background: #3498db;
+            color: white;
+        }
+        
+        .message.other .message-content {
+            background: white;
+            color: #2c3e50;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .message.system .message-content {
+            background: #f1c40f;
+            color: #2c3e50;
+            font-style: italic;
+            border-radius: 8px;
+            display: inline-block;
+            max-width: 400px;
+        }
+        
+        .message.join .message-content {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .message.leave .message-content {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        /* 메시지 헤더 스타일 개선 */
+        .message-header {
+            margin-bottom: 4px;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .message-time {
+            color: #95a5a6;
+            font-size: 10px;
+        }
+        
+        /* 메시지 입력 영역 */
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e5e9;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+        }
+        
+        .message-input {
+            flex: 1;
+            min-height: 44px;
+            max-height: 120px;
+            padding: 12px 16px;
+            border: 1px solid #e1e5e9;
+            border-radius: 22px;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            transition: all 0.2s;
+        }
+        
+        .message-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .message-input:disabled {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .send-button {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 18px;
+        }
+        
+        .send-button:hover:not(:disabled) {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        .send-button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* ========== 반응형 디자인 ========== */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+                height: 70vh;
+            }
+            
+            .rooms-section {
+                max-height: 200px;
+            }
+        }
+        
+        /* ========== 스크롤바 스타일 ========== */
+        .chat-messages::-webkit-scrollbar,
+        .rooms-section::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track,
+        .rooms-section::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb,
+        .rooms-section::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover,
+        .rooms-section::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ========== 좌측 사이드바 ========== -->
+        <div class="sidebar">
+            <!-- 헤더 (연결 상태 및 컨트롤) -->
+            <div class="sidebar-header">
+                <h2>채팅방 목록</h2>
+                <div id="connectionStatus" class="connection-status status-disconnected">
+                    연결되지 않음
+                </div>
+                <div class="connection-controls">
+                    <button id="connectBtn" class="btn-connection btn-connect">연결</button>
+                    <button id="disconnectBtn" class="btn-connection btn-disconnect" disabled>해제</button>
+                </div>
+            </div>
+            
+            <!-- 사용자 정보 입력 -->
+            <div class="user-section">
+                <input type="text" id="usernameInput" class="username-input" 
+                       placeholder="사용자명을 입력하세요" maxlength="20">
+            </div>
+            
+            <!-- 채팅방 목록 -->
+            <div class="rooms-section">
+                <div class="section-title">채팅방</div>
+                <ul class="room-list" id="roomList">
+                    <li class="room-item" data-room-id="room1">
+                        <div class="room-name">일반 채팅방</div>
+                        <div class="room-info">
+                            <span>자유로운 대화를 나누세요</span>
+                            <span class="participant-count" id="room1-count">0</span>
+                        </div>
+                    </li>
+                    <li class="room-item" data-room-id="room2">
+                        <div class="room-name">개발자 채팅방</div>
+                        <div class="room-info">
+                            <span>개발 관련 토론방</span>
+                            <span class="participant-count" id="room2-count">0</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- ========== 메인 채팅 영역 ========== -->
+        <div class="main-content">
+            <!-- 채팅방 헤더 -->
+            <div class="chat-header">
+                <div>
+                    <div class="room-title" id="currentRoomTitle">채팅방을 선택하세요</div>
+                    <div class="room-subtitle" id="currentRoomSubtitle">좌측에서 참여할 채팅방을 클릭하세요</div>
+                    <div class="room-participants" id="currentRoomParticipants"></div>
+                </div>
+                <div class="room-actions">
+                    <button id="joinRoomBtn" class="btn-room-action btn-join" disabled>입장</button>
+                    <button id="leaveRoomBtn" class="btn-room-action btn-leave" disabled>퇴장</button>
+                </div>
+            </div>
+            
+            <!-- 메시지 표시 영역 -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <h3>채팅방 테스트에 오신 것을 환영합니다! 🎉</h3>
+                    <p>1. 먼저 사용자명을 입력하고 WebSocket에 연결하세요</p>
+                    <p>2. 좌측에서 참여할 채팅방을 선택하세요</p>
+                    <p>3. 입장 버튼을 클릭하여 채팅방에 참여하세요</p>
+                </div>
+            </div>
+            
+            <!-- 메시지 입력 영역 -->
+            <div class="chat-input">
+                <div class="input-container">
+                    <textarea id="messageInput" class="message-input" 
+                              placeholder="메시지를 입력하세요... (Enter: 전송, Shift+Enter: 줄바꿈)" 
+                              rows="1" disabled></textarea>
+                    <button id="sendBtn" class="send-button" disabled>
+                        &#10148;
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STOMP.js와 SockJS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+
+    <script>
+        // ========== 전역 변수 선언 ==========
+        let stompClient = null;
+        let currentRoom = null;
+        let currentUsername = null;
+        let isConnected = false;
+        let roomSubscriptions = new Map(); // 룸별 구독 객체 저장
+        let unreadCounts = new Map(); // 룸별 읽지 않은 메시지 수
+        
+        // DOM 요소 참조
+        const elements = {
+            // 연결 관련
+            connectionStatus: document.getElementById('connectionStatus'),
+            connectBtn: document.getElementById('connectBtn'),
+            disconnectBtn: document.getElementById('disconnectBtn'),
+            usernameInput: document.getElementById('usernameInput'),
+            
+            // 룸 관련
+            roomList: document.getElementById('roomList'),
+            currentRoomTitle: document.getElementById('currentRoomTitle'),
+            currentRoomSubtitle: document.getElementById('currentRoomSubtitle'),
+            currentRoomParticipants: document.getElementById('currentRoomParticipants'),
+            joinRoomBtn: document.getElementById('joinRoomBtn'),
+            leaveRoomBtn: document.getElementById('leaveRoomBtn'),
+            
+            // 메시지 관련
+            chatMessages: document.getElementById('chatMessages'),
+            messageInput: document.getElementById('messageInput'),
+            sendBtn: document.getElementById('sendBtn')
+        };
+        
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 채팅방 테스트 페이지 로드 완료');
+            initializeEventListeners();
+            loadUsername();
+        });
+        
+        // ========== 이벤트 리스너 초기화 ==========
+        function initializeEventListeners() {
+            // 연결 버튼
+            elements.connectBtn.addEventListener('click', connect);
+            elements.disconnectBtn.addEventListener('click', disconnect);
+            
+            // 사용자명 입력 (자동 저장)
+            elements.usernameInput.addEventListener('input', saveUsername);
+            elements.usernameInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !isConnected) {
+                    connect();
+                }
+            });
+            
+            // 룸 관련 버튼
+            elements.joinRoomBtn.addEventListener('click', joinCurrentRoom);
+            elements.leaveRoomBtn.addEventListener('click', leaveCurrentRoom);
+            
+            // 메시지 입력
+            elements.messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            elements.sendBtn.addEventListener('click', sendMessage);
+            
+            // 룸 목록 클릭 이벤트
+            elements.roomList.addEventListener('click', function(e) {
+                const roomItem = e.target.closest('.room-item');
+                if (roomItem) {
+                    selectRoom(roomItem.dataset.roomId);
+                }
+            });
+            
+            // 텍스트 에어리어 자동 크기 조절
+            elements.messageInput.addEventListener('input', autoResizeTextarea);
+        }
+        
+        // ========== 사용자명 관리 ==========
+        function saveUsername() {
+            const username = elements.usernameInput.value.trim();
+            localStorage.setItem('chatroom-username', username);
+        }
+        
+        function loadUsername() {
+            const savedUsername = localStorage.getItem('chatroom-username');
+            if (savedUsername) {
+                elements.usernameInput.value = savedUsername;
+            }
+        }
+        
+        function getUsername() {
+            const username = elements.usernameInput.value.trim();
+            return username || 'Anonymous';
+        }
+        
+        // ========== 연결 상태 관리 ==========
+        function updateConnectionStatus(status, connected) {
+            isConnected = connected;
+            elements.connectionStatus.textContent = status;
+            elements.connectionStatus.className = `connection-status ${connected ? 'status-connected' : 'status-disconnected'}`;
+            
+            // 버튼 상태 업데이트
+            elements.connectBtn.disabled = connected;
+            elements.disconnectBtn.disabled = !connected;
+            
+            // 입력 필드 상태 업데이트
+            elements.usernameInput.disabled = connected;
+            
+            // 룸 관련 버튼 상태 업데이트
+            updateRoomControls();
+        }
+        
+        function updateRoomControls() {
+            const hasRoom = currentRoom !== null;
+            const canJoin = isConnected && hasRoom && !isInRoom();
+            const canLeave = isConnected && hasRoom && isInRoom();
+            const canSendMessage = isConnected && isInRoom();
+            
+            elements.joinRoomBtn.disabled = !canJoin;
+            elements.leaveRoomBtn.disabled = !canLeave;
+            elements.messageInput.disabled = !canSendMessage;
+            elements.sendBtn.disabled = !canSendMessage;
+        }
+        
+        function isInRoom() {
+            return currentRoom && roomSubscriptions.has(currentRoom);
+        }
+        
+        // ========== WebSocket 연결 관리 ==========
+        function connect() {
+            if (isConnected) return;
+            
+            currentUsername = getUsername();
+            console.log(`🔗 WebSocket 연결 시도: ${currentUsername}`);
+            
+            updateConnectionStatus('연결 중...', false);
+            elements.connectionStatus.className = 'connection-status status-connecting';
+            
+            const socket = new SockJS('/ws');
+            stompClient = new StompJs.Client({
+                webSocketFactory: () => socket,
+                debug: (str) => console.log('🔍 STOMP Debug:', str),
+                
+                onConnect: (frame) => {
+                    console.log('✅ STOMP 연결 성공:', frame);
+                    updateConnectionStatus('연결됨', true);
+                    addSystemMessage('WebSocket 연결이 성공했습니다.');
+                    
+                    // 현재 선택된 룸이 있으면 참여자 목록 조회
+                    if (currentRoom) {
+                        fetchAndUpdateParticipants(currentRoom);
+                    }
+                },
+                
+                onDisconnect: (frame) => {
+                    console.log('🔌 STOMP 연결 종료:', frame);
+                    updateConnectionStatus('연결되지 않음', false);
+                    addSystemMessage('WebSocket 연결이 종료되었습니다.');
+                    
+                    // 모든 구독 정리
+                    roomSubscriptions.clear();
+                    currentRoom = null;
+                    updateRoomSelection();
+                },
+                
+                onStompError: (frame) => {
+                    console.error('❌ STOMP 오류:', frame);
+                    updateConnectionStatus('연결 오류', false);
+                    addSystemMessage('연결 중 오류가 발생했습니다: ' + frame.headers['message']);
+                }
+            });
+            
+            stompClient.activate();
+        }
+        
+        function disconnect() {
+            if (!isConnected || !stompClient) return;
+            
+            console.log('🔌 WebSocket 연결 해제 시도');
+            
+            // 현재 룸에서 퇴장
+            if (isInRoom()) {
+                leaveCurrentRoom();
+            }
+            
+            // 모든 룸 구독 해제
+            unsubscribeFromAllRooms();
+            
+            stompClient.deactivate();
+        }
+        
+        // ========== 룸 관리 ==========
+        function selectRoom(roomId) {
+            console.log(`🏠 룸 선택: ${roomId}`);
+            
+            // 이전 룸 선택 해제
+            document.querySelectorAll('.room-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 새 룸 선택
+            const roomItem = document.querySelector(`[data-room-id="${roomId}"]`);
+            if (roomItem) {
+                roomItem.classList.add('active');
+                currentRoom = roomId;
+                
+                // 룸 제목 업데이트
+                const roomName = roomItem.querySelector('.room-name').textContent;
+                const roomInfo = roomItem.querySelector('.room-info span').textContent;
+                
+                elements.currentRoomTitle.textContent = roomName;
+                elements.currentRoomSubtitle.textContent = roomInfo;
+                
+                // 읽지 않은 메시지 초기화
+                clearUnreadCount(roomId);
+                
+                // 메시지 영역 초기화 (새로운 룸을 선택했으므로)
+                if (!isInRoom()) {
+                    clearMessages();
+                    const welcomeDiv = document.createElement('div');
+                    welcomeDiv.className = 'welcome-message';
+                    welcomeDiv.innerHTML = `
+                        <h3>${roomName}에 오신 것을 환영합니다! 🎉</h3>
+                        <p>입장 버튼을 클릭하여 채팅에 참여하세요</p>
+                    `;
+                    elements.chatMessages.appendChild(welcomeDiv);
+                    
+                    // 참여자 목록 초기화
+                    clearParticipantsDisplay();
+                } else {
+                    // 이미 입장한 룸이면 참여자 목록 조회
+                    fetchAndUpdateParticipants(roomId);
+                }
+                
+                updateRoomControls();
+                
+                console.log(`✅ 룸 선택 완료: ${roomName}`);
+            }
+        }
+        
+        function updateRoomSelection() {
+            if (currentRoom) {
+                elements.currentRoomTitle.textContent = '룸을 다시 선택하세요';
+                elements.currentRoomSubtitle.textContent = '연결이 해제되었습니다';
+            } else {
+                elements.currentRoomTitle.textContent = '채팅방을 선택하세요';
+                elements.currentRoomSubtitle.textContent = '좌측에서 참여할 채팅방을 클릭하세요';
+            }
+            
+            // 참여자 목록 초기화
+            clearParticipantsDisplay();
+        }
+        
+        // ========== 읽지 않은 메시지 관리 ==========
+        function incrementUnreadCount(roomId) {
+            if (roomId === currentRoom) return; // 현재 보고 있는 룸은 제외
+            
+            const count = (unreadCounts.get(roomId) || 0) + 1;
+            unreadCounts.set(roomId, count);
+            updateUnreadBadge(roomId, count);
+        }
+        
+        function clearUnreadCount(roomId) {
+            unreadCounts.set(roomId, 0);
+            updateUnreadBadge(roomId, 0);
+        }
+        
+        function updateUnreadBadge(roomId, count) {
+            const roomItem = document.querySelector(`[data-room-id="${roomId}"]`);
+            if (!roomItem) return;
+            
+            let badge = roomItem.querySelector('.unread-badge');
+            
+            if (count > 0) {
+                if (!badge) {
+                    badge = document.createElement('div');
+                    badge.className = 'unread-badge';
+                    roomItem.appendChild(badge);
+                }
+                badge.textContent = count > 99 ? '99+' : count.toString();
+            } else if (badge) {
+                badge.remove();
+            }
+        }
+        
+        // ========== 메시지 관리 ==========
+        function clearMessages() {
+            elements.chatMessages.innerHTML = '';
+        }
+        
+        function addSystemMessage(content) {
+            addMessage({
+                type: 'SYSTEM',
+                message: content,
+                sender: 'System',
+                timestamp: new Date().toISOString()
+            });
+        }
+        
+        function addMessage(messageData) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            // 메시지 타입에 따른 클래스 추가
+            switch (messageData.type) {
+                case 'SYSTEM':
+                case 'NOTIFICATION':
+                    messageDiv.classList.add('system');
+                    break;
+                case 'JOIN':
+                    messageDiv.classList.add('system', 'join');
+                    break;
+                case 'LEAVE':
+                    messageDiv.classList.add('system', 'leave');
+                    break;
+                case 'CHAT':
+                default:
+                    const isOwnMessage = messageData.sender === currentUsername;
+                    messageDiv.classList.add(isOwnMessage ? 'own' : 'other');
+                    break;
+            }
+            
+            // 시간 포맷
+            const time = new Date(messageData.timestamp).toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // 메시지 HTML 생성
+            let messageHTML = '';
+            
+            if (messageData.type === 'CHAT') {
+                messageHTML = `
+                    <div class="message-header">
+                        <span class="message-sender">${messageData.sender}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-content">${escapeHtml(messageData.message)}</div>
+                `;
+            } else {
+                messageHTML = `
+                    <div class="message-content">${escapeHtml(messageData.message)}</div>
+                `;
+            }
+            
+            messageDiv.innerHTML = messageHTML;
+            elements.chatMessages.appendChild(messageDiv);
+            
+            // 스크롤을 최하단으로
+            elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ========== 텍스트에어리어 자동 크기 조절 ==========
+        function autoResizeTextarea() {
+            const textarea = elements.messageInput;
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+        
+        // ========== 룸 입장/퇴장 및 메시지 전송 (3단계 구현) ==========
+        
+        /**
+         * 현재 선택된 룸에 입장
+         */
+        function joinCurrentRoom() {
+            if (!currentRoom || !isConnected) return;
+            
+            console.log(`🚪 룸 입장 시도: ${currentRoom}`);
+            
+            try {
+                // 이미 입장한 상태인지 확인
+                if (isInRoom()) {
+                    addSystemMessage(`이미 ${currentRoom}에 참여 중입니다.`);
+                    return;
+                }
+                
+                // 룸 구독 설정
+                subscribeToRoom(currentRoom);
+                
+                // 서버에 입장 메시지 전송
+                const joinMessage = {
+                    username: currentUsername
+                };
+                
+                stompClient.publish({
+                    destination: `/app/room/${currentRoom}/join`,
+                    body: JSON.stringify(joinMessage)
+                });
+                
+                // UI 업데이트
+                updateRoomControls();
+                clearMessages();
+                addSystemMessage(`${currentRoom}에 입장했습니다.`);
+                
+                // 참여자 목록 업데이트 (약간의 지연 후 - 서버에서 입장 처리 완료 대기)
+                setTimeout(() => {
+                    fetchAndUpdateParticipants(currentRoom);
+                }, 500);
+                
+                console.log(`✅ 룸 입장 완료: ${currentRoom}`);
+                
+            } catch (error) {
+                console.error(`❌ 룸 입장 실패: ${currentRoom}`, error);
+                addSystemMessage(`룸 입장 중 오류가 발생했습니다: ${error.message}`);
+            }
+        }
+        
+        /**
+         * 현재 룸에서 퇴장
+         */
+        function leaveCurrentRoom() {
+            if (!currentRoom) return;
+            
+            console.log(`🚪 룸 퇴장 시도: ${currentRoom}`);
+            
+            try {
+                // 입장하지 않은 상태인지 확인
+                if (!isInRoom()) {
+                    addSystemMessage(`${currentRoom}에 참여하지 않은 상태입니다.`);
+                    return;
+                }
+                
+                // 서버에 퇴장 메시지 전송
+                stompClient.publish({
+                    destination: `/app/room/${currentRoom}/leave`,
+                    body: ''
+                });
+                
+                // 룸 구독 해제
+                unsubscribeFromRoom(currentRoom);
+                
+                // UI 업데이트
+                updateRoomControls();
+                addSystemMessage(`${currentRoom}에서 퇴장했습니다.`);
+                
+                // 참여자 목록 초기화
+                clearParticipantsDisplay();
+                
+                console.log(`✅ 룸 퇴장 완료: ${currentRoom}`);
+                
+            } catch (error) {
+                console.error(`❌ 룸 퇴장 실패: ${currentRoom}`, error);
+                addSystemMessage(`룸 퇴장 중 오류가 발생했습니다: ${error.message}`);
+            }
+        }
+        
+        /**
+         * 현재 룸에 메시지 전송
+         */
+        function sendMessage() {
+            const message = elements.messageInput.value.trim();
+            if (!message || !isConnected || !isInRoom()) return;
+            
+            console.log(`💬 메시지 전송 시도: [${currentRoom}] ${message}`);
+            
+            try {
+                // 서버에 메시지 전송
+                const chatMessage = {
+                    message: message
+                };
+                
+                stompClient.publish({
+                    destination: `/app/room/${currentRoom}/message`,
+                    body: JSON.stringify(chatMessage)
+                });
+                
+                // 입력 필드 초기화
+                elements.messageInput.value = '';
+                autoResizeTextarea();
+                
+                console.log(`✅ 메시지 전송 완료: [${currentRoom}] ${message}`);
+                
+            } catch (error) {
+                console.error(`❌ 메시지 전송 실패: [${currentRoom}] ${message}`, error);
+                addSystemMessage(`메시지 전송 중 오류가 발생했습니다: ${error.message}`);
+            }
+        }
+        
+        // ========== 룸 구독 관리 ==========
+        
+        /**
+         * 특정 룸 구독
+         */
+        function subscribeToRoom(roomId) {
+            if (!stompClient || !isConnected) {
+                console.warn(`⚠️ 연결되지 않은 상태에서 룸 구독 시도: ${roomId}`);
+                return;
+            }
+            
+            if (roomSubscriptions.has(roomId)) {
+                console.log(`ℹ️ 이미 구독 중인 룸: ${roomId}`);
+                return;
+            }
+            
+            console.log(`📡 룸 구독 시작: ${roomId}`);
+            
+            try {
+                const subscription = stompClient.subscribe(`/topic/room/${roomId}`, (message) => {
+                    handleRoomMessage(roomId, JSON.parse(message.body));
+                });
+                
+                roomSubscriptions.set(roomId, subscription);
+                console.log(`✅ 룸 구독 완료: ${roomId}`);
+                
+            } catch (error) {
+                console.error(`❌ 룸 구독 실패: ${roomId}`, error);
+                addSystemMessage(`룸 구독 중 오류가 발생했습니다: ${error.message}`);
+            }
+        }
+        
+        /**
+         * 특정 룸 구독 해제
+         */
+        function unsubscribeFromRoom(roomId) {
+            const subscription = roomSubscriptions.get(roomId);
+            if (subscription) {
+                console.log(`📡 룸 구독 해제: ${roomId}`);
+                subscription.unsubscribe();
+                roomSubscriptions.delete(roomId);
+                console.log(`✅ 룸 구독 해제 완료: ${roomId}`);
+            }
+        }
+        
+        /**
+         * 모든 룸 구독 해제
+         */
+        function unsubscribeFromAllRooms() {
+            console.log('📡 모든 룸 구독 해제');
+            roomSubscriptions.forEach((subscription, roomId) => {
+                subscription.unsubscribe();
+                console.log(`✅ 룸 구독 해제: ${roomId}`);
+            });
+            roomSubscriptions.clear();
+        }
+        
+        // ========== 룸 메시지 처리 ==========
+        
+        /**
+         * 룸에서 수신된 메시지 처리
+         */
+        function handleRoomMessage(roomId, messageData) {
+            console.log(`📨 룸 메시지 수신: [${roomId}]`, messageData);
+            
+            try {
+                // 현재 보고 있는 룸이 아니면 읽지 않은 메시지 수 증가
+                if (roomId !== currentRoom) {
+                    incrementUnreadCount(roomId);
+                }
+                
+                // 현재 보고 있는 룸의 메시지만 표시
+                if (roomId === currentRoom) {
+                    addMessage(messageData);
+                }
+                
+                // 참가자 수 업데이트 (JOIN/LEAVE 메시지인 경우)
+                if (messageData.participantCount !== undefined) {
+                    updateParticipantCount(roomId, messageData.participantCount);
+                }
+                
+            } catch (error) {
+                console.error('❌ 룸 메시지 처리 중 오류:', error);
+            }
+        }
+        
+        /**
+         * 참가자 수 업데이트
+         */
+        function updateParticipantCount(roomId, count) {
+            const countElement = document.getElementById(`${roomId}-count`);
+            if (countElement) {
+                countElement.textContent = count;
+                console.log(`👥 룸 ${roomId} 참가자 수 업데이트: ${count}`);
+            }
+            
+            // 현재 보고 있는 룸이면 참여자 목록도 업데이트
+            if (roomId === currentRoom) {
+                fetchAndUpdateParticipants(roomId);
+            }
+        }
+        
+        // ========== 참여자 목록 관리 ==========
+        
+        /**
+         * 특정 룸의 참여자 목록을 서버에서 조회하고 UI 업데이트
+         */
+        async function fetchAndUpdateParticipants(roomId) {
+            if (!roomId) return;
+            
+            try {
+                console.log(`👥 참여자 목록 조회 시작: ${roomId}`);
+                
+                const response = await fetch(`/api/websocket/rooms/${roomId}/participants`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                console.log(`👥 참여자 목록 조회 완료: ${roomId}`, data);
+                
+                // 참여자 목록 UI 업데이트
+                updateParticipantsDisplay(data.participants || []);
+                
+            } catch (error) {
+                console.error(`❌ 참여자 목록 조회 실패: ${roomId}`, error);
+                elements.currentRoomParticipants.textContent = '참여자 정보를 불러올 수 없습니다.';
+            }
+        }
+        
+        /**
+         * 참여자 목록을 UI에 표시
+         */
+        function updateParticipantsDisplay(participants) {
+            const participantsArray = Array.isArray(participants) ? participants : Array.from(participants);
+            
+            if (participantsArray.length === 0) {
+                elements.currentRoomParticipants.textContent = '참여자가 없습니다.';
+            } else {
+                const participantsText = `참여자 (${participantsArray.length}명): ${participantsArray.join(', ')}`;
+                elements.currentRoomParticipants.textContent = participantsText;
+            }
+            
+            console.log(`👥 참여자 목록 UI 업데이트 완료: ${participantsArray.length}명`);
+        }
+        
+        /**
+         * 참여자 목록 표시 초기화
+         */
+        function clearParticipantsDisplay() {
+            elements.currentRoomParticipants.textContent = '';
+        }
+    </script>
+</body>
+</html> 
