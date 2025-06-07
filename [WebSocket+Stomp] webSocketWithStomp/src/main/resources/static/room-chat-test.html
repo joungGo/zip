@@ -746,6 +746,9 @@
                 leaveCurrentRoom();
             }
             
+            // 모든 룸 구독 해제
+            unsubscribeFromAllRooms();
+            
             stompClient.deactivate();
         }
         
@@ -773,6 +776,18 @@
                 
                 // 읽지 않은 메시지 초기화
                 clearUnreadCount(roomId);
+                
+                // 메시지 영역 초기화 (새로운 룸을 선택했으므로)
+                if (!isInRoom()) {
+                    clearMessages();
+                    const welcomeDiv = document.createElement('div');
+                    welcomeDiv.className = 'welcome-message';
+                    welcomeDiv.innerHTML = `
+                        <h3>${roomName}에 오신 것을 환영합니다! 🎉</h3>
+                        <p>입장 버튼을 클릭하여 채팅에 참여하세요</p>
+                    `;
+                    elements.chatMessages.appendChild(welcomeDiv);
+                }
                 
                 updateRoomControls();
                 
@@ -902,32 +917,212 @@
             textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
         }
         
-        // ========== 임시 함수들 (3단계에서 구현될 예정) ==========
+        // ========== 룸 입장/퇴장 및 메시지 전송 (3단계 구현) ==========
+        
+        /**
+         * 현재 선택된 룸에 입장
+         */
         function joinCurrentRoom() {
             if (!currentRoom || !isConnected) return;
+            
             console.log(`🚪 룸 입장 시도: ${currentRoom}`);
-            // 3단계에서 구현
-            addSystemMessage(`${currentRoom} 입장 기능은 3단계에서 구현됩니다.`);
+            
+            try {
+                // 이미 입장한 상태인지 확인
+                if (isInRoom()) {
+                    addSystemMessage(`이미 ${currentRoom}에 참여 중입니다.`);
+                    return;
+                }
+                
+                // 룸 구독 설정
+                subscribeToRoom(currentRoom);
+                
+                // 서버에 입장 메시지 전송
+                const joinMessage = {
+                    username: currentUsername
+                };
+                
+                stompClient.publish({
+                    destination: `/app/room/${currentRoom}/join`,
+                    body: JSON.stringify(joinMessage)
+                });
+                
+                // UI 업데이트
+                updateRoomControls();
+                clearMessages();
+                addSystemMessage(`${currentRoom}에 입장했습니다.`);
+                
+                console.log(`✅ 룸 입장 완료: ${currentRoom}`);
+                
+            } catch (error) {
+                console.error(`❌ 룸 입장 실패: ${currentRoom}`, error);
+                addSystemMessage(`룸 입장 중 오류가 발생했습니다: ${error.message}`);
+            }
         }
         
+        /**
+         * 현재 룸에서 퇴장
+         */
         function leaveCurrentRoom() {
             if (!currentRoom) return;
+            
             console.log(`🚪 룸 퇴장 시도: ${currentRoom}`);
-            // 3단계에서 구현
-            addSystemMessage(`${currentRoom} 퇴장 기능은 3단계에서 구현됩니다.`);
+            
+            try {
+                // 입장하지 않은 상태인지 확인
+                if (!isInRoom()) {
+                    addSystemMessage(`${currentRoom}에 참여하지 않은 상태입니다.`);
+                    return;
+                }
+                
+                // 서버에 퇴장 메시지 전송
+                stompClient.publish({
+                    destination: `/app/room/${currentRoom}/leave`,
+                    body: ''
+                });
+                
+                // 룸 구독 해제
+                unsubscribeFromRoom(currentRoom);
+                
+                // UI 업데이트
+                updateRoomControls();
+                addSystemMessage(`${currentRoom}에서 퇴장했습니다.`);
+                
+                console.log(`✅ 룸 퇴장 완료: ${currentRoom}`);
+                
+            } catch (error) {
+                console.error(`❌ 룸 퇴장 실패: ${currentRoom}`, error);
+                addSystemMessage(`룸 퇴장 중 오류가 발생했습니다: ${error.message}`);
+            }
         }
         
+        /**
+         * 현재 룸에 메시지 전송
+         */
         function sendMessage() {
             const message = elements.messageInput.value.trim();
             if (!message || !isConnected || !isInRoom()) return;
             
-            console.log(`💬 메시지 전송 시도: ${message}`);
-            // 3단계에서 구현
-            addSystemMessage('메시지 전송 기능은 3단계에서 구현됩니다.');
+            console.log(`💬 메시지 전송 시도: [${currentRoom}] ${message}`);
             
-            // 입력 필드 초기화
-            elements.messageInput.value = '';
-            autoResizeTextarea();
+            try {
+                // 서버에 메시지 전송
+                const chatMessage = {
+                    message: message
+                };
+                
+                stompClient.publish({
+                    destination: `/app/room/${currentRoom}/message`,
+                    body: JSON.stringify(chatMessage)
+                });
+                
+                // 입력 필드 초기화
+                elements.messageInput.value = '';
+                autoResizeTextarea();
+                
+                console.log(`✅ 메시지 전송 완료: [${currentRoom}] ${message}`);
+                
+            } catch (error) {
+                console.error(`❌ 메시지 전송 실패: [${currentRoom}] ${message}`, error);
+                addSystemMessage(`메시지 전송 중 오류가 발생했습니다: ${error.message}`);
+            }
+        }
+        
+        // ========== 룸 구독 관리 ==========
+        
+        /**
+         * 특정 룸 구독
+         */
+        function subscribeToRoom(roomId) {
+            if (!stompClient || !isConnected) {
+                console.warn(`⚠️ 연결되지 않은 상태에서 룸 구독 시도: ${roomId}`);
+                return;
+            }
+            
+            if (roomSubscriptions.has(roomId)) {
+                console.log(`ℹ️ 이미 구독 중인 룸: ${roomId}`);
+                return;
+            }
+            
+            console.log(`📡 룸 구독 시작: ${roomId}`);
+            
+            try {
+                const subscription = stompClient.subscribe(`/topic/room/${roomId}`, (message) => {
+                    handleRoomMessage(roomId, JSON.parse(message.body));
+                });
+                
+                roomSubscriptions.set(roomId, subscription);
+                console.log(`✅ 룸 구독 완료: ${roomId}`);
+                
+            } catch (error) {
+                console.error(`❌ 룸 구독 실패: ${roomId}`, error);
+                addSystemMessage(`룸 구독 중 오류가 발생했습니다: ${error.message}`);
+            }
+        }
+        
+        /**
+         * 특정 룸 구독 해제
+         */
+        function unsubscribeFromRoom(roomId) {
+            const subscription = roomSubscriptions.get(roomId);
+            if (subscription) {
+                console.log(`📡 룸 구독 해제: ${roomId}`);
+                subscription.unsubscribe();
+                roomSubscriptions.delete(roomId);
+                console.log(`✅ 룸 구독 해제 완료: ${roomId}`);
+            }
+        }
+        
+        /**
+         * 모든 룸 구독 해제
+         */
+        function unsubscribeFromAllRooms() {
+            console.log('📡 모든 룸 구독 해제');
+            roomSubscriptions.forEach((subscription, roomId) => {
+                subscription.unsubscribe();
+                console.log(`✅ 룸 구독 해제: ${roomId}`);
+            });
+            roomSubscriptions.clear();
+        }
+        
+        // ========== 룸 메시지 처리 ==========
+        
+        /**
+         * 룸에서 수신된 메시지 처리
+         */
+        function handleRoomMessage(roomId, messageData) {
+            console.log(`📨 룸 메시지 수신: [${roomId}]`, messageData);
+            
+            try {
+                // 현재 보고 있는 룸이 아니면 읽지 않은 메시지 수 증가
+                if (roomId !== currentRoom) {
+                    incrementUnreadCount(roomId);
+                }
+                
+                // 현재 보고 있는 룸의 메시지만 표시
+                if (roomId === currentRoom) {
+                    addMessage(messageData);
+                }
+                
+                // 참가자 수 업데이트 (JOIN/LEAVE 메시지인 경우)
+                if (messageData.participantCount !== undefined) {
+                    updateParticipantCount(roomId, messageData.participantCount);
+                }
+                
+            } catch (error) {
+                console.error('❌ 룸 메시지 처리 중 오류:', error);
+            }
+        }
+        
+        /**
+         * 참가자 수 업데이트
+         */
+        function updateParticipantCount(roomId, count) {
+            const countElement = document.getElementById(`${roomId}-count`);
+            if (countElement) {
+                countElement.textContent = count;
+                console.log(`👥 룸 ${roomId} 참가자 수 업데이트: ${count}`);
+            }
         }
     </script>
 </body>
