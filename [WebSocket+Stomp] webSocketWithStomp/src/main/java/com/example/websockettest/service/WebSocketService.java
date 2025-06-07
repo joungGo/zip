@@ -46,6 +46,12 @@ public class WebSocketService {
     private final WebSocketSessionRepository sessionRepository;
     
     /**
+     * 세션 카운트 관리 서비스 - 실시간 세션 수 조회용
+     * 순환 의존성 없이 STOMP 세션 수를 추적
+     */
+    private final SessionCountService sessionCountService;
+    
+    /**
      * 처리된 총 메시지 수를 추적하는 원자적 카운터
      * 멀티스레드 환경에서 안전한 카운팅
      */
@@ -186,6 +192,13 @@ public class WebSocketService {
             StompMessage stompMessage = SystemStatusDto.createStatusMessage(statusData);
             stompMessage.setMessageId(generateMessageId());
             
+            // 디버깅을 위한 상세 로그
+            log.info("📊 시스템 상태 데이터: activeSessions={}, memoryUsagePercent={}, memoryUsedMb={}, memoryTotalMb={}", 
+                    statusData.getActiveSessions(), statusData.getMemoryUsagePercent(), 
+                    statusData.getMemoryUsedMb(), statusData.getMemoryTotalMb());
+            log.info("📊 전송할 STOMP 메시지: type={}, content={}, extraData={}", 
+                    stompMessage.getType(), stompMessage.getContent(), stompMessage.getExtraData());
+            
             // /topic/status로 상태 정보 브로드캐스트
             messagingTemplate.convertAndSend("/topic/status", stompMessage);
             
@@ -225,14 +238,23 @@ public class WebSocketService {
 
     /**
      * 현재 활성 세션 수를 반환하는 메서드
+     * STOMP 이벤트 리스너에서 실시간으로 추적하는 세션 수를 반환합니다.
      * 
-     * @return 활성 WebSocket 세션 수
+     * @return 활성 STOMP 세션 수
      */
     public int getActiveSessionCount() {
         try {
-            int count = sessionRepository.getActiveSessionCount();
-            log.debug("📊 활성 세션 수 조회: count={}", count);
-            return count;
+            // 세션 카운트 서비스에서 실시간으로 추적하는 세션 수 사용
+            int sessionCountServiceCount = sessionCountService.getConnectedSessionCount();
+            
+            // 기존 Repository 방식도 확인 (디버깅용)
+            int repositorySessionCount = sessionRepository.getActiveSessionCount();
+            
+            log.debug("📊 활성 세션 수 조회: sessionCountService={}, repository={}", 
+                    sessionCountServiceCount, repositorySessionCount);
+            
+            // 세션 카운트 서비스의 카운트를 우선 사용
+            return sessionCountServiceCount;
         } catch (Exception e) {
             log.error("❌ 활성 세션 수 조회 실패: error={}", e.getMessage(), e);
             return 0;
@@ -271,9 +293,10 @@ public class WebSocketService {
      * 주로 스케줄러에서 호출되어 클라이언트 연결 상태를 확인
      * 
      * @param intervalSeconds 하트비트 간격 (초)
+     * @return 생성된 하트비트 메시지의 ID (실패 시 null)
      */
-    public void sendHeartbeat(int intervalSeconds) {
-        log.debug("💗 하트비트 전송 시작: interval={}초", intervalSeconds);
+    public String sendHeartbeat(int intervalSeconds) {
+        log.info("💗 하트비트 전송 시작: interval={}초", intervalSeconds);
         
         try {
             int activeSessions = getActiveSessionCount();
@@ -283,7 +306,7 @@ public class WebSocketService {
                 StompMessage heartbeatMessage = StompMessage.builder()
                         .type(StompMessage.MessageType.HEARTBEAT)
                         .senderId("SYSTEM")
-                        .content("heartbeat")
+                        .content(String.format("💗 하트비트 - 활성 세션: %d개, 간격: %d초", activeSessions, intervalSeconds))
                         .timestamp(System.currentTimeMillis())
                         .messageId(generateMessageId())
                         .priority(0)
@@ -291,13 +314,17 @@ public class WebSocketService {
                 
                 messagingTemplate.convertAndSend("/topic/heartbeat", heartbeatMessage);
                 
-                log.debug("✅ 하트비트 전송 완료: activeSessions={}, messageId={}", 
+                log.info("✅ 하트비트 전송 완료: activeSessions={}, messageId={}", 
                         activeSessions, heartbeatMessage.getMessageId());
+                
+                return heartbeatMessage.getMessageId();
             } else {
-                log.debug("⏭️ 활성 세션이 없어 하트비트 전송 생략");
+                log.info("⏭️ 활성 세션이 없어 하트비트 전송 생략");
+                return null;
             }
         } catch (Exception e) {
             log.error("❌ 하트비트 전송 실패: error={}", e.getMessage(), e);
+            return null;
         }
     }
 } 

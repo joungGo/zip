@@ -3,7 +3,6 @@ package com.example.websockettest.service;
 import com.example.websockettest.dto.ScheduledMessageDto;
 import com.example.websockettest.dto.StompMessage;
 import com.example.websockettest.dto.SystemStatusDto;
-import com.example.websockettest.controller.StompEventListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -45,10 +44,10 @@ public class WebSocketSchedulerService {
     private final WebSocketService webSocketService;
 
     /**
-     * STOMP 이벤트 리스너 - 실시간 세션 정보 조회용
-     * 더 정확한 연결 상태 파악을 위해 사용
+     * 세션 카운트 관리 서비스 - 실시간 세션 정보 조회용
+     * 순환 의존성 없이 정확한 연결 상태 파악
      */
-    private final StompEventListener stompEventListener;
+    private final SessionCountService sessionCountService;
 
     /**
      * 날짜/시간 포맷터 (한국 시간 형식)
@@ -76,12 +75,8 @@ public class WebSocketSchedulerService {
     @Scheduled(fixedRate = 5000)
     public void sendHeartbeatMessage() {
         try {
-            // 현재 활성 세션 수 조회 (두 가지 소스에서 확인) >> why? Client가 연결/해제 할 경우 Event 발생시 count한 값 vs
-            int serviceSessionCount = webSocketService.getActiveSessionCount();
-            int listenerSessionCount = stompEventListener.getConnectedSessionCount();
-            
-            // 더 정확한 세션 수 사용 (리스너가 더 실시간)
-            int activeSessionCount = Math.max(serviceSessionCount, listenerSessionCount);
+            // 현재 활성 세션 수 조회 (세션 카운트 서비스 사용)
+            int activeSessionCount = sessionCountService.getConnectedSessionCount();
             
             // 활성 세션이 없으면 하트비트 전송 건너뛰기
             if (activeSessionCount == 0) {
@@ -89,18 +84,14 @@ public class WebSocketSchedulerService {
                 return;
             }
 
-            log.info("💗 하트비트 스케줄러: 하트비트 전송 시작 - 활성세션: {} (service: {}, listener: {})", 
-                    activeSessionCount, serviceSessionCount, listenerSessionCount);
-
-            // ScheduledMessageDto의 정적 팩토리 메서드를 사용하여 하트비트 메시지 생성
-            StompMessage heartbeatMessage = ScheduledMessageDto.createHeartbeatMessage(
-                    activeSessionCount, HEARTBEAT_INTERVAL_SECONDS);
+            log.info("💗 하트비트 스케줄러: 하트비트 전송 시작 - 활성세션: {}", 
+                    activeSessionCount);
 
             // /topic/heartbeat destination으로 하트비트 브로드캐스트
-            webSocketService.sendHeartbeat(HEARTBEAT_INTERVAL_SECONDS);
+            String messageId = webSocketService.sendHeartbeat(HEARTBEAT_INTERVAL_SECONDS);
 
             log.info("✅ 하트비트 스케줄러: 하트비트 전송 완료 - 대상세션: {}, messageId: {}", 
-                    activeSessionCount, heartbeatMessage.getMessageId());
+                    activeSessionCount, messageId);
 
         } catch (Exception e) {
             log.error("❌ 하트비트 스케줄러: 하트비트 전송 중 오류 발생: {}", e.getMessage(), e);
@@ -122,9 +113,7 @@ public class WebSocketSchedulerService {
     public void sendSystemStatusMessage() {
         try {
             // 현재 활성 세션 수 조회
-            int serviceSessionCount = webSocketService.getActiveSessionCount();
-            int listenerSessionCount = stompEventListener.getConnectedSessionCount();
-            int activeSessionCount = Math.max(serviceSessionCount, listenerSessionCount);
+            int activeSessionCount = sessionCountService.getConnectedSessionCount();
             
             // 활성 세션이 없으면 상태 정보 전송 건너뛰기
             if (activeSessionCount == 0) {
@@ -161,9 +150,7 @@ public class WebSocketSchedulerService {
     @Scheduled(fixedRate = 300000)
     public void sendPeriodicAnnouncement() {
         try {
-            int activeSessionCount = Math.max(
-                    webSocketService.getActiveSessionCount(), 
-                    stompEventListener.getConnectedSessionCount());
+            int activeSessionCount = sessionCountService.getConnectedSessionCount();
             
             // 활성 세션이 없으면 공지사항 전송 건너뛰기
             if (activeSessionCount == 0) {
@@ -208,9 +195,7 @@ public class WebSocketSchedulerService {
     // @Scheduled(cron = "0 0 9 * * ?")
     public void sendDailyReport() {
         try {
-            int activeSessionCount = Math.max(
-                    webSocketService.getActiveSessionCount(), 
-                    stompEventListener.getConnectedSessionCount());
+            int activeSessionCount = sessionCountService.getConnectedSessionCount();
 
             String dailyReport = String.format(
                     "🌅 일일 리포트: 오늘도 좋은 하루 되세요! 현재 %d명이 접속 중입니다. " +
@@ -243,9 +228,7 @@ public class WebSocketSchedulerService {
      */
     public void sendMaintenanceNotification(String maintenanceTime, String message) {
         try {
-            int activeSessionCount = Math.max(
-                    webSocketService.getActiveSessionCount(), 
-                    stompEventListener.getConnectedSessionCount());
+            int activeSessionCount = sessionCountService.getConnectedSessionCount();
 
             if (activeSessionCount == 0) {
                 log.info("🔧 유지보수 알림: 활성 세션이 없어 알림을 건너뜁니다.");

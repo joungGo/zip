@@ -1,6 +1,7 @@
 package com.example.websockettest.controller;
 
 import com.example.websockettest.dto.StompMessage;
+import com.example.websockettest.service.SessionCountService;
 import com.example.websockettest.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,12 @@ public class StompEventListener {
      * WebSocket 관련 비즈니스 로직을 처리하는 서비스
      */
     private final WebSocketService webSocketService;
+
+    /**
+     * 세션 카운트 관리 서비스
+     * 순환 의존성 없이 세션 수를 추적
+     */
+    private final SessionCountService sessionCountService;
 
     /**
      * 세션 ID와 사용자 정보를 매핑하는 동시성 안전 맵
@@ -81,6 +88,9 @@ public class StompEventListener {
 
             sessionUserMap.put(sessionId, userInfo);
 
+            // 세션 카운트 증가
+            int totalSessions = sessionCountService.incrementSessionCount(sessionId);
+
             // 구독 정보 초기화
             sessionSubscriptions.put(sessionId, new ConcurrentHashMap<>());
 
@@ -98,7 +108,7 @@ public class StompEventListener {
             webSocketService.broadcastNotification(joinMessage, userInfo);
 
             log.info("✅ STOMP 세션 연결 처리 완료: sessionId={}, username={}, totalSessions={}", 
-                    sessionId, username, sessionUserMap.size());
+                    sessionId, username, totalSessions);
 
         } catch (Exception e) {
             log.error("❌ STOMP 세션 연결 처리 중 오류 발생: sessionId={}, username={}, error={}", 
@@ -128,6 +138,9 @@ public class StompEventListener {
                 String username = userInfo.getUsername();
                 long connectedDuration = System.currentTimeMillis() - userInfo.getConnectedAt();
 
+                // 세션 카운트 감소
+                int remainingSessions = sessionCountService.decrementSessionCount(sessionId);
+
                 // 구독 정보 정리
                 sessionSubscriptions.remove(sessionId);
 
@@ -147,7 +160,7 @@ public class StompEventListener {
                 webSocketService.broadcastNotification(leaveMessage, userInfo);
 
                 log.info("✅ STOMP 세션 해제 처리 완료: sessionId={}, username={}, duration={}ms, remainingSessions={}", 
-                        sessionId, username, connectedDuration, sessionUserMap.size());
+                        sessionId, username, connectedDuration, remainingSessions);
             } else {
                 log.warn("⚠️ 해제된 세션의 사용자 정보를 찾을 수 없음: sessionId={}", sessionId);
             }
@@ -272,11 +285,12 @@ public class StompEventListener {
 
     /**
      * 현재 연결된 세션 수를 반환하는 메서드
+     * SessionCountService를 통해 정확한 세션 수를 반환합니다.
      * 
      * @return 연결된 세션 수
      */
     public int getConnectedSessionCount() {
-        return sessionUserMap.size();
+        return sessionCountService.getConnectedSessionCount();
     }
 
     /**
