@@ -1,6 +1,7 @@
 package com.example.websockettest.controller;
 
 import com.example.websockettest.dto.StompMessage;
+import com.example.websockettest.service.ChatRoomService;
 import com.example.websockettest.service.SessionCountService;
 import com.example.websockettest.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,12 @@ public class StompEventListener {
      * 순환 의존성 없이 세션 수를 추적
      */
     private final SessionCountService sessionCountService;
+    
+    /**
+     * 채팅방 관리 서비스
+     * 세션 해제 시 채팅방에서 정리 처리
+     */
+    private final ChatRoomService chatRoomService;
 
     /**
      * 세션 ID와 사용자 정보를 매핑하는 동시성 안전 맵
@@ -143,6 +150,9 @@ public class StompEventListener {
 
                 // 구독 정보 정리
                 sessionSubscriptions.remove(sessionId);
+                
+                // 채팅방에서 세션 정리 (채팅방에 참여 중이었다면 퇴장 처리)
+                chatRoomService.disconnectSession(sessionId);
 
                 // 사용자 퇴장 알림 브로드캐스트
                 String leaveMessage = String.format("사용자 '%s'님이 퇴장하셨습니다. (연결 시간: %d초)", 

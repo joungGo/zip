@@ -1,8 +1,13 @@
 package com.example.websockettest.controller;
 
+import com.example.websockettest.dto.RoomMessageDto;
+import com.example.websockettest.service.ChatRoomService;
 import com.example.websockettest.service.WebSocketService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -38,6 +43,18 @@ public class WebSocketController {
      */
     @Autowired
     private WebSocketService webSocketService;
+    
+    /**
+     * 채팅방 관련 비즈니스 로직을 처리하는 서비스
+     */
+    @Autowired
+    private ChatRoomService chatRoomService;
+    
+    /**
+     * JSON 직렬화/역직렬화를 위한 ObjectMapper
+     */
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * 일반 메시지를 처리하고 모든 구독자에게 브로드캐스트하는 메서드
@@ -227,5 +244,162 @@ public class WebSocketController {
         }
         
         return String.format("System processed: %s", message);
+    }
+    
+    // ==================== 채팅방 관련 메서드들 ====================
+    
+    /**
+     * 특정 채팅방에 입장하는 메서드
+     * 
+     * STOMP 라우팅:
+     * - 수신: /app/room/{roomId}/join
+     * - 응답: 없음 (ChatRoomService에서 브로드캐스트 처리)
+     * 
+     * @param roomId 입장할 채팅방 ID
+     * @param username 사용자명 (JSON 형태로 전송)
+     * @param headerAccessor STOMP 메시지 헤더 정보
+     */
+    @MessageMapping("/room/{roomId}/join")
+    public void handleRoomJoin(@DestinationVariable String roomId, String username, SimpMessageHeaderAccessor headerAccessor) {
+        String sessionId = headerAccessor.getSessionId();
+        
+        try {
+            // JSON에서 사용자명 추출 (단순 문자열이거나 JSON 객체일 수 있음)
+            String extractedUsername = extractUsernameFromJson(username);
+            
+            log.info("🚪 룸 입장 요청: roomId={}, sessionId={}, username={}", roomId, sessionId, extractedUsername);
+            
+            chatRoomService.joinRoom(roomId, sessionId, extractedUsername);
+            
+        } catch (Exception e) {
+            log.error("❌ 룸 입장 처리 중 오류 발생: roomId={}, sessionId={}, username={}, error={}", 
+                    roomId, sessionId, username, e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 특정 채팅방에서 퇴장하는 메서드
+     * 
+     * STOMP 라우팅:
+     * - 수신: /app/room/{roomId}/leave
+     * - 응답: 없음 (ChatRoomService에서 브로드캐스트 처리)
+     * 
+     * @param roomId 퇴장할 채팅방 ID
+     * @param headerAccessor STOMP 메시지 헤더 정보
+     */
+    @MessageMapping("/room/{roomId}/leave")
+    public void handleRoomLeave(@DestinationVariable String roomId, SimpMessageHeaderAccessor headerAccessor) {
+        String sessionId = headerAccessor.getSessionId();
+        
+        log.info("🚪 룸 퇴장 요청: roomId={}, sessionId={}", roomId, sessionId);
+        
+        try {
+            chatRoomService.leaveRoom(roomId, sessionId);
+        } catch (Exception e) {
+            log.error("❌ 룸 퇴장 처리 중 오류 발생: roomId={}, sessionId={}, error={}", 
+                    roomId, sessionId, e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 특정 채팅방에 메시지를 전송하는 메서드
+     * 
+     * STOMP 라우팅:
+     * - 수신: /app/room/{roomId}/message
+     * - 응답: 없음 (ChatRoomService에서 브로드캐스트 처리)
+     * 
+     * @param roomId 메시지를 전송할 채팅방 ID
+     * @param message 전송할 메시지 내용
+     * @param headerAccessor STOMP 메시지 헤더 정보
+     */
+    @MessageMapping("/room/{roomId}/message")
+    public void handleRoomMessage(@DestinationVariable String roomId, String message, SimpMessageHeaderAccessor headerAccessor) {
+        String sessionId = headerAccessor.getSessionId();
+        
+        log.info("💬 룸 메시지 수신: roomId={}, sessionId={}, messageLength={}", roomId, sessionId, message.length());
+        
+        try {
+            // JSON에서 메시지 내용 추출 (단순 문자열이거나 JSON 객체일 수 있음)
+            String extractedMessage = extractMessageFromJson(message);
+            
+            if (extractedMessage == null || extractedMessage.trim().isEmpty()) {
+                log.warn("⚠️ 빈 메시지 수신: roomId={}, sessionId={}", roomId, sessionId);
+                return;
+            }
+            
+            chatRoomService.sendChatMessage(roomId, sessionId, extractedMessage);
+            
+        } catch (Exception e) {
+            log.error("❌ 룸 메시지 처리 중 오류 발생: roomId={}, sessionId={}, message={}, error={}", 
+                    roomId, sessionId, message, e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * JSON 문자열에서 사용자명을 추출하는 헬퍼 메서드
+     * 
+     * @param json JSON 문자열 또는 단순 문자열
+     * @return 추출된 사용자명
+     */
+    private String extractUsernameFromJson(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            return "anonymous";
+        }
+        
+        // JSON 형태인지 확인
+        if (json.trim().startsWith("{") && json.trim().endsWith("}")) {
+            try {
+                // JSON 파싱을 시도하여 username 필드 추출
+                var jsonNode = objectMapper.readTree(json);
+                if (jsonNode.has("username")) {
+                    return jsonNode.get("username").asText();
+                }
+                if (jsonNode.has("user")) {
+                    return jsonNode.get("user").asText();
+                }
+                if (jsonNode.has("name")) {
+                    return jsonNode.get("name").asText();
+                }
+            } catch (JsonProcessingException e) {
+                log.warn("JSON 파싱 실패, 원본 문자열 사용: {}", json);
+            }
+        }
+        
+        // JSON이 아니거나 파싱 실패 시 원본 문자열 반환
+        return json.trim();
+    }
+    
+    /**
+     * JSON 문자열에서 메시지 내용을 추출하는 헬퍼 메서드
+     * 
+     * @param json JSON 문자열 또는 단순 문자열
+     * @return 추출된 메시지 내용
+     */
+    private String extractMessageFromJson(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            return "";
+        }
+        
+        // JSON 형태인지 확인
+        if (json.trim().startsWith("{") && json.trim().endsWith("}")) {
+            try {
+                // JSON 파싱을 시도하여 message 필드 추출
+                var jsonNode = objectMapper.readTree(json);
+                if (jsonNode.has("message")) {
+                    return jsonNode.get("message").asText();
+                }
+                if (jsonNode.has("content")) {
+                    return jsonNode.get("content").asText();
+                }
+                if (jsonNode.has("text")) {
+                    return jsonNode.get("text").asText();
+                }
+            } catch (JsonProcessingException e) {
+                log.warn("JSON 파싱 실패, 원본 문자열 사용: {}", json);
+            }
+        }
+        
+        // JSON이 아니거나 파싱 실패 시 원본 문자열 반환
+        return json.trim();
     }
 } 
