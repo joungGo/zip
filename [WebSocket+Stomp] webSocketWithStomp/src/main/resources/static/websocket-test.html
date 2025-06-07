@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Test</title>
+    <title>WebSocket Test (STOMP)</title>
     <style>
         /* 전체 페이지 스타일 설정 */
         body {
@@ -100,7 +100,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>WebSocket Test Page</h1>
+        <h1>WebSocket Test Page (STOMP)</h1>
         
         <!-- WebSocket 연결 상태 표시 영역 -->
         <div id="status" class="status disconnected">연결되지 않음</div>
@@ -136,14 +136,18 @@
         </div>
     </div>
 
+    <!-- STOMP.js와 SockJS CDN 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+
     <script>
         // ========== 전역 변수 선언 ==========
         
         /**
-         * WebSocket 연결 객체
-         * null: 연결되지 않음, WebSocket 객체: 연결됨
+         * STOMP 클라이언트 객체
+         * null: 연결되지 않음, StompJs.Client 객체: 연결됨
          */
-        let websocket = null;
+        let stompClient = null;
         
         // DOM 요소들을 변수에 저장 (성능 최적화 및 코드 가독성 향상)
         const statusDiv = document.getElementById('status');           // 연결 상태 표시 영역
@@ -153,134 +157,206 @@
         const disconnectBtn = document.getElementById('disconnectBtn'); // 연결 해제 버튼
         const sendBtn = document.getElementById('sendBtn');             // 메시지 전송 버튼
 
-        // ========== WebSocket 연결 관리 함수 ==========
+        // ========== STOMP WebSocket 연결 관리 함수 ==========
         
         /**
-         * WebSocket 서버에 연결을 시도하는 함수
+         * STOMP WebSocket 서버에 연결을 시도하는 함수
          * 
          * 연결 과정:
-         * 1. 현재 페이지의 호스트를 기반으로 WebSocket URL 생성
-         * 2. WebSocket 객체 생성 및 이벤트 핸들러 등록
-         * 3. 연결 상태에 따른 UI 업데이트
+         * 1. SockJS를 사용하여 WebSocket 연결 설정
+         * 2. STOMP 클라이언트 생성 및 설정
+         * 3. 연결 성공 시 토픽 구독 및 UI 업데이트
          */
         function connect() {
-            // WebSocket URL 생성 (현재 페이지의 호스트 + WebSocket 엔드포인트)
-            // 예: ws://localhost:8080/my-websocket
-            const wsUrl = `ws://${window.location.host}/my-websocket`;
+            console.log('🔗 STOMP WebSocket 연결 시도');
             
-            console.log(`🔗 WebSocket 연결 시도: ${wsUrl}`);
+            // SockJS 소켓 생성 (STOMP 엔드포인트로 연결)
+            const socket = new SockJS('/ws');
             
-            // WebSocket 객체 생성 및 연결 시도
-            websocket = new WebSocket(wsUrl);
-            
-            /**
-             * WebSocket 연결 성공 시 호출되는 이벤트 핸들러
-             * @param {Event} event - WebSocket 연결 이벤트 객체
-             */
-            websocket.onopen = function(event) {
-                console.log('✅ WebSocket 연결 성공:', event);
-                
-                // UI 상태를 연결됨으로 업데이트
-                updateStatus('연결됨', true);
-                
-                // 연결 성공 메시지를 메시지 영역에 표시
-                addMessage('시스템: WebSocket 연결이 성공했습니다.', 'system');
-                
-                // 연결 후 사용 가능한 컨트롤들 활성화
-                enableControls(true);
-            };
-            
-            /**
-             * 서버로부터 메시지를 받았을 때 호출되는 이벤트 핸들러
-             * @param {MessageEvent} event - 수신된 메시지 이벤트 객체
-             */
-            websocket.onmessage = function(event) {
-                console.log('📨 서버로부터 메시지 수신:', event.data);
-                
-                try {
-                    // JSON 메시지인지 확인하여 파싱 시도
-                    const messageData = JSON.parse(event.data);
+            // STOMP 클라이언트 생성
+            stompClient = new StompJs.Client({
+                webSocketFactory: () => socket,
+                debug: (str) => {
+                    console.log('🔍 STOMP Debug:', str);
+                },
+                onConnect: (frame) => {
+                    console.log('✅ STOMP 연결 성공:', frame);
                     
-                    // 스케줄러에서 보낸 메시지인지 확인
-                    if (messageData.type === 'scheduled_message') {
-                        // 스케줄러 메시지를 특별히 포맷팅해서 표시
-                        const formattedMessage = `🔔 자동 메시지 [${messageData.server_time}] - 활성 세션: ${messageData.active_sessions}개`;
-                        addMessage(formattedMessage, 'scheduled');
-                    } else if (messageData.type === 'system_status') {
-                        // 시스템 상태 메시지 포맷팅
-                        const memoryUsage = `${messageData.memory_usage_percent}%`;
-                        const formattedMessage = `📊 시스템 상태 - 메모리 사용률: ${memoryUsage}, 활성 세션: ${messageData.active_sessions}개`;
-                        addMessage(formattedMessage, 'system');
-                    } else {
-                        // 다른 JSON 메시지는 일반적으로 표시
-                        addMessage('서버: ' + JSON.stringify(messageData, null, 2), 'received');
-                    }
-                } catch (e) {
-                    // JSON이 아닌 일반 텍스트 메시지는 기존처럼 처리
-                    addMessage('서버: ' + event.data, 'received');
+                    // UI 상태를 연결됨으로 업데이트
+                    updateStatus('연결됨', true);
+                    
+                    // 연결 성공 메시지를 메시지 영역에 표시
+                    addMessage('시스템: STOMP WebSocket 연결이 성공했습니다.', 'system');
+                    
+                    // 연결 후 사용 가능한 컨트롤들 활성화
+                    enableControls(true);
+                    
+                    // 토픽 구독 설정
+                    subscribeToTopics();
+                },
+                onDisconnect: (frame) => {
+                    console.log('🔌 STOMP 연결 종료:', frame);
+                    
+                    // UI 상태를 연결 해제됨으로 업데이트
+                    updateStatus('연결 해제됨', false);
+                    
+                    // 연결 종료 메시지 표시
+                    addMessage('시스템: STOMP WebSocket 연결이 종료되었습니다.', 'system');
+                    
+                    // 연결 종료 후 관련 컨트롤들 비활성화
+                    enableControls(false);
+                },
+                onStompError: (frame) => {
+                    console.error('❌ STOMP 에러 발생:', frame);
+                    
+                    // 에러 메시지를 화면에 표시
+                    addMessage('시스템: STOMP 오류가 발생했습니다 - ' + frame.body, 'error');
                 }
-            };
+            });
             
-            /**
-             * WebSocket 연결이 종료되었을 때 호출되는 이벤트 핸들러
-             * @param {CloseEvent} event - 연결 종료 이벤트 객체
-             */
-            websocket.onclose = function(event) {
-                console.log('🔌 WebSocket 연결 종료:', event.code, event.reason);
-                
-                // UI 상태를 연결 해제됨으로 업데이트
-                updateStatus('연결 해제됨', false);
-                
-                // 연결 종료 메시지 표시
-                addMessage('시스템: WebSocket 연결이 종료되었습니다.', 'system');
-                
-                // 연결 종료 후 관련 컨트롤들 비활성화
-                enableControls(false);
-            };
-            
-            /**
-             * WebSocket 에러 발생 시 호출되는 이벤트 핸들러
-             * @param {Event} error - 에러 이벤트 객체
-             */
-            websocket.onerror = function(error) {
-                console.error('❌ WebSocket 에러 발생:', error);
-                
-                // 에러 메시지를 화면에 표시
-                addMessage('시스템: 오류가 발생했습니다 - ' + error, 'error');
-            };
+            // STOMP 클라이언트 활성화 (연결 시작)
+            stompClient.activate();
         }
 
         /**
-         * WebSocket 연결을 종료하는 함수
+         * 토픽 구독을 설정하는 함수
+         * 서버에서 보내는 다양한 메시지를 수신하기 위한 구독 설정
+         */
+        function subscribeToTopics() {
+            if (!stompClient || !stompClient.connected) {
+                console.warn('⚠️ STOMP 클라이언트가 연결되지 않음');
+                return;
+            }
+            
+            // 1. 일반 메시지 토픽 구독 (/topic/messages)
+            stompClient.subscribe('/topic/messages', (message) => {
+                console.log('📨 일반 메시지 수신:', message.body);
+                
+                try {
+                    const messageData = JSON.parse(message.body);
+                    addMessage('서버: ' + messageData.content, 'received');
+                } catch (e) {
+                    addMessage('서버: ' + message.body, 'received');
+                }
+            });
+            
+            // 2. 하트비트 토픽 구독 (/topic/heartbeat)
+            stompClient.subscribe('/topic/heartbeat', (message) => {
+                console.log('💗 하트비트 수신:', message.body);
+                
+                try {
+                    const heartbeatData = JSON.parse(message.body);
+                    // 하트비트 메시지를 채팅창에도 표시
+                    const formattedMessage = `💗 ${heartbeatData.content}`;
+                    addMessage(formattedMessage, 'heartbeat');
+                    console.log(`💓 하트비트 - 세션: ${heartbeatData.sessionCount}개`);
+                } catch (e) {
+                    // JSON 파싱 실패 시 원본 메시지 표시
+                    addMessage('💗 하트비트: ' + message.body, 'heartbeat');
+                    console.log('💓 하트비트:', message.body);
+                }
+            });
+            
+            // 3. 시스템 상태 토픽 구독 (/topic/status)
+            stompClient.subscribe('/topic/status', (message) => {
+                console.log('📊 시스템 상태 수신:', message.body);
+                
+                try {
+                    console.log('🔍 원본 시스템 상태 메시지:', message.body);
+                    
+                    const statusData = JSON.parse(message.body);
+                    console.log('🔍 파싱된 시스템 상태 데이터:', statusData);
+                    console.log('🔍 statusData.extraData:', statusData.extraData);
+                    console.log('🔍 statusData의 모든 키:', Object.keys(statusData));
+                    
+                    // STOMP 메시지에서 extraData 필드에 실제 시스템 정보가 들어있음
+                    // Jackson이 extraData를 extra_data로 직렬화할 수 있음
+                    const systemInfo = statusData.extraData || statusData.extra_data || statusData;
+                    console.log('🔍 systemInfo:', systemInfo);
+                    console.log('🔍 systemInfo의 모든 키:', Object.keys(systemInfo));
+                    
+                    const memoryUsage = systemInfo.memory_usage_percent || systemInfo.memoryUsagePercent || 'N/A';
+                    const activeSessions = systemInfo.active_sessions || systemInfo.activeSessions || 'N/A';
+                    const memoryUsedMb = systemInfo.memory_used_mb || systemInfo.memoryUsedMb || 'N/A';
+                    const memoryTotalMb = systemInfo.memory_total_mb || systemInfo.memoryTotalMb || 'N/A';
+                    
+                    console.log('🔍 추출된 값들:', {
+                        memoryUsage, activeSessions, memoryUsedMb, memoryTotalMb
+                    });
+                    
+                    const formattedMessage = `📊 시스템 상태 - 메모리: ${memoryUsedMb}/${memoryTotalMb}MB (${memoryUsage}%), 활성 세션: ${activeSessions}개`;
+                    addMessage(formattedMessage, 'system');
+                } catch (e) {
+                    console.error('❌ 시스템 상태 파싱 오류:', e);
+                    console.error('❌ 원본 메시지:', message.body);
+                    addMessage('📊 시스템 상태: ' + message.body, 'system');
+                }
+            });
+            
+            // 4. 알림 토픽 구독 (/topic/notifications)
+            stompClient.subscribe('/topic/notifications', (message) => {
+                console.log('🔔 알림 수신:', message.body);
+                
+                try {
+                    const notificationData = JSON.parse(message.body);
+                    const formattedMessage = `🔔 알림 [${notificationData.timestamp}] - ${notificationData.content}`;
+                    addMessage(formattedMessage, 'scheduled');
+                } catch (e) {
+                    addMessage('🔔 알림: ' + message.body, 'scheduled');
+                }
+            });
+            
+            // 5. 사용자 개인 메시지 토픽 구독 (/user/queue/messages)
+            stompClient.subscribe('/user/queue/messages', (message) => {
+                console.log('👤 개인 메시지 수신:', message.body);
+                
+                try {
+                    const privateData = JSON.parse(message.body);
+                    addMessage('개인 메시지: ' + privateData.content, 'received');
+                } catch (e) {
+                    addMessage('개인 메시지: ' + message.body, 'received');
+                }
+            });
+            
+            console.log('✅ 모든 토픽 구독 완료');
+        }
+
+        /**
+         * STOMP WebSocket 연결을 종료하는 함수
          * 사용자가 명시적으로 연결을 끊을 때 호출
          */
         function disconnect() {
-            if (websocket) {
-                console.log('🔌 WebSocket 연결 해제 요청');
+            if (stompClient && stompClient.connected) {
+                console.log('🔌 STOMP WebSocket 연결 해제 요청');
                 
-                // WebSocket 연결 종료 (정상 종료 코드 전송)
-                websocket.close();
+                // STOMP 클라이언트 비활성화 (연결 종료)
+                stompClient.deactivate();
             }
         }
 
         /**
-         * 서버에 메시지를 전송하는 함수
+         * 서버에 메시지를 전송하는 함수 (STOMP 방식)
          * 
          * 전송 조건:
          * 1. 메시지가 비어있지 않음
-         * 2. WebSocket이 연결된 상태
-         * 3. WebSocket 연결 상태가 OPEN
+         * 2. STOMP 클라이언트가 연결된 상태
          */
         function sendMessage() {
             // 입력 필드에서 메시지 내용 가져오기 (앞뒤 공백 제거)
             const message = messageInput.value.trim();
             
-            // 메시지 유효성 검사 및 WebSocket 연결 상태 확인
-            if (message && websocket && websocket.readyState === WebSocket.OPEN) {
+            // 메시지 유효성 검사 및 STOMP 연결 상태 확인
+            if (message && stompClient && stompClient.connected) {
                 console.log('📤 서버로 메시지 전송:', message);
                 
-                // 서버에 메시지 전송
-                websocket.send(message);
+                // STOMP 메시지 전송 (/app/message 엔드포인트로)
+                stompClient.publish({
+                    destination: '/app/message',
+                    body: JSON.stringify({
+                        content: message,
+                        timestamp: new Date().toISOString()
+                    })
+                });
                 
                 // 전송한 메시지를 화면에 표시 (사용자 확인용)
                 addMessage('나: ' + message, 'sent');
@@ -359,6 +435,15 @@
                     messageElement.style.backgroundColor = '#fff3cd';
                     messageElement.style.padding = '5px';
                     messageElement.style.borderRadius = '3px';
+                    break;
+                case 'heartbeat':   // 하트비트 메시지 (분홍색, 작은 크기)
+                    messageElement.style.color = '#e91e63';
+                    messageElement.style.fontSize = '0.9em';
+                    messageElement.style.fontStyle = 'italic';
+                    messageElement.style.backgroundColor = '#fce4ec';
+                    messageElement.style.padding = '3px 5px';
+                    messageElement.style.borderRadius = '3px';
+                    messageElement.style.opacity = '0.8';
                     break;
             }
             
@@ -494,7 +579,7 @@
         
         // 페이지 로드 완료 시 초기화 로그
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 WebSocket Test 페이지 로드 완료');
+            console.log('🚀 STOMP WebSocket Test 페이지 로드 완료');
         });
     </script>
 </body>
