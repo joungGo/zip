@@ -248,6 +248,14 @@
             gap: 10px;
         }
         
+        .room-participants {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+        
         .btn-room-action {
             padding: 8px 16px;
             border: none;
@@ -371,6 +379,21 @@
         .message.leave .message-content {
             background: #e74c3c;
             color: white;
+        }
+        
+        /* 메시지 헤더 스타일 개선 */
+        .message-header {
+            margin-bottom: 4px;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .message-time {
+            color: #95a5a6;
+            font-size: 10px;
         }
         
         /* 메시지 입력 영역 */
@@ -532,6 +555,7 @@
                 <div>
                     <div class="room-title" id="currentRoomTitle">채팅방을 선택하세요</div>
                     <div class="room-subtitle" id="currentRoomSubtitle">좌측에서 참여할 채팅방을 클릭하세요</div>
+                    <div class="room-participants" id="currentRoomParticipants"></div>
                 </div>
                 <div class="room-actions">
                     <button id="joinRoomBtn" class="btn-room-action btn-join" disabled>입장</button>
@@ -588,6 +612,7 @@
             roomList: document.getElementById('roomList'),
             currentRoomTitle: document.getElementById('currentRoomTitle'),
             currentRoomSubtitle: document.getElementById('currentRoomSubtitle'),
+            currentRoomParticipants: document.getElementById('currentRoomParticipants'),
             joinRoomBtn: document.getElementById('joinRoomBtn'),
             leaveRoomBtn: document.getElementById('leaveRoomBtn'),
             
@@ -713,6 +738,11 @@
                     console.log('✅ STOMP 연결 성공:', frame);
                     updateConnectionStatus('연결됨', true);
                     addSystemMessage('WebSocket 연결이 성공했습니다.');
+                    
+                    // 현재 선택된 룸이 있으면 참여자 목록 조회
+                    if (currentRoom) {
+                        fetchAndUpdateParticipants(currentRoom);
+                    }
                 },
                 
                 onDisconnect: (frame) => {
@@ -787,6 +817,12 @@
                         <p>입장 버튼을 클릭하여 채팅에 참여하세요</p>
                     `;
                     elements.chatMessages.appendChild(welcomeDiv);
+                    
+                    // 참여자 목록 초기화
+                    clearParticipantsDisplay();
+                } else {
+                    // 이미 입장한 룸이면 참여자 목록 조회
+                    fetchAndUpdateParticipants(roomId);
                 }
                 
                 updateRoomControls();
@@ -803,6 +839,9 @@
                 elements.currentRoomTitle.textContent = '채팅방을 선택하세요';
                 elements.currentRoomSubtitle.textContent = '좌측에서 참여할 채팅방을 클릭하세요';
             }
+            
+            // 참여자 목록 초기화
+            clearParticipantsDisplay();
         }
         
         // ========== 읽지 않은 메시지 관리 ==========
@@ -952,6 +991,11 @@
                 clearMessages();
                 addSystemMessage(`${currentRoom}에 입장했습니다.`);
                 
+                // 참여자 목록 업데이트 (약간의 지연 후 - 서버에서 입장 처리 완료 대기)
+                setTimeout(() => {
+                    fetchAndUpdateParticipants(currentRoom);
+                }, 500);
+                
                 console.log(`✅ 룸 입장 완료: ${currentRoom}`);
                 
             } catch (error) {
@@ -987,6 +1031,9 @@
                 // UI 업데이트
                 updateRoomControls();
                 addSystemMessage(`${currentRoom}에서 퇴장했습니다.`);
+                
+                // 참여자 목록 초기화
+                clearParticipantsDisplay();
                 
                 console.log(`✅ 룸 퇴장 완료: ${currentRoom}`);
                 
@@ -1123,6 +1170,64 @@
                 countElement.textContent = count;
                 console.log(`👥 룸 ${roomId} 참가자 수 업데이트: ${count}`);
             }
+            
+            // 현재 보고 있는 룸이면 참여자 목록도 업데이트
+            if (roomId === currentRoom) {
+                fetchAndUpdateParticipants(roomId);
+            }
+        }
+        
+        // ========== 참여자 목록 관리 ==========
+        
+        /**
+         * 특정 룸의 참여자 목록을 서버에서 조회하고 UI 업데이트
+         */
+        async function fetchAndUpdateParticipants(roomId) {
+            if (!roomId) return;
+            
+            try {
+                console.log(`👥 참여자 목록 조회 시작: ${roomId}`);
+                
+                const response = await fetch(`/api/websocket/rooms/${roomId}/participants`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                console.log(`👥 참여자 목록 조회 완료: ${roomId}`, data);
+                
+                // 참여자 목록 UI 업데이트
+                updateParticipantsDisplay(data.participants || []);
+                
+            } catch (error) {
+                console.error(`❌ 참여자 목록 조회 실패: ${roomId}`, error);
+                elements.currentRoomParticipants.textContent = '참여자 정보를 불러올 수 없습니다.';
+            }
+        }
+        
+        /**
+         * 참여자 목록을 UI에 표시
+         */
+        function updateParticipantsDisplay(participants) {
+            const participantsArray = Array.isArray(participants) ? participants : Array.from(participants);
+            
+            if (participantsArray.length === 0) {
+                elements.currentRoomParticipants.textContent = '참여자가 없습니다.';
+            } else {
+                const participantsText = `참여자 (${participantsArray.length}명): ${participantsArray.join(', ')}`;
+                elements.currentRoomParticipants.textContent = participantsText;
+            }
+            
+            console.log(`👥 참여자 목록 UI 업데이트 완료: ${participantsArray.length}명`);
+        }
+        
+        /**
+         * 참여자 목록 표시 초기화
+         */
+        function clearParticipantsDisplay() {
+            elements.currentRoomParticipants.textContent = '';
         }
     </script>
 </body>

@@ -1,5 +1,6 @@
 package com.example.websockettest.controller;
 
+import com.example.websockettest.service.ChatRoomService;
 import com.example.websockettest.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * WebSocketRestController는 WebSocket 관련 REST API를 제공하는 컨트롤러입니다.
@@ -44,6 +46,11 @@ public class WebSocketRestController {
      * final 키워드와 @RequiredArgsConstructor로 불변성과 의존성 주입을 보장
      */
     private final WebSocketService webSocketService;
+    
+    /**
+     * 채팅방 관련 비즈니스 로직을 처리하는 서비스
+     */
+    private final ChatRoomService chatRoomService;
 
     /**
      * 현재 활성 WebSocket 세션 수를 조회하는 GET API
@@ -244,6 +251,150 @@ public class WebSocketRestController {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "Failed to get WebSocket service status");
             errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
+    
+    // ========== 채팅방 관련 API ==========
+    
+    /**
+     * 특정 채팅방의 참여자 목록을 조회하는 GET API
+     * 
+     * HTTP Method: GET
+     * URL: /api/websocket/rooms/{roomId}/participants
+     * 
+     * @param roomId 조회할 채팅방 ID
+     * @return ResponseEntity<Map<String, Object>> JSON 형태의 응답
+     *         - roomId: 채팅방 ID
+     *         - participantCount: 참여자 수
+     *         - participants: 참여자 목록 (Set<String>)
+     *         - timestamp: 응답 생성 시간
+     */
+    @GetMapping("/rooms/{roomId}/participants")
+    public ResponseEntity<Map<String, Object>> getRoomParticipants(@PathVariable String roomId) {
+        log.info("🔍 API 호출: 채팅방 참여자 목록 조회 요청, roomId={}", roomId);
+        
+        try {
+            // 참여자 목록 조회
+            Set<String> participants = chatRoomService.getRoomParticipants(roomId);
+            int participantCount = chatRoomService.getRoomParticipantCount(roomId);
+            
+            log.info("📊 채팅방 참여자 조회 완료: roomId={}, count={}", roomId, participantCount);
+            
+            // 응답 데이터 생성
+            Map<String, Object> response = new HashMap<>();
+            response.put("roomId", roomId);
+            response.put("participantCount", participantCount);
+            response.put("participants", participants);
+            response.put("timestamp", System.currentTimeMillis());
+            
+            log.debug("✅ 채팅방 참여자 조회 API 응답 완료: response={}", response);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("❌ 채팅방 참여자 조회 중 오류 발생: roomId={}, error={}", roomId, e.getMessage(), e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to get room participants");
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("roomId", roomId);
+            
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
+    
+    /**
+     * 모든 채팅방의 정보를 조회하는 GET API
+     * 
+     * HTTP Method: GET
+     * URL: /api/websocket/rooms
+     * 
+     * @return ResponseEntity<Map<String, Object>> JSON 형태의 응답
+     *         - totalRooms: 전체 채팅방 수
+     *         - rooms: 채팅방 정보 목록
+     *         - timestamp: 응답 생성 시간
+     */
+    @GetMapping("/rooms")
+    public ResponseEntity<Map<String, Object>> getAllRooms() {
+        log.info("🔍 API 호출: 전체 채팅방 정보 조회 요청");
+        
+        try {
+            // 모든 채팅방 목록 조회
+            Set<String> allRooms = chatRoomService.getAllRooms();
+            
+            // 각 채팅방의 상세 정보 수집
+            Map<String, Map<String, Object>> roomsInfo = new HashMap<>();
+            for (String roomId : allRooms) {
+                Map<String, Object> roomInfo = new HashMap<>();
+                roomInfo.put("participantCount", chatRoomService.getRoomParticipantCount(roomId));
+                roomInfo.put("participants", chatRoomService.getRoomParticipants(roomId));
+                roomsInfo.put(roomId, roomInfo);
+            }
+            
+            log.info("📊 전체 채팅방 조회 완료: totalRooms={}", allRooms.size());
+            
+            // 응답 데이터 생성
+            Map<String, Object> response = new HashMap<>();
+            response.put("totalRooms", allRooms.size());
+            response.put("rooms", roomsInfo);
+            response.put("timestamp", System.currentTimeMillis());
+            
+            log.debug("✅ 전체 채팅방 조회 API 응답 완료: response={}", response);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("❌ 전체 채팅방 조회 중 오류 발생: error={}", e.getMessage(), e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to get all rooms");
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
+    
+    /**
+     * 특정 채팅방의 상태 정보를 조회하는 GET API
+     * 
+     * HTTP Method: GET
+     * URL: /api/websocket/rooms/{roomId}/status
+     * 
+     * @param roomId 조회할 채팅방 ID
+     * @return ResponseEntity<Map<String, Object>> JSON 형태의 응답
+     *         - roomId: 채팅방 ID
+     *         - participantCount: 참여자 수
+     *         - isActive: 채팅방 활성 상태 (참여자가 있으면 true)
+     *         - timestamp: 응답 생성 시간
+     */
+    @GetMapping("/rooms/{roomId}/status")
+    public ResponseEntity<Map<String, Object>> getRoomStatus(@PathVariable String roomId) {
+        log.info("🔍 API 호출: 채팅방 상태 조회 요청, roomId={}", roomId);
+        
+        try {
+            // 채팅방 상태 정보 조회
+            int participantCount = chatRoomService.getRoomParticipantCount(roomId);
+            boolean isActive = participantCount > 0;
+            
+            log.info("📊 채팅방 상태 조회 완료: roomId={}, count={}, active={}", roomId, participantCount, isActive);
+            
+            // 응답 데이터 생성
+            Map<String, Object> response = new HashMap<>();
+            response.put("roomId", roomId);
+            response.put("participantCount", participantCount);
+            response.put("isActive", isActive);
+            response.put("timestamp", System.currentTimeMillis());
+            
+            log.debug("✅ 채팅방 상태 조회 API 응답 완료: response={}", response);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("❌ 채팅방 상태 조회 중 오류 발생: roomId={}, error={}", roomId, e.getMessage(), e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to get room status");
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("roomId", roomId);
             
             return ResponseEntity.internalServerError().body(errorResponse);
         }
