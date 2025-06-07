@@ -109,10 +109,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             // WebSocket을 지원하지 않는 구형 브라우저에서 폴백 옵션 제공
             // HTTP 롱 폴링, JSONP 폴링 등의 대체 전송 방법 사용
             .withSockJS();
-        
-        // 추가 엔드포인트 설정 가능 (필요시):
-        // registry.addEndpoint("/ws-native")  // SockJS 없는 순수 WebSocket 엔드포인트
-        //     .setAllowedOriginPatterns("*");
+
+        // Postman용 Native WebSocket 엔드포인트 추가
+        registry.addEndpoint("/ws-native")
+                .setAllowedOriginPatterns("*");
         
         // 핸드셰이크 인터셉터 설정 (인증, 로깅 등):
         // .setHandshakeInterceptors(new HttpSessionHandshakeInterceptor())
