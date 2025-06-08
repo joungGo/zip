@@ -14,6 +14,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Redis 연결 및 STOMP + Pub/Sub 하이브리드 설정을 담당하는 Configuration 클래스
@@ -234,5 +235,18 @@ public class RedisConfig {
         log.info("분산 환경에서 Redis Pub/Sub → STOMP 브로드캐스트 준비 완료");
         
         return container;
+    }
+
+    /**
+     * JSON 직렬화/역직렬화를 위한 ObjectMapper Bean 설정
+     * 
+     * @return ObjectMapper JSON 처리용 ObjectMapper
+     */
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.findAndRegisterModules(); // JSR310 (LocalDateTime 등) 모듈 자동 등록
+        log.info("ObjectMapper Bean 설정 완료 - LocalDateTime 지원 활성화");
+        return mapper;
     }
 } 
