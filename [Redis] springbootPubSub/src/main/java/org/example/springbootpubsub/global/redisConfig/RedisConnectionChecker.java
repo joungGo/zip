@@ -27,6 +27,11 @@ import org.springframework.stereotype.Component;
 @Component // Spring 컴포넌트로 등록하여 자동 실행
 @RequiredArgsConstructor // Lombok: final 필드를 매개변수로 받는 생성자 자동 생성
 @Slf4j // Lombok: 로깅을 위한 Logger 자동 생성
+/**
+ * pring Boot 애플리케이션이 완전히 시작된 후 실행할 코드를 작성할 수 있게 해주는 기능을 제공합니다.
+ * 구현체의 run(String... args) 메서드는 애플리케이션 구동 직후 한 번 자동으로 호출되며, 주로 초기화 작업, 외부 시스템 점검, 데이터 로딩 등에 사용됩니다.
+ * 즉, 스프링 컨텍스트가 준비된 뒤 실행되는 "애플리케이션 시작 후 후처리"용 인터페이스입니다.
+ */
 public class RedisConnectionChecker implements CommandLineRunner {
 
     /**

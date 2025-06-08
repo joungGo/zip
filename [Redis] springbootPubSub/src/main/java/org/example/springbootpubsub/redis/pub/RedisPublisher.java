@@ -85,7 +85,7 @@ public class RedisPublisher {
         // 3. 전송 결과 반환 (구독자 수)
         template.convertAndSend(topic.getTopic(), dto);
         
-        // 참고 링크: https://grok.com/share/bGVnYWN5_d3a90bd8-944e-4087-9b17-78fbfa815d11
+        // 참고 링크: https://grok.com/share/bGVnYWN5_f23a8595-481b-4774-af90-8d503b1e8f48
         // -> Redis Pub/Sub 메커니즘에 대한 자세한 설명
     }
 
