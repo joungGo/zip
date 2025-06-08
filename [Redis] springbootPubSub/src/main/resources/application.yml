@@ -5,7 +5,7 @@ spring:
   data:
     redis:
       host: localhost
-      port: 6379
+      port: 6382
       password: pk2258
   datasource:
     url: jdbc:h2:mem:testdb
