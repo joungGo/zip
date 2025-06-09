@@ -185,7 +185,7 @@ public class RedisConfig {
      * @return RedisTemplate<String, String> 문자열 전용 템플릿
      */
     @Bean
-    public RedisTemplate<String, String> stringRedisTemplate() {
+    public RedisTemplate<String, String> customStringRedisTemplate() {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory());
         
@@ -198,7 +198,7 @@ public class RedisConfig {
         template.setEnableTransactionSupport(true);
         template.afterPropertiesSet();
         
-        log.info("String 전용 RedisTemplate 설정 완료");
+        log.info("Custom String 전용 RedisTemplate 설정 완료");
         return template;
     }
 
