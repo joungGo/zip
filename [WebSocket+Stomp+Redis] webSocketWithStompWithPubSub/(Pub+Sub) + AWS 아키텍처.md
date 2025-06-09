@@ -3,7 +3,7 @@
 ## **🚨 문제 상황: Redis Pub/Sub 없는 환경**
 
 ### **시나리오**: 채팅방에 사용자 3명이 서로 다른 서버에 접속
-![img.png](img.png)
+![img.png](src/main/resources/images/img.png)
 ### **💥 문제점 발생**
 
 **상황**: 사용자A가 "안녕하세요!" 메시지를 room-1에 전송
@@ -17,9 +17,9 @@
 ```
 
 ## **✅ 해결책: Redis Pub/Sub 적용된 AWS 아키텍처**
-![img_1.png](img_1.png)
+![img_1.png](src/main/resources/images/img_1.png)
 ## **📡 Redis Pub/Sub 메시지 동기화 흐름**
-![img_2.png](img_2.png)
+![img_2.png](src/main/resources/images/img_2.png)
 ## **🐳 Docker Compose 구성 예시**
 
 ```yaml
