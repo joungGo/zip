@@ -29,27 +29,15 @@ public class RedisChannelConfig {
     // ============ 채널 패턴 상수 정의 ============
     
     /**
-     * 룸별 브로드캐스트 채널 패턴
-     * 사용: stomp:broadcast:room:room1
+     * 룸 통합 채널 패턴 (채팅, 입장, 퇴장 모든 메시지)
+     * 사용: stomp:room:room1
      */
-    public static final String CHANNEL_ROOM_BROADCAST = "stomp:broadcast:room:%s"; // RedisMessagePublisher에서 룸 채팅 메시지를 다른 서버로 발행할 때 사용
+    public static final String CHANNEL_ROOM = "stomp:room:%s"; // 룸별 모든 메시지를 하나의 채널로 통합 처리
     
     /**
      * 전역 브로드캐스트 채널
      */
     public static final String CHANNEL_GLOBAL_BROADCAST = "stomp:broadcast:global"; // 시스템 공지사항이나 전체 사용자 대상 메시지를 모든 서버에 브로드캐스트할 때 사용
-    
-    /**
-     * 룸 입장 이벤트 채널 패턴
-     * 사용: stomp:event:join:room1
-     */
-    public static final String CHANNEL_ROOM_JOIN = "stomp:event:join:%s"; // 사용자가 룸에 입장할 때 다른 서버의 동일 룸 참여자들에게 입장 알림을 전송할 때 사용
-    
-    /**
-     * 룸 퇴장 이벤트 채널 패턴
-     * 사용: stomp:event:leave:room1
-     */
-    public static final String CHANNEL_ROOM_LEAVE = "stomp:event:leave:%s"; // 사용자가 룸에서 퇴장할 때 다른 서버의 동일 룸 참여자들에게 퇴장 알림을 전송할 때 사용
     
     /**
      * 세션 연결 이벤트 채널
@@ -69,33 +57,13 @@ public class RedisChannelConfig {
     // ============ 채널 패턴 생성 유틸리티 메서드 ============
     
     /**
-     * 룸별 브로드캐스트 채널명 생성
+     * 룸 통합 채널명 생성 (채팅, 입장, 퇴장 모든 메시지)
      * 
      * @param roomId 룸 ID
-     * @return 채널명 (예: stomp:broadcast:room:room1)
+     * @return 채널명 (예: stomp:room:room1)
      */
-    public static String getRoomBroadcastChannel(String roomId) { // ChatRoomService에서 룸 메시지를 Redis로 발행할 때 채널명 생성에 사용
-        return String.format(CHANNEL_ROOM_BROADCAST, roomId);
-    }
-    
-    /**
-     * 룸 입장 이벤트 채널명 생성
-     * 
-     * @param roomId 룸 ID
-     * @return 채널명 (예: stomp:event:join:room1)
-     */
-    public static String getRoomJoinChannel(String roomId) { // WebSocketController의 joinRoom 메서드에서 입장 이벤트를 Redis로 발행할 때 사용
-        return String.format(CHANNEL_ROOM_JOIN, roomId);
-    }
-    
-    /**
-     * 룸 퇴장 이벤트 채널명 생성
-     * 
-     * @param roomId 룸 ID
-     * @return 채널명 (예: stomp:event:leave:room1)
-     */
-    public static String getRoomLeaveChannel(String roomId) { // WebSocketController의 leaveRoom 메서드에서 퇴장 이벤트를 Redis로 발행할 때 사용
-        return String.format(CHANNEL_ROOM_LEAVE, roomId);
+    public static String getRoomChannel(String roomId) { // ChatRoomService에서 룸의 모든 메시지(채팅, 입장, 퇴장)를 Redis로 발행할 때 채널명 생성에 사용
+        return String.format(CHANNEL_ROOM, roomId);
     }
 
     // ============ Redis 키 패턴 상수 정의 ============

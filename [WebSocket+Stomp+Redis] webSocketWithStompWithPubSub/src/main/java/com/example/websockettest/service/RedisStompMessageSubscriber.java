@@ -56,12 +56,8 @@ public class RedisStompMessageSubscriber implements MessageListener {
             log.debug("Redis 메시지 수신 - 채널: {}, 메시지: {}", channel, messageBody);
             
             // 채널 패턴에 따라 적절한 처리 메서드 호출
-            if (channel.startsWith("stomp:broadcast:room:")) {
-                handleRoomBroadcastMessage(channel, messageBody);
-            } else if (channel.startsWith("stomp:event:join:")) {
-                handleRoomJoinEvent(channel, messageBody);
-            } else if (channel.startsWith("stomp:event:leave:")) {
-                handleRoomLeaveEvent(channel, messageBody);
+            if (channel.startsWith("stomp:room:")) {
+                handleRoomMessage(channel, messageBody);
             } else if (channel.equals(RedisChannelConfig.CHANNEL_SESSION_CONNECT)) {
                 handleSessionConnectEvent(messageBody);
             } else if (channel.equals(RedisChannelConfig.CHANNEL_SESSION_DISCONNECT)) {
@@ -82,16 +78,16 @@ public class RedisStompMessageSubscriber implements MessageListener {
     // ============ 룸 관련 메시지 처리 ============
 
     /**
-     * 룸 브로드캐스트 메시지 처리
-     * stomp:broadcast:room:{roomId} 채널의 메시지를 /topic/room/{roomId}로 STOMP 브로드캐스트
+     * 룸 통합 메시지 처리 (채팅, 입장, 퇴장 모든 메시지)
+     * stomp:room:{roomId} 채널의 메시지를 /topic/room/{roomId}로 STOMP 브로드캐스트
      * 
      * @param channel Redis 채널명
      * @param messageBody JSON 메시지 본문
      */
-    private void handleRoomBroadcastMessage(String channel, String messageBody) {
+    private void handleRoomMessage(String channel, String messageBody) {
         try {
-            // 채널명에서 roomId 추출 (stomp:broadcast:room:room1 → room1)
-            String roomId = channel.substring("stomp:broadcast:room:".length());
+            // 채널명에서 roomId 추출 (stomp:room:room1 → room1)
+            String roomId = channel.substring("stomp:room:".length());
             
             // JSON을 RoomMessageDto로 역직렬화
             RoomMessageDto roomMessage = objectMapper.readValue(messageBody, RoomMessageDto.class);
@@ -104,85 +100,9 @@ public class RedisStompMessageSubscriber implements MessageListener {
                      roomId, roomMessage.getType(), roomMessage.getSender());
             
         } catch (JsonProcessingException e) {
-            log.error("룸 브로드캐스트 메시지 JSON 파싱 실패 - 채널: {}, 메시지: {}", channel, messageBody, e);
+            log.error("룸 메시지 JSON 파싱 실패 - 채널: {}, 메시지: {}", channel, messageBody, e);
         } catch (Exception e) {
-            log.error("룸 브로드캐스트 메시지 처리 실패 - 채널: {}", channel, e);
-        }
-    }
-
-    /**
-     * 룸 입장 이벤트 처리
-     * stomp:event:join:{roomId} 채널의 메시지를 /topic/room/{roomId}로 입장 알림 브로드캐스트
-     * 
-     * @param channel Redis 채널명
-     * @param messageBody JSON 메시지 본문
-     */
-    private void handleRoomJoinEvent(String channel, String messageBody) {
-        try {
-            // 채널명에서 roomId 추출
-            String roomId = channel.substring("stomp:event:join:".length());
-            
-            // JSON을 Map으로 역직렬화
-            @SuppressWarnings("unchecked")
-            Map<String, Object> joinEvent = objectMapper.readValue(messageBody, Map.class);
-            
-            // 입장 메시지 생성
-            RoomMessageDto joinMessage = RoomMessageDto.builder()
-                    .type(RoomMessageDto.MessageType.JOIN)
-                    .roomId(roomId)
-                    .message(joinEvent.get("username") + "님이 입장했습니다.")
-                    .sender((String) joinEvent.get("username"))
-                    .sessionId((String) joinEvent.get("sessionId"))
-                    .participantCount((Integer) joinEvent.get("participantCount"))
-                    .build();
-            
-            // STOMP Topic으로 브로드캐스트
-            String stompDestination = "/topic/room/" + roomId;
-            messagingTemplate.convertAndSend(stompDestination, joinMessage);
-            
-            log.info("룸 입장 이벤트 STOMP 브로드캐스트 완료 - 룸: {}, 사용자: {}", 
-                    roomId, joinEvent.get("username"));
-            
-        } catch (Exception e) {
-            log.error("룸 입장 이벤트 처리 실패 - 채널: {}", channel, e);
-        }
-    }
-
-    /**
-     * 룸 퇴장 이벤트 처리
-     * stomp:event:leave:{roomId} 채널의 메시지를 /topic/room/{roomId}로 퇴장 알림 브로드캐스트
-     * 
-     * @param channel Redis 채널명
-     * @param messageBody JSON 메시지 본문
-     */
-    private void handleRoomLeaveEvent(String channel, String messageBody) {
-        try {
-            // 채널명에서 roomId 추출
-            String roomId = channel.substring("stomp:event:leave:".length());
-            
-            // JSON을 Map으로 역직렬화
-            @SuppressWarnings("unchecked")
-            Map<String, Object> leaveEvent = objectMapper.readValue(messageBody, Map.class);
-            
-            // 퇴장 메시지 생성
-            RoomMessageDto leaveMessage = RoomMessageDto.builder()
-                    .type(RoomMessageDto.MessageType.LEAVE)
-                    .roomId(roomId)
-                    .message(leaveEvent.get("username") + "님이 퇴장했습니다.")
-                    .sender((String) leaveEvent.get("username"))
-                    .sessionId((String) leaveEvent.get("sessionId"))
-                    .participantCount((Integer) leaveEvent.get("participantCount"))
-                    .build();
-            
-            // STOMP Topic으로 브로드캐스트
-            String stompDestination = "/topic/room/" + roomId;
-            messagingTemplate.convertAndSend(stompDestination, leaveMessage);
-            
-            log.info("룸 퇴장 이벤트 STOMP 브로드캐스트 완료 - 룸: {}, 사용자: {}", 
-                    roomId, leaveEvent.get("username"));
-            
-        } catch (Exception e) {
-            log.error("룸 퇴장 이벤트 처리 실패 - 채널: {}", channel, e);
+            log.error("룸 메시지 처리 실패 - 채널: {}", channel, e);
         }
     }
 

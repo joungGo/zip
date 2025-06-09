@@ -77,8 +77,8 @@ public class RedisListenerConfig {
     }
     
     /**
-     * 특정 룸의 모든 관련 채널을 동적으로 구독하는 메서드
-     * 사용자가 룸에 입장할 때 호출하여 해당 룸의 메시지를 수신
+     * 특정 룸의 통합 채널을 동적으로 구독하는 메서드
+     * 사용자가 룸에 입장할 때 호출하여 해당 룸의 모든 메시지를 수신
      * 
      * @param roomId 구독할 룸 ID
      */
@@ -90,26 +90,15 @@ public class RedisListenerConfig {
                 return;
             }
             
-            // 룸 브로드캐스트 채널 구독 (채팅 메시지)
-            String roomBroadcastChannel = RedisChannelConfig.getRoomBroadcastChannel(roomId);
-            ChannelTopic roomBroadcastTopic = new ChannelTopic(roomBroadcastChannel);
-            redisMessageListenerContainer.addMessageListener(redisStompMessageSubscriber, roomBroadcastTopic);
-            
-            // 룸 입장 이벤트 채널 구독
-            String roomJoinChannel = RedisChannelConfig.getRoomJoinChannel(roomId);
-            ChannelTopic roomJoinTopic = new ChannelTopic(roomJoinChannel);
-            redisMessageListenerContainer.addMessageListener(redisStompMessageSubscriber, roomJoinTopic);
-            
-            // 룸 퇴장 이벤트 채널 구독
-            String roomLeaveChannel = RedisChannelConfig.getRoomLeaveChannel(roomId);
-            ChannelTopic roomLeaveTopic = new ChannelTopic(roomLeaveChannel);
-            redisMessageListenerContainer.addMessageListener(redisStompMessageSubscriber, roomLeaveTopic);
+            // 룸 통합 채널 구독 (채팅, 입장, 퇴장 모든 메시지)
+            String roomChannel = RedisChannelConfig.getRoomChannel(roomId); // 1. roomId를 이용해 채널명 생성
+            ChannelTopic roomTopic = new ChannelTopic(roomChannel); // 2. Redis 채널 토픽 생성
+            redisMessageListenerContainer.addMessageListener(redisStompMessageSubscriber, roomTopic); // 3. 룸 채널에 메시지 리스너 등록
             
             // 구독 완료 기록
             subscribedRoomChannels.add(roomId);
             
-            log.info("룸 채널 동적 구독 완료 - roomId: {}", roomId);
-            log.debug("구독된 채널들: {}, {}, {}", roomBroadcastChannel, roomJoinChannel, roomLeaveChannel);
+            log.info("룸 채널 동적 구독 완료 - roomId: {}, 채널: {}", roomId, roomChannel);
             
         } catch (Exception e) {
             log.error("룸 채널 구독 실패 - roomId: {}", roomId, e);
@@ -117,7 +106,7 @@ public class RedisListenerConfig {
     }
     
     /**
-     * 특정 룸의 모든 관련 채널 구독을 해제하는 메서드
+     * 특정 룸의 통합 채널 구독을 해제하는 메서드
      * 해당 룸에 더 이상 참여자가 없을 때 호출하여 리소스 절약
      * 
      * @param roomId 구독 해제할 룸 ID
@@ -130,26 +119,15 @@ public class RedisListenerConfig {
                 return;
             }
             
-            // 룸 브로드캐스트 채널 구독 해제
-            String roomBroadcastChannel = RedisChannelConfig.getRoomBroadcastChannel(roomId);
-            ChannelTopic roomBroadcastTopic = new ChannelTopic(roomBroadcastChannel);
-            redisMessageListenerContainer.removeMessageListener(redisStompMessageSubscriber, roomBroadcastTopic);
-            
-            // 룸 입장 이벤트 채널 구독 해제
-            String roomJoinChannel = RedisChannelConfig.getRoomJoinChannel(roomId);
-            ChannelTopic roomJoinTopic = new ChannelTopic(roomJoinChannel);
-            redisMessageListenerContainer.removeMessageListener(redisStompMessageSubscriber, roomJoinTopic);
-            
-            // 룸 퇴장 이벤트 채널 구독 해제
-            String roomLeaveChannel = RedisChannelConfig.getRoomLeaveChannel(roomId);
-            ChannelTopic roomLeaveTopic = new ChannelTopic(roomLeaveChannel);
-            redisMessageListenerContainer.removeMessageListener(redisStompMessageSubscriber, roomLeaveTopic);
+            // 룸 통합 채널 구독 해제
+            String roomChannel = RedisChannelConfig.getRoomChannel(roomId);
+            ChannelTopic roomTopic = new ChannelTopic(roomChannel);
+            redisMessageListenerContainer.removeMessageListener(redisStompMessageSubscriber, roomTopic);
             
             // 구독 해제 기록
             subscribedRoomChannels.remove(roomId);
             
-            log.info("룸 채널 구독 해제 완료 - roomId: {}", roomId);
-            log.debug("해제된 채널들: {}, {}, {}", roomBroadcastChannel, roomJoinChannel, roomLeaveChannel);
+            log.info("룸 채널 구독 해제 완료 - roomId: {}, 채널: {}", roomId, roomChannel);
             
         } catch (Exception e) {
             log.error("룸 채널 구독 해제 실패 - roomId: {}", roomId, e);

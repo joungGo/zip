@@ -41,18 +41,18 @@ public class RedisStompMessagePublisher {
     // ============ 룸 관련 메시지 발행 ============
 
     /**
-     * 룸 채팅 메시지를 다른 서버들에게 전파
+     * 룸의 모든 메시지(채팅, 입장, 퇴장)를 다른 서버들에게 전파
      * 
      * @param roomId 룸 ID
      * @param message 룸 메시지 DTO (채팅, 입장, 퇴장 등)
      */
     public void publishRoomMessage(String roomId, RoomMessageDto message) {
         try {
-            String channel = RedisChannelConfig.getRoomBroadcastChannel(roomId); // stomp:broadcast:room:{roomId} 채널 생성
+            String channel = RedisChannelConfig.getRoomChannel(roomId); // stomp:room:{roomId} 통합 채널 생성
             String jsonMessage = objectMapper.writeValueAsString(message); // RoomMessageDto를 JSON으로 직렬화
-
+            
             /**
-             * onvert는 두 번째 인자인 jsonMessage(Java 객체 또는 문자열 등)를 Redis에 전송 가능한 형태로 변환(직렬화)하는 역할을 합니다.
+             * convert는 두 번째 인자인 jsonMessage(Java 객체 또는 문자열 등)를 Redis에 전송 가능한 형태로 변환(직렬화)하는 역할을 합니다.
              * 즉, 내부적으로 RedisTemplate이 메시지를 바이트 배열 등 Redis가 처리할 수 있는 데이터로 변환한 뒤, 지정한 채널로 발행(send)합니다.
              */
             redisTemplate.convertAndSend(channel, jsonMessage); // Redis 채널로 메시지 발행
@@ -68,7 +68,7 @@ public class RedisStompMessagePublisher {
     }
 
     /**
-     * 룸 입장 이벤트를 다른 서버들에게 전파
+     * 룸 입장 이벤트 메시지 생성 및 발행
      * 
      * @param roomId 룸 ID
      * @param username 입장한 사용자명
@@ -77,19 +77,8 @@ public class RedisStompMessagePublisher {
      */
     public void publishJoinEvent(String roomId, String username, String sessionId, int participantCount) {
         try {
-            String channel = RedisChannelConfig.getRoomJoinChannel(roomId); // stomp:event:join:{roomId} 채널 생성
-            
-            Map<String, Object> joinEvent = new HashMap<>();
-            joinEvent.put("type", "JOIN");
-            joinEvent.put("roomId", roomId);
-            joinEvent.put("username", username);
-            joinEvent.put("sessionId", sessionId);
-            joinEvent.put("participantCount", participantCount);
-            joinEvent.put("timestamp", LocalDateTime.now().toString());
-            joinEvent.put("serverId", RedisChannelConfig.getCurrentServerId());
-            
-            String jsonMessage = objectMapper.writeValueAsString(joinEvent); // writeValueAsString는 ObjectMapper의 메서드로, Java 객체를 JSON 문자열로 변환합니다.
-            redisTemplate.convertAndSend(channel, jsonMessage);
+            RoomMessageDto joinMessage = RoomMessageDto.createJoinMessage(roomId, username, sessionId, participantCount);
+            publishRoomMessage(roomId, joinMessage); // 통합 채널로 발행
             
             log.info("룸 입장 이벤트 Redis 발행 완료 - roomId: {}, user: {}, 참여자수: {}", 
                     roomId, username, participantCount);
@@ -100,7 +89,7 @@ public class RedisStompMessagePublisher {
     }
 
     /**
-     * 룸 퇴장 이벤트를 다른 서버들에게 전파
+     * 룸 퇴장 이벤트 메시지 생성 및 발행
      * 
      * @param roomId 룸 ID
      * @param username 퇴장한 사용자명
@@ -109,19 +98,8 @@ public class RedisStompMessagePublisher {
      */
     public void publishLeaveEvent(String roomId, String username, String sessionId, int participantCount) {
         try {
-            String channel = RedisChannelConfig.getRoomLeaveChannel(roomId); // stomp:event:leave:{roomId} 채널 생성
-            
-            Map<String, Object> leaveEvent = new HashMap<>();
-            leaveEvent.put("type", "LEAVE");
-            leaveEvent.put("roomId", roomId);
-            leaveEvent.put("username", username);
-            leaveEvent.put("sessionId", sessionId);
-            leaveEvent.put("participantCount", participantCount);
-            leaveEvent.put("timestamp", LocalDateTime.now().toString());
-            leaveEvent.put("serverId", RedisChannelConfig.getCurrentServerId());
-            
-            String jsonMessage = objectMapper.writeValueAsString(leaveEvent);
-            redisTemplate.convertAndSend(channel, jsonMessage);
+            RoomMessageDto leaveMessage = RoomMessageDto.createLeaveMessage(roomId, username, sessionId, participantCount);
+            publishRoomMessage(roomId, leaveMessage); // 통합 채널로 발행
             
             log.info("룸 퇴장 이벤트 Redis 발행 완료 - roomId: {}, user: {}, 참여자수: {}", 
                     roomId, username, participantCount);
