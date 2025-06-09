@@ -1,5 +1,6 @@
 package com.example.websockettest.service;
 
+import com.example.websockettest.config.RedisListenerConfig;
 import com.example.websockettest.dto.RoomMessageDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -12,14 +13,22 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
- * 채팅방 관리 서비스
+ * 채팅방 관리 서비스 (Redis Pub/Sub 통합)
  * 룸별 세션 관리, 메시지 전송, 참가자 관리를 담당합니다.
+ * 
+ * Redis 통합 기능:
+ * - 룸 입장 시 Redis 채널 동적 구독
+ * - 룸 퇴장 시 Redis 채널 구독 해제 (마지막 사용자일 때)
+ * - 모든 메시지를 Redis Pub/Sub으로 발행하여 다중 서버 동기화
+ * - 로컬 메모리와 Redis 하이브리드 방식으로 성능 최적화
  */
 @Slf4j
 @Service
 public class ChatRoomService {
     
     private final SimpMessagingTemplate messagingTemplate;
+    private final RedisStompMessagePublisher redisStompMessagePublisher;
+    private final RedisListenerConfig redisListenerConfig;
     
     // 룸별 세션 정보 저장 (roomId -> Set<sessionId>)
     private final ConcurrentMap<String, Set<String>> roomSessions = new ConcurrentHashMap<>();
@@ -33,12 +42,17 @@ public class ChatRoomService {
     // 룸별 참가자 수 카운터
     private final ConcurrentMap<String, AtomicInteger> roomParticipantCounts = new ConcurrentHashMap<>();
     
-    public ChatRoomService(SimpMessagingTemplate messagingTemplate) {
+    public ChatRoomService(SimpMessagingTemplate messagingTemplate,
+                          RedisStompMessagePublisher redisStompMessagePublisher,
+                          RedisListenerConfig redisListenerConfig) {
         this.messagingTemplate = messagingTemplate;
+        this.redisStompMessagePublisher = redisStompMessagePublisher;
+        this.redisListenerConfig = redisListenerConfig;
     }
     
     /**
      * 사용자가 특정 룸에 입장
+     * Redis 동적 구독 및 입장 이벤트 발행 포함
      */
     public void joinRoom(String roomId, String sessionId, String username) {
         log.info("사용자 {}(세션: {})가 룸 {}에 입장 요청", username, sessionId, roomId);
@@ -48,6 +62,10 @@ public class ChatRoomService {
         if (currentRoom != null && !currentRoom.equals(roomId)) {
             leaveRoom(currentRoom, sessionId);
         }
+        
+        // 룸이 처음 생성되는지 확인 (첫 번째 참가자)
+        boolean isFirstParticipant = !roomSessions.containsKey(roomId) || 
+                                   roomSessions.get(roomId).isEmpty();
         
         // 룸 세션 리스트에 추가
         roomSessions.computeIfAbsent(roomId, k -> new ConcurrentSkipListSet<>()).add(sessionId);
@@ -63,15 +81,26 @@ public class ChatRoomService {
                 .computeIfAbsent(roomId, k -> new AtomicInteger(0))
                 .incrementAndGet();
         
+        // 🚀 첫 번째 참가자인 경우 Redis 채널 동적 구독
+        if (isFirstParticipant) {
+            redisListenerConfig.subscribeToRoomChannels(roomId);
+            log.info("룸 {} 첫 번째 참가자 입장으로 Redis 채널 구독 시작", roomId);
+        }
+        
         log.info("룸 {} 입장 완료. 현재 참가자 수: {}", roomId, participantCount);
         
-        // 입장 메시지 브로드캐스트
+        // 입장 메시지 생성 및 Redis 발행
         RoomMessageDto joinMessage = RoomMessageDto.createJoinMessage(roomId, username, sessionId, participantCount);
-        broadcastToRoom(roomId, joinMessage);
+        
+        // 🌟 Redis Pub/Sub으로 입장 이벤트 발행 (다중 서버 동기화)
+        redisStompMessagePublisher.publishRoomMessage(roomId, joinMessage);
+        
+        log.debug("룸 {} 입장 이벤트 Redis 발행 완료: {}", roomId, username);
     }
     
     /**
      * 사용자가 특정 룸에서 퇴장
+     * Redis 구독 해제 및 퇴장 이벤트 발행 포함
      */
     public void leaveRoom(String roomId, String sessionId) {
         String username = sessionUsers.get(sessionId);
@@ -87,11 +116,15 @@ public class ChatRoomService {
         if (sessions != null) {
             sessions.remove(sessionId);
             
-            // 룸이 비어있으면 정리
+            // 룸이 비어있으면 정리 및 Redis 구독 해제
             if (sessions.isEmpty()) {
                 roomSessions.remove(roomId);
                 roomParticipantCounts.remove(roomId);
-                log.info("룸 {}가 비어서 정리되었습니다", roomId);
+                
+                // 🚀 마지막 참가자 퇴장으로 Redis 채널 구독 해제
+                redisListenerConfig.unsubscribeFromRoomChannels(roomId);
+                
+                log.info("룸 {}가 비어서 정리되었습니다. Redis 채널 구독 해제", roomId);
                 return;
             }
         }
@@ -105,9 +138,13 @@ public class ChatRoomService {
         
         log.info("룸 {} 퇴장 완료. 현재 참가자 수: {}", roomId, participantCount);
         
-        // 퇴장 메시지 브로드캐스트
+        // 퇴장 메시지 생성 및 Redis 발행
         RoomMessageDto leaveMessage = RoomMessageDto.createLeaveMessage(roomId, username, sessionId, participantCount);
-        broadcastToRoom(roomId, leaveMessage);
+        
+        // 🌟 Redis Pub/Sub으로 퇴장 이벤트 발행 (다중 서버 동기화)
+        redisStompMessagePublisher.publishRoomMessage(roomId, leaveMessage);
+        
+        log.debug("룸 {} 퇴장 이벤트 Redis 발행 완료: {}", roomId, username);
     }
     
     /**
@@ -127,17 +164,19 @@ public class ChatRoomService {
     }
     
     /**
-     * 특정 룸에 메시지 브로드캐스트
+     * 특정 룸에 메시지 브로드캐스트 (로컬 전용 - 기존 호환성 유지)
+     * Redis 통합 후에는 이 메서드보다 Redis 발행을 권장
      */
     public void broadcastToRoom(String roomId, RoomMessageDto message) {
         String destination = "/topic/room/" + roomId;
         messagingTemplate.convertAndSend(destination, message);
         
-        log.debug("룸 {}에 메시지 브로드캐스트: {}", roomId, message.getMessage());
+        log.debug("룸 {}에 로컬 메시지 브로드캐스트: {}", roomId, message.getMessage());
     }
     
     /**
      * 특정 룸에 채팅 메시지 전송
+     * Redis Pub/Sub 통합으로 다중 서버 동기화
      */
     public void sendChatMessage(String roomId, String sessionId, String message) {
         String username = sessionUsers.get(sessionId);
@@ -153,10 +192,13 @@ public class ChatRoomService {
             return;
         }
         
+        // 채팅 메시지 생성
         RoomMessageDto chatMessage = RoomMessageDto.createChatMessage(roomId, message, username, sessionId);
-        broadcastToRoom(roomId, chatMessage);
         
-        log.debug("룸 {}에 채팅 메시지 전송: {} - {}", roomId, username, message);
+        // 🌟 Redis Pub/Sub으로 채팅 메시지 발행 (다중 서버 동기화)
+        redisStompMessagePublisher.publishRoomMessage(roomId, chatMessage);
+        
+        log.debug("룸 {} 채팅 메시지 Redis 발행 완료: {} - {}", roomId, username, message);
     }
     
     /**

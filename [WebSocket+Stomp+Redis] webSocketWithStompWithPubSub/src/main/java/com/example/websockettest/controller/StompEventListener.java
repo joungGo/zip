@@ -2,6 +2,7 @@ package com.example.websockettest.controller;
 
 import com.example.websockettest.dto.StompMessage;
 import com.example.websockettest.service.ChatRoomService;
+import com.example.websockettest.service.RedisStompMessagePublisher;
 import com.example.websockettest.service.SessionCountService;
 import com.example.websockettest.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * STOMP WebSocket 세션 이벤트를 처리하는 리스너 클래스입니다.
+ * STOMP WebSocket 세션 이벤트를 처리하는 리스너 클래스 (Redis 통합)
  * 
  * 주요 기능:
  * 1. 세션 연결 이벤트 처리 (@EventListener) >> 즉, 사용자가 직접 이벤트를 발행하는 코드는 없고, Spring이 WebSocket 생명주기에 따라 자동으로 발행하는 시스템 이벤트들입니다.
@@ -28,6 +29,7 @@ import java.util.concurrent.ConcurrentMap;
  * 3. destination 구독/구독해제 이벤트 처리
  * 4. 사용자 세션 매핑 관리
  * 5. 연결 상태 알림 브로드캐스트
+ * 6. Redis Pub/Sub을 통한 세션 이벤트 다중 서버 동기화
  * 
  * Spring의 이벤트 기반 아키텍처를 활용하여
  * STOMP 세션 생명주기를 관리합니다.
@@ -53,6 +55,12 @@ public class StompEventListener {
      * 세션 해제 시 채팅방에서 정리 처리
      */
     private final ChatRoomService chatRoomService;
+    
+    /**
+     * Redis Pub/Sub 메시지 발행 서비스
+     * 세션 이벤트를 다른 서버들과 동기화
+     */
+    private final RedisStompMessagePublisher redisStompMessagePublisher;
 
     /**
      * 세션 ID와 사용자 정보를 매핑하는 동시성 안전 맵
@@ -113,6 +121,9 @@ public class StompEventListener {
                     .build();
 
             webSocketService.broadcastNotification(joinMessage, userInfo);
+            
+            // 🌟 Redis Pub/Sub으로 세션 연결 이벤트 발행 (다중 서버 동기화)
+            redisStompMessagePublisher.publishSessionConnectEvent(sessionId, username);
 
             log.info("✅ STOMP 세션 연결 처리 완료: sessionId={}, username={}, totalSessions={}", 
                     sessionId, username, totalSessions);
@@ -168,6 +179,10 @@ public class StompEventListener {
                         .build();
 
                 webSocketService.broadcastNotification(leaveMessage, userInfo);
+                
+                // 🌟 Redis Pub/Sub으로 세션 해제 이벤트 발행 (다중 서버 동기화)
+                String currentRoomId = chatRoomService.getCurrentRoom(sessionId);
+                redisStompMessagePublisher.publishSessionDisconnectEvent(sessionId, username, currentRoomId);
 
                 log.info("✅ STOMP 세션 해제 처리 완료: sessionId={}, username={}, duration={}ms, remainingSessions={}", 
                         sessionId, username, connectedDuration, remainingSessions);
