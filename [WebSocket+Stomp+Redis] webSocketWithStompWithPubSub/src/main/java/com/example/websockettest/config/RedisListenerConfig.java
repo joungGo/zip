@@ -92,7 +92,7 @@ public class RedisListenerConfig {
             
             // 룸 통합 채널 구독 (채팅, 입장, 퇴장 모든 메시지)
             String roomChannel = RedisChannelConfig.getRoomChannel(roomId); // 1. roomId를 이용해 채널명 생성
-            ChannelTopic roomTopic = new ChannelTopic(roomChannel); // 2. Redis 채널 토픽 생성
+            ChannelTopic roomTopic = new ChannelTopic(roomChannel); // 2. Redis 채널 토픽 생성 >> 토픽이란 Redis에서 메시지를 구독할 때 사용하는 채널의 이름
             redisMessageListenerContainer.addMessageListener(redisStompMessageSubscriber, roomTopic); // 3. 룸 채널에 메시지 리스너 등록
             
             // 구독 완료 기록
