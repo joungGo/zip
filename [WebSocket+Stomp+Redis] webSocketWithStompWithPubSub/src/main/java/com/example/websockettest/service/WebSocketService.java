@@ -2,7 +2,6 @@ package com.example.websockettest.service;
 
 import com.example.websockettest.dto.StompMessage;
 import com.example.websockettest.dto.SystemStatusDto;
-import com.example.websockettest.repository.WebSocketSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -39,11 +38,7 @@ public class WebSocketService {
      */
     private final SimpMessagingTemplate messagingTemplate;
 
-    /**
-     * WebSocket 세션 데이터를 관리하는 리포지토리
-     * final 키워드와 @RequiredArgsConstructor로 불변성과 의존성 주입을 보장
-     */
-    private final WebSocketSessionRepository sessionRepository;
+    // WebSocketSessionRepository 제거 - SessionCountService 단일 소스 사용
     
     /**
      * 세션 카운트 관리 서비스 - 실시간 세션 수 조회용
@@ -245,16 +240,11 @@ public class WebSocketService {
     public int getActiveSessionCount() {
         try {
             // 세션 카운트 서비스에서 실시간으로 추적하는 세션 수 사용
-            int sessionCountServiceCount = sessionCountService.getConnectedSessionCount();
+            int sessionCount = sessionCountService.getConnectedSessionCount();
             
-            // 기존 Repository 방식도 확인 (디버깅용)
-            int repositorySessionCount = sessionRepository.getActiveSessionCount();
+            log.debug("💚 활성 세션 수 조회: count={}", sessionCount);
             
-            log.debug("📊 활성 세션 수 조회: sessionCountService={}, repository={}", 
-                    sessionCountServiceCount, repositorySessionCount);
-            
-            // 세션 카운트 서비스의 카운트를 우선 사용
-            return sessionCountServiceCount;
+            return sessionCount;
         } catch (Exception e) {
             log.error("❌ 활성 세션 수 조회 실패: error={}", e.getMessage(), e);
             return 0;
