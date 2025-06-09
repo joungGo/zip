@@ -28,6 +28,7 @@ out/
 /logs/*
 /logs/websocket-app.log
 /logs/websocket-app.log.*
+.resources/images/*
 
 
 ### NetBeans ###
