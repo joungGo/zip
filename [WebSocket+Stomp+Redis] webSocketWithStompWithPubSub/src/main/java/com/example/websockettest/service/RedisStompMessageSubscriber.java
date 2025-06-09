@@ -115,8 +115,8 @@ public class RedisStompMessageSubscriber implements MessageListener {
      */
     private void handleSessionConnectEvent(String messageBody) {
         try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> connectEvent = objectMapper.readValue(messageBody, Map.class);
+            // 안전한 JSON 파싱 (이중 인코딩 처리)
+            Map<String, Object> connectEvent = parseJsonSafely(messageBody);
             
             log.debug("분산 세션 연결 이벤트 수신 - 세션: {}, 사용자: {}, 서버: {}", 
                      connectEvent.get("sessionId"), connectEvent.get("username"), connectEvent.get("serverId"));
@@ -124,7 +124,7 @@ public class RedisStompMessageSubscriber implements MessageListener {
             // 필요시 세션 통계 업데이트, 전역 알림 등 추가 처리 가능
             
         } catch (Exception e) {
-            log.error("세션 연결 이벤트 처리 실패", e);
+            log.error("세션 연결 이벤트 처리 실패 - 원본 메시지: {}", messageBody, e);
         }
     }
 
@@ -135,8 +135,8 @@ public class RedisStompMessageSubscriber implements MessageListener {
      */
     private void handleSessionDisconnectEvent(String messageBody) {
         try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> disconnectEvent = objectMapper.readValue(messageBody, Map.class);
+            // 안전한 JSON 파싱 (이중 인코딩 처리)
+            Map<String, Object> disconnectEvent = parseJsonSafely(messageBody);
             
             log.debug("분산 세션 해제 이벤트 수신 - 세션: {}, 사용자: {}, 룸: {}, 서버: {}", 
                      disconnectEvent.get("sessionId"), disconnectEvent.get("username"), 
@@ -145,7 +145,7 @@ public class RedisStompMessageSubscriber implements MessageListener {
             // 필요시 세션 정리, 통계 업데이트 등 추가 처리 가능
             
         } catch (Exception e) {
-            log.error("세션 해제 이벤트 처리 실패", e);
+            log.error("세션 해제 이벤트 처리 실패 - 원본 메시지: {}", messageBody, e);
         }
     }
 
@@ -159,8 +159,8 @@ public class RedisStompMessageSubscriber implements MessageListener {
      */
     private void handleGlobalBroadcast(String messageBody) {
         try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> globalMessage = objectMapper.readValue(messageBody, Map.class);
+            // 안전한 JSON 파싱 (이중 인코딩 처리)
+            Map<String, Object> globalMessage = parseJsonSafely(messageBody);
             
             // 전역 브로드캐스트를 /topic/global로 전송
             messagingTemplate.convertAndSend("/topic/global", globalMessage);
@@ -169,7 +169,7 @@ public class RedisStompMessageSubscriber implements MessageListener {
                     globalMessage.get("type"), globalMessage.get("message"));
             
         } catch (Exception e) {
-            log.error("전역 브로드캐스트 처리 실패", e);
+            log.error("전역 브로드캐스트 처리 실패 - 원본 메시지: {}", messageBody, e);
         }
     }
 
@@ -181,8 +181,8 @@ public class RedisStompMessageSubscriber implements MessageListener {
      */
     private void handleSystemNotification(String messageBody) {
         try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> notification = objectMapper.readValue(messageBody, Map.class);
+            // 안전한 JSON 파싱 (이중 인코딩 처리)
+            Map<String, Object> notification = parseJsonSafely(messageBody);
             
             // 시스템 알림을 /topic/system으로 전송
             messagingTemplate.convertAndSend("/topic/system", notification);
@@ -191,7 +191,45 @@ public class RedisStompMessageSubscriber implements MessageListener {
                     notification.get("level"), notification.get("notification"));
             
         } catch (Exception e) {
-            log.error("시스템 알림 처리 실패", e);
+            log.error("시스템 알림 처리 실패 - 원본 메시지: {}", messageBody, e);
+        }
+    }
+
+    // ============ 유틸리티 메서드 ============
+
+    /**
+     * 안전한 JSON 파싱 헬퍼 메서드
+     * 이중 JSON 인코딩이나 문자열 래핑 문제를 해결
+     * 
+     * @param messageBody 파싱할 JSON 문자열
+     * @return 파싱된 Map 객체
+     * @throws JsonProcessingException JSON 파싱 실패 시
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> parseJsonSafely(String messageBody) throws JsonProcessingException {
+        try {
+            // 첫 번째 시도: 직접 Map으로 파싱
+            return objectMapper.readValue(messageBody, Map.class);
+        } catch (JsonProcessingException e) {
+            log.debug("직접 Map 파싱 실패, JsonNode를 통한 파싱 시도: {}", e.getMessage());
+            
+            // 두 번째 시도: JsonNode로 먼저 파싱 후 타입 확인
+            var jsonNode = objectMapper.readTree(messageBody);
+            
+            // JsonNode가 문자열인 경우 (이중 인코딩)
+            if (jsonNode.isTextual()) {
+                String innerJson = jsonNode.asText();
+                log.debug("이중 JSON 인코딩 감지, 내부 JSON 파싱: {}", innerJson);
+                return objectMapper.readValue(innerJson, Map.class);
+            }
+            
+            // JsonNode가 객체인 경우 Map으로 변환
+            if (jsonNode.isObject()) {
+                return objectMapper.convertValue(jsonNode, Map.class);
+            }
+            
+            // 다른 타입인 경우 원본 예외 재발생
+            throw e;
         }
     }
 } 
