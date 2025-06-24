@@ -24,6 +24,20 @@ import java.util.concurrent.ConcurrentMap;
  * 
  * 주요 기능:
  * 1. 세션 연결 이벤트 처리 (@EventListener) >> 즉, 사용자가 직접 이벤트를 발행하는 코드는 없고, Spring이 WebSocket 생명주기에 따라 자동으로 발행하는 시스템 이벤트들입니다.
+ * CONNECT: 클라이언트가 WebSocket 연결을 설정하고 STOMP 프로토콜을 사용하겠다고 서버에 알립니다.
+ *
+ * Spring은 SessionConnectedEvent를 발생시킵니다.
+ * DISCONNECT: 클라이언트가 연결을 종료하거나 네트워크 문제가 발생했을 때 전송됩니다.
+ *
+ * Spring은 SessionDisconnectEvent를 발생시킵니다.
+ * SUBSCRIBE: 클라이언트가 특정 destination(예: /topic/messages)을 구독할 때 전송됩니다.
+ *
+ * Spring은 SessionSubscribeEvent를 발생시킵니다.
+ * UNSUBSCRIBE: 클라이언트가 특정 destination 구독을 해제할 때 전송됩니다.
+ *
+ * Spring은 SessionUnsubscribeEvent를 발생시킵니다.
+ * Spring은 이러한 STOMP 메시지를 WebSocket 핸드셰이크와 메시지 처리 과정에서 자동으로 감지하고, 해당 이벤트 객체를 생성하여 @EventListener로 등록된 메서드에 전달합니다. 이를 통해 개발자는 WebSocket 연결 상태 변화에 따른 비즈니스 로직을 쉽게 구현할 수 있습니다.
+ *
  * 2. 세션 해제 이벤트 처리
  * 3. destination 구독/구독해제 이벤트 처리
  * 4. 사용자 세션 매핑 관리

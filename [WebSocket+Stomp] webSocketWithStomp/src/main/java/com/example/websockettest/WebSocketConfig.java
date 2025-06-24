@@ -57,7 +57,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // Simple Message Broker 활성화
         // /topic: 브로드캐스트 메시지용 (채팅방, 공지사항 등)
         // /queue: 개별 사용자 메시지용 (1:1 메시지, 알림 등)
-        registry.enableSimpleBroker("/topic", "/queue");
+        registry.enableSimpleBroker("/topic", "/queue"); // /topic, /queue로 시작하는 모든 경로를 브로커가 처리하겠다는 선언 -> @SendTo() 사용
         
         // 클라이언트에서 서버로 보내는 메시지의 destination prefix 설정
         // 예: 클라이언트가 /app/chat으로 메시지 전송 → @MessageMapping("/chat") 메서드 호출
@@ -65,7 +65,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         
         // 사용자별 개별 메시지 전송을 위한 prefix 설정
         // /queue/reply-{userId} 형태로 개별 사용자에게 메시지 전송 가능
-        registry.setUserDestinationPrefix("/queue");
+        registry.setUserDestinationPrefix("/queue"); // @SendToUser() 사용
         
         // 외부 메시지 브로커 설정 (Redis, RabbitMQ 등) - 필요시 활성화
         // registry.enableStompBrokerRelay("/topic", "/queue")
